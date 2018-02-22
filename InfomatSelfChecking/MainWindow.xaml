@@ -1,0 +1,47 @@
+﻿<Window x:Class="InfomatSelfChecking.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InfomatSelfChecking"
+        mc:Ignorable="d"
+        Title="InfomatSelfChecking" Height="1024" Width="1280" WindowStartupLocation="CenterScreen" Topmost="False" WindowStyle="None" WindowState="Normal">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="70*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="15"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Stuff on line1&#x0a;Stuff on line 2" 
+               FontSize="50" 
+               FontFamily="Franklin Gothic"
+               FontWeight="DemiBold"
+               Foreground="White"
+               Background="ForestGreen"
+               x:Name="LabelTitle"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Center"
+               Visibility="Visible">
+            <Label.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="TextWrapping" Value="Wrap"/>
+                </Style>
+            </Label.Resources>
+        </Label>
+
+        <Frame Grid.Row="1" Grid.RowSpan="2" Source="/InfomatSelfChecking;component/PageWelcomeAnimation.xaml" NavigationUIVisibility="Hidden"/>
+        <Image Grid.Row="2" Source="Media/ButterflyClear.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20"/>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Media/BottomLineTemplate.png" Stretch="Fill"/>
+            <Image Grid.Column="1" Source="Media/BottomLineContinuesClear.png"/>
+        </Grid>
+    </Grid>
+</Window>
