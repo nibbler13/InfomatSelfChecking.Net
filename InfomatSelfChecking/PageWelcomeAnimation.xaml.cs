@@ -21,12 +21,12 @@ namespace InfomatSelfChecking {
 		public PageWelcomeAnimation() {
 			InitializeComponent();
 			PreviewMouseDown += PageWelcomeAnimation_PreviewMouseDown;
-			PageEnterNumber pageEnterNumber = new PageEnterNumber();
-			NavigationService.Navigate(pageEnterNumber);
 		}
 
 		private void PageWelcomeAnimation_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
 			Console.WriteLine("PageWelcomeAnimation_PreviewMouseDown");
+			PageEnterNumber pageEnterNumber = new PageEnterNumber();
+			NavigationService.Navigate(pageEnterNumber);
 		}
 
 		private void WelcomeAnimation_MediaEnded(object sender, RoutedEventArgs e) {

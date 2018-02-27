@@ -5,7 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InfomatSelfChecking"
         mc:Ignorable="d"
-        Title="InfomatSelfChecking" Height="1024" Width="1280" WindowStartupLocation="CenterScreen" Topmost="False" WindowStyle="None" WindowState="Normal">
+        Title="InfomatSelfChecking" 
+        Height="1024" 
+        Width="1280" 
+        WindowStartupLocation="CenterScreen" 
+        Topmost="False" 
+        WindowStyle="None" 
+        WindowState="Normal">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="15*"/>
@@ -31,7 +37,7 @@
             </Label.Resources>
         </Label>
 
-        <Frame Grid.Row="1" Grid.RowSpan="2" Source="/InfomatSelfChecking;component/PageWelcomeAnimation.xaml" NavigationUIVisibility="Hidden"/>
+        <Frame Grid.Row="1" Grid.RowSpan="2" NavigationUIVisibility="Hidden" Source="/InfomatSelfChecking;component/PageWelcomeAnimation.xaml"/>
         <Image Grid.Row="2" Source="Media/ButterflyClear.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20"/>
 
         <Grid Grid.Row="3">

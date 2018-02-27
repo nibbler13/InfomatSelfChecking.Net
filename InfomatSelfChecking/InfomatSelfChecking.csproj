@@ -65,14 +65,36 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataHandle.cs" />
     <Compile Include="FirebirdClient.cs" />
+    <Compile Include="ItemAppointment.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Mail.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PageAppointmentsNotFound.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PageAppointmentsShow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PageEnterNumber.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PagePatientNotFound.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PagePatientSelectedMultiple.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PagePatientSelectedSingle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -82,8 +104,24 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ItemPatient.cs" />
+    <Compile Include="PageAppointmentsNotFound.xaml.cs">
+      <DependentUpon>PageAppointmentsNotFound.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PageAppointmentsShow.xaml.cs">
+      <DependentUpon>PageAppointmentsShow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PageEnterNumber.xaml.cs">
       <DependentUpon>PageEnterNumber.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PagePatientNotFound.xaml.cs">
+      <DependentUpon>PagePatientNotFound.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PagePatientSelectedMultiple.xaml.cs">
+      <DependentUpon>PagePatientSelectedMultiple.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PagePatientSelectedSingle.xaml.cs">
+      <DependentUpon>PagePatientSelectedSingle.xaml</DependentUpon>
     </Compile>
     <Compile Include="PageWelcomeAnimation.xaml.cs">
       <DependentUpon>PageWelcomeAnimation.xaml</DependentUpon>
@@ -153,10 +191,12 @@
     <Content Include="Media\check-animation-v2.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Media\PicError.jpg" />
+    <Resource Include="Media\PicNotFound.jpg" />
+    <Resource Include="Media\PicPrinterError.jpg" />
     <Resource Include="Media\OutOfTimeIcon.png" />
     <Resource Include="Media\PicOk.png" />
     <Resource Include="Media\PicRegistry.png" />
-    <Resource Include="Media\PicRegistry2.png" />
     <Resource Include="Media\RubleIcon.png" />
     <Resource Include="Media\TimeIcon.png" />
     <Resource Include="Media\XrayIcon.png" />
