@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,174 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="appointments_mark_ok" xml:space="preserve">
+    <value>Отметка о посещении успешно проставлена
+
+Пожалуйста пройдите на приём</value>
+  </data>
+  <data name="appointments_mark_problem" xml:space="preserve">
+    <value>Для отметки о посещении
+просьба пройти в регистратуру</value>
+  </data>
+  <data name="appointments_print_ok" xml:space="preserve">
+    <value>Список записей успешно распечатан</value>
+  </data>
+  <data name="appointments_print_problem" xml:space="preserve">
+    <value>К сожалению, по техническим причинам
+не удалось распечатать список записей
+Информация о проблеме будет передана
+ответственным лицам</value>
+  </data>
+  <data name="appointments_warning_cash" xml:space="preserve">
+    <value>Имеются записи, запланированные за наличный расчет
+Необходимо заранее оплатить данные приёмы</value>
+  </data>
+  <data name="appointments_warning_general" xml:space="preserve">
+    <value>Для отметки о посещении необходимо обратиться в регистратуру</value>
+  </data>
+  <data name="appointments_warning_time" xml:space="preserve">
+    <value>Имеются записи с пропущенным временем начала
+Необходимо согласовать перенос на другое время</value>
+  </data>
+  <data name="appointments_warning_xray" xml:space="preserve">
+    <value>Имеются записи в рентгенологическое отделение</value>
+  </data>
+  <data name="notification_db_not_available" xml:space="preserve">
+    <value>К сожалению,
+cервис временно недоступен
+
+Попробуйте позднее
+или обратитесь в регистратуру</value>
+  </data>
+  <data name="notification_first_visit" xml:space="preserve">
+    <value>Вы впервые в нашей клинике,
+
+Пожалуйста, пройдите в регистратуру
+для оформления необходимых документов</value>
+  </data>
+  <data name="notification_need_go_to_registry" xml:space="preserve">
+    <value>Для отметки о посещении
+Вам необходимо обратиться в регистратуру</value>
+  </data>
+  <data name="notification_nothing_found" xml:space="preserve">
+    <value>К сожалению, по номеру *
+не найдено записей на сегодня
+
+Возможно указан неверный номер
+Попробуйте снова или обратитесь в регистратуру</value>
+  </data>
+  <data name="notification_no_appointmetns_for_now" xml:space="preserve">
+    <value>На ближайшее время у Вас нет записей
+
+За подробной информацией Вы можете
+обратиться в регистратуру</value>
+  </data>
+  <data name="notification_wrong_name" xml:space="preserve">
+    <value>Возможно введен неправильный номер телефона
+
+Попробуйте снова
+или обратитесь в регистратуру</value>
+  </data>
+  <data name="print_message_final_cash" xml:space="preserve">
+    <value>У Вас имеются записи за наличный расчет
+Просьба пройти в регистратуру для оплаты приёма</value>
+  </data>
+  <data name="print_message_final_multiple" xml:space="preserve">
+    <value>Для отметки о посещении
+Просьба пройти в регистратуру</value>
+  </data>
+  <data name="print_message_final_ok" xml:space="preserve">
+    <value>Просьба проходить на приём</value>
+  </data>
+  <data name="print_message_final_time" xml:space="preserve">
+    <value>У Вас имеются записи, у которых пропущено время начала
+Просьба пройти в регистратуру для согласования переноса</value>
+  </data>
+  <data name="print_message_final_xray" xml:space="preserve">
+    <value>У Вас имеются записи в рентгенологическое отделение
+Просьба пройти в регистратуру для отметки о посещении</value>
+  </data>
+  <data name="print_message_information_loyalty" xml:space="preserve">
+    <value>Пожалуйста, оцените качество
+приёма у врача,
+воспользовавшись терминалом,
+установленным в холле клиники
+
+Ваше мнение
+очень важно для нас!</value>
+  </data>
+  <data name="print_message_information_private_office" xml:space="preserve">
+    <value>В нашей клинике
+доступен новый сервис:
+«Личный кабинет пациента»
+
+Получить логин и пароль
+Вы можете при предъявлении
+паспорта в регистратуре</value>
+  </data>
+  <data name="print_message_time_late" xml:space="preserve">
+    <value>От начала ближайшего приёма прошло минут: @minutes</value>
+  </data>
+  <data name="print_message_time_ok" xml:space="preserve">
+    <value>До начала ближайшего приёма осталось минут: @minutes</value>
+  </data>
+  <data name="print_notification_cash" xml:space="preserve">
+    <value>Прием запланирован за наличный расчет</value>
+  </data>
+  <data name="print_notification_time" xml:space="preserve">
+    <value>Пропущено время начала приёма</value>
+  </data>
+  <data name="print_notification_xray" xml:space="preserve">
+    <value />
+  </data>
+  <data name="title_appointments" xml:space="preserve">
+    <value>*,
+Ваши записи на ближайшее время:</value>
+  </data>
+  <data name="title_dialer" xml:space="preserve">
+    <value>Для отметки о посещении
+введите Ваш номер мобильного телефона</value>
+  </data>
+  <data name="title_name_confirm" xml:space="preserve">
+    <value>Пожалуйста,
+убедитесь в соответствии Ваших данных:</value>
+  </data>
+  <data name="title_name_confirm_multiple" xml:space="preserve">
+    <value>Выберите пациента из списка:</value>
+  </data>
+  <data name="title_notification" xml:space="preserve">
+    <value>Уважаемый пациент!</value>
+  </data>
+  <data name="title_welcome" xml:space="preserve">
+    <value>Уважаемые пациенты!</value>
+  </data>
+  <data name="notification_tap_to_continue" xml:space="preserve">
+    <value>Для продолжения коснитесь экрана</value>
+  </data>
+  <data name="notification_welcome" xml:space="preserve">
+    <value>Обслуживаетесь по страховке?
+Здесь можно отметиться на приём!</value>
+  </data>
+  <data name="about_developer" xml:space="preserve">
+    <value>Разработка приложения:
+ООО "Клиника ЛМС"
+dev@bzklinika.ru</value>
+  </data>
+  <data name="show_appointments_cash" xml:space="preserve">
+    <value>- наличный расчет</value>
+  </data>
+  <data name="show_appointments_late" xml:space="preserve">
+    <value>- пропущено время</value>
+  </data>
+  <data name="show_appointments_roentgen" xml:space="preserve">
+    <value>- лучевая диагностика</value>
+  </data>
+  <data name="show_appointments_warning" xml:space="preserve">
+    <value>Имеются записи, по которым Вам нужно обратиться в регистратуру:</value>
+  </data>
 </root>

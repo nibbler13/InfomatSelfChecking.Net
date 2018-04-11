@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:InfomatSelfChecking"
         mc:Ignorable="d"
         Title="InfomatSelfChecking" 
-        Height="1024" 
         Width="1280" 
+        Height="1024" 
         WindowStartupLocation="CenterScreen" 
         Topmost="False" 
         WindowStyle="None" 
@@ -20,25 +20,57 @@
             <RowDefinition Height="15"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Stuff on line1&#x0a;Stuff on line 2" 
-               FontSize="50" 
-               FontFamily="Franklin Gothic"
-               FontWeight="DemiBold"
-               Foreground="White"
+        <Label x:Name="LabelTitle"
                Background="ForestGreen"
-               x:Name="LabelTitle"
+               Foreground="White"
                VerticalContentAlignment="Center"
-               HorizontalContentAlignment="Center"
-               Visibility="Visible">
-            <Label.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="TextWrapping" Value="Wrap"/>
-                </Style>
-            </Label.Resources>
+               HorizontalContentAlignment="Center">
+            <TextBlock Text="Stuff on line1&#x0a;Stuff on line 2 long long long" 
+                       TextWrapping="Wrap" 
+                       TextAlignment="Center"
+                       x:Name="TextBlockTitle"/>
         </Label>
 
-        <Frame Grid.Row="1" Grid.RowSpan="2" NavigationUIVisibility="Hidden" Source="/InfomatSelfChecking;component/PageWelcomeAnimation.xaml"/>
-        <Image Grid.Row="2" Source="Media/ButterflyClear.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20"/>
+        <WrapPanel Orientation="Horizontal" 
+                   HorizontalAlignment="Right" 
+                   VerticalAlignment="Top"
+                   Height="{Binding ElementName=TextBlockTimeHours,Path=ActualHeight}" 
+                   Margin="20">
+            <Image Source="Media/IconTime.png" 
+                   Margin="0,5,10,5"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+            
+            <TextBlock Text="00" 
+                       x:Name="TextBlockTimeHours"
+                       Foreground="White" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"/>
+
+            <TextBlock Text=":" 
+                       x:Name="TextBlockTimeSplitter"
+                       Foreground="White" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"/>
+
+            <TextBlock Text="00" 
+                       x:Name="TextBlockTimeMinutes"
+                       Foreground="White" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"/>
+        </WrapPanel>
+
+        <Frame Grid.Row="1" 
+               Grid.RowSpan="2" 
+               NavigationUIVisibility="Hidden" 
+               Margin="20"
+               x:Name="FrameMain"/>
+        
+        <Image Grid.Row="2" 
+               Source="Media/ButterflyClear.png" 
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Bottom" 
+               Margin="0,0,20,20" 
+               x:Name="ImageLogo"/>
 
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>

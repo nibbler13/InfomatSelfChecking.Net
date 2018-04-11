@@ -1,0 +1,120 @@
+﻿<Page x:Class="InfomatSelfChecking.PageShowAppointments"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:InfomatSelfChecking"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" 
+      d:DesignWidth="800"
+      Title="PageAppointmentsShow">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="85*"/>
+            <RowDefinition Height="15*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid x:Name="GridAppointments" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Grid.ColumnSpan="8"
+                   Background="#FFF0F0F0"/>
+
+            <Border Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="2" BorderBrush="White">
+            </Border>
+            <TextBlock Grid.Column="1"
+                       Text="Время" 
+                       Margin="10,0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+
+            <Border Grid.Column="2" BorderThickness="2" BorderBrush="White">
+                <TextBlock Text="Кабинет" 
+                           Margin="10,0"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            
+            <Border Grid.Column="3" BorderThickness="2" BorderBrush="White">
+                <TextBlock Text="Отделение" 
+                           Margin="10,0"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </Border>
+            
+            <Border Grid.Column="4" Grid.ColumnSpan="4" BorderThickness="2" BorderBrush="White">
+                <TextBlock Text="Специалист" 
+                           Margin="10,0"
+                           VerticalAlignment="Center"/>
+            </Border>
+        </Grid>
+
+        <Button Grid.Row="1"
+                Grid.Column="0"
+                Content="Закрыть"
+                Margin="20"
+                BorderThickness="0"
+                x:Name="ButtonClose"
+                Visibility="Hidden"
+                Click="ButtonClose_Click">
+            <Button.Effect>
+            <DropShadowEffect Opacity="0.3"/>
+            </Button.Effect> 
+        </Button>
+
+        <Button Grid.Row="1" 
+                Grid.Column="1" 
+                Margin="20" 
+                Click="ButtonBeNotedAndPrint_CLick"
+                BorderThickness="0"
+                x:Name="ButtonBeNotedAndPrint"
+                VerticalContentAlignment="Center">
+            <Button.Content>
+                <TextBlock Text="Отметиться" TextAlignment="Center" VerticalAlignment="Center"/>
+            </Button.Content>
+            <Button.Effect>
+                <DropShadowEffect Opacity="0.3"/>
+            </Button.Effect>
+        </Button>
+
+        <Button Grid.Row="1"
+                Grid.Column="2"
+                Margin="20"
+                BorderThickness="0"
+                x:Name="ButtonPrintAndClose"
+                Visibility="Hidden"
+                Click="ButtonPrintAndClose_Click">
+            <Button.Content>
+                <TextBlock Text="Распечатать" TextAlignment="Center"/>
+            </Button.Content>
+            <Button.Effect>
+                <DropShadowEffect Opacity="0.3"/>
+            </Button.Effect>
+        </Button>
+    </Grid>
+</Page>

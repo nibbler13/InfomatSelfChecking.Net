@@ -5,47 +5,68 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:InfomatSelfChecking"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="800"
-      Title="PageEnterNumber"
-      FontSize="40">
+      d:DesignHeight="600" 
+      d:DesignWidth="800"
+      Title="PageEnterNumber">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*"/>
-            <RowDefinition Height="80*"/>
+            <RowDefinition Height="65*" x:Name="RowButtons"/>
+            <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="+7 (___) ___-__-__" FontSize="60" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" x:Name="TextBoxEntered"/>
+        <TextBlock Text="+7 (___) ___-__-__" 
+                   FontWeight="Heavy" 
+                   TextAlignment="Center" 
+                   VerticalAlignment="Center" 
+                   x:Name="TextBlockEntered"/>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" 
+              HorizontalAlignment="Center"
+              x:Name="GridNumbers"
+              Margin="0,20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="{Binding ElementName=Button1,Path=ActualHeight}"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="{Binding ElementName=Button1,Path=ActualHeight}"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="{Binding ElementName=Button1,Path=ActualHeight}"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>
+                <RowDefinition Height="30"/>
                 <RowDefinition/>
+                <RowDefinition Height="30"/>
                 <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="30"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button Content="1" Grid.Row="0" Grid.Column="1" Margin="10" Click="Button_Click"/>
-            <Button Content="2" Grid.Row="0" Grid.Column="2" Margin="10" Click="Button_Click"/>
-            <Button Content="3" Grid.Row="0" Grid.Column="3" Margin="10" Click="Button_Click"/>
-            <Button Content="4" Grid.Row="1" Grid.Column="1" Margin="10" Click="Button_Click"/>
-            <Button Content="5" Grid.Row="1" Grid.Column="2" Margin="10" Click="Button_Click"/>
-            <Button Content="6" Grid.Row="1" Grid.Column="3" Margin="10" Click="Button_Click"/>
-            <Button Content="7" Grid.Row="2" Grid.Column="1" Margin="10" Click="Button_Click"/>
-            <Button Content="8" Grid.Row="2" Grid.Column="2" Margin="10" Click="Button_Click"/>
-            <Button Content="9" Grid.Row="2" Grid.Column="3" Margin="10" Click="Button_Click"/>
-            <Button Content="C" Grid.Row="3" Grid.Column="1" Margin="10" x:Name="ButtonClear" Click="ButtonClear_Click" IsEnabled="False"/>
-            <Button Content="0" Grid.Row="3" Grid.Column="2" Margin="10" Click="Button_Click"/>
-            <Button Content="&lt;" Grid.Row="3" Grid.Column="3" Margin="10" x:Name="ButtonRemoveOne" Click="ButtonRemoveOne_Click" IsEnabled="False"/>
-            <Button Content="Продолжить" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="10" x:Name="ButtonContinue" Click="ButtonContinue_Click" IsEnabled="False"/>
+            <Button Content="1" Grid.Row="0" Grid.Column="0" Click="Button_Click" BorderThickness="0" x:Name="Button1"/>
+            <Button Content="2" Grid.Row="0" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="3" Grid.Row="0" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="4" Grid.Row="2" Grid.Column="0" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="5" Grid.Row="2" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="6" Grid.Row="2" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="7" Grid.Row="4" Grid.Column="0" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="8" Grid.Row="4" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="9" Grid.Row="4" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="C" Grid.Row="6" Grid.Column="0" x:Name="ButtonClear" Click="ButtonClear_Click" IsEnabled="False" BorderThickness="0"/>
+            <Button Content="0" Grid.Row="6" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
+            <Button Content="&lt;" Grid.Row="6" Grid.Column="4" x:Name="ButtonRemoveOne" Click="ButtonRemoveOne_Click" IsEnabled="False" BorderThickness="0"/>
         </Grid>
+        
+        <Button Content="Продолжить" 
+                Grid.Row="3" 
+                Margin="20" 
+                x:Name="ButtonContinue"
+                Click="ButtonContinue_Click"
+                IsEnabled="False"
+                BorderThickness="0" 
+                Width="{Binding ElementName=GridNumbers,Path=ActualWidth}">
+            <Button.Effect>
+                <DropShadowEffect Opacity="0.3"/>
+            </Button.Effect>
+        </Button>
     </Grid>
 </Page>

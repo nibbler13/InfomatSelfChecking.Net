@@ -39,6 +39,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -65,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ControlsFactory.cs" />
     <Compile Include="DataHandle.cs" />
     <Compile Include="FirebirdClient.cs" />
     <Compile Include="ItemAppointment.cs" />
@@ -74,11 +76,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="PageAppointmentsNotFound.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PageAppointmentsShow.xaml">
+    <Page Include="PageShowAppointments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -86,45 +84,28 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PagePatientNotFound.xaml">
+    <Page Include="PageNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PagePatientSelectedMultiple.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PagePatientSelectedSingle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PageWelcomeAnimation.xaml">
+    <Page Include="PagePatientConfirmation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItemPatient.cs" />
-    <Compile Include="PageAppointmentsNotFound.xaml.cs">
-      <DependentUpon>PageAppointmentsNotFound.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PageAppointmentsShow.xaml.cs">
-      <DependentUpon>PageAppointmentsShow.xaml</DependentUpon>
+    <Compile Include="PageShowAppointments.xaml.cs">
+      <DependentUpon>PageShowAppointments.xaml</DependentUpon>
     </Compile>
     <Compile Include="PageEnterNumber.xaml.cs">
       <DependentUpon>PageEnterNumber.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PagePatientNotFound.xaml.cs">
-      <DependentUpon>PagePatientNotFound.xaml</DependentUpon>
+    <Compile Include="PageNotification.xaml.cs">
+      <DependentUpon>PageNotification.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PagePatientSelectedMultiple.xaml.cs">
-      <DependentUpon>PagePatientSelectedMultiple.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PagePatientSelectedSingle.xaml.cs">
-      <DependentUpon>PagePatientSelectedSingle.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PageWelcomeAnimation.xaml.cs">
-      <DependentUpon>PageWelcomeAnimation.xaml</DependentUpon>
+    <Compile Include="PagePatientConfirmation.xaml.cs">
+      <DependentUpon>PagePatientConfirmation.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -140,7 +121,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -187,19 +168,18 @@
     <Resource Include="Media\ButterflyClear.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\AnimationCheckOk.avi" />
     <Content Include="Media\check-animation-v2.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Media\PicPrinterError.png" />
+    <Resource Include="Media\PicRegistry.png" />
+    <Resource Include="Media\IconTime.png" />
+    <Resource Include="Media\IconCash.png" />
+    <Resource Include="Media\IconLate.png" />
+    <Resource Include="Media\IconXray.png" />
     <Resource Include="Media\PicError.jpg" />
     <Resource Include="Media\PicNotFound.jpg" />
-    <Resource Include="Media\PicPrinterError.jpg" />
-    <Resource Include="Media\OutOfTimeIcon.png" />
     <Resource Include="Media\PicOk.png" />
-    <Resource Include="Media\PicRegistry.png" />
-    <Resource Include="Media\RubleIcon.png" />
-    <Resource Include="Media\TimeIcon.png" />
-    <Resource Include="Media\XrayIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

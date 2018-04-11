@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -37,14 +38,49 @@ namespace InfomatSelfChecking {
 				foreach (char symbol in enteredNumber)
 					enteredPhone = regex.Replace(enteredPhone, symbol.ToString(), 1);
 
-				TextBoxEntered.Text = enteredPhone;
+				TextBlockEntered.Text = enteredPhone;
 			}
 		}
+
+
+
 
 		public PageEnterNumber() {
 			InitializeComponent();
 
 			EnteredNumber = "9601811873";
+			ButtonContinue.Background = MainWindow.BrushButtonOkBackground;
+			ButtonContinue.Foreground = MainWindow.BrushTextHeaderForeground;
+
+			foreach (Control item in GridNumbers.Children)
+				item.Effect = ControlsFactory.CreateDropShadowEffect();
+
+			MainWindow.ConfigurePage(this);
+			MainWindow.AppMainWindow.SetUpWindows(true, Properties.Resources.title_dialer, false);
+			TextBlockEntered.FontSize = FontSize * 2;
+
+			ButtonClear.IsEnabledChanged += Button_IsEnabledChanged;
+			ButtonRemoveOne.IsEnabledChanged += Button_IsEnabledChanged;
+			ButtonContinue.IsEnabledChanged += Button_IsEnabledChanged;
+		}
+
+		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
+			Button button = sender as Button;
+			if (button == null)
+				return;
+
+			if ((bool)e.NewValue == true) {
+				button.Effect = ControlsFactory.CreateDropShadowEffect();
+				if (button == ButtonContinue) {
+					button.Foreground = MainWindow.BrushTextHeaderForeground;
+				} else {
+					button.Foreground = MainWindow.BrushTextForeground;
+				}
+
+			} else {
+				button.Effect = null;
+				button.Foreground = MainWindow.BrushTextDisabledForeground;
+			}
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e) {
@@ -67,13 +103,17 @@ namespace InfomatSelfChecking {
 				return;
 
 			List<ItemPatient> patients = DataHandle.GetPatients(enteredNumber.Substring(0, 3), enteredNumber.Substring(3, 7));
+			Page page = null;
+
 			if (patients.Count == 0) {
-				PagePatientNotFound pagePatientNotFound = new PagePatientNotFound();
-				NavigationService.Navigate(pagePatientNotFound);
-			} else if (patients.Count == 1) {
-				PagePatientSelectedSingle pagePatientSelectedSingle = new PagePatientSelectedSingle(patients.First());
-				NavigationService.Navigate(pagePatientSelectedSingle);
+				page = new PageNotification(PageNotification.NotificationType.NumberNotFound, TextBlockEntered.Text);
+			} else if (patients.Count > 4) {
+				page = new PageNotification(PageNotification.NotificationType.TooManyPatients);
+			} else {
+				page = new PagePatientConfirmation(patients);
 			}
+
+			NavigationService.Navigate(page);
 		}
 	}
 }
