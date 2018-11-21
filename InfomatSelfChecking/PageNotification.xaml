@@ -17,34 +17,37 @@
         </Grid.RowDefinitions>
 
         <!--Need to work click preview-->
-        <TextBlock Grid.RowSpan="2"/>
+        <TextBlock Grid.RowSpan="4"/>
 
         <TextBlock TextAlignment="Center" 
                    VerticalAlignment="Center"
                    x:Name="TextBlockTop"/>
 
         <MediaElement Grid.Row="1" 
+                      Grid.RowSpan="2"
                       Source="Media/check-animation-v2.gif" 
                       x:Name="MediaElementWelcomeAnimation" 
                       UnloadedBehavior="Manual" 
                       MediaEnded="MediaElementWelcomeAnimation_MediaEnded"
-                      Visibility="Hidden"/>
+                      Visibility="Hidden"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center"/>
 
         <Image Grid.Row="1" 
-               Margin="60"
+               Margin="120"
                x:Name="ImageCenter"/>
 
         <TextBlock Grid.Row="2" 
                    TextAlignment="Center"
                    VerticalAlignment="Center"
-                   x:Name="TextBlockBottom"/>
+                   x:Name="TextBlockBottom"
+                   Margin="0,0,0,60"/>
 
         <TextBlock Text="{x:Static local:Resources.notification_tap_to_continue}"
                    Grid.Row="3"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Center"
-                   x:Name="TextBlockTapToContinue"
-                   Margin="0,60,0,0"/>
+                   x:Name="TextBlockTapToContinue"/>
 
         <TextBlock Grid.RowSpan="4"
                    Text="{x:Static local:Resources.about_developer}" 

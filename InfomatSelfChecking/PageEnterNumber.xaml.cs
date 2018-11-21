@@ -48,25 +48,29 @@ namespace InfomatSelfChecking {
 		public PageEnterNumber() {
 			InitializeComponent();
 
-			EnteredNumber = "9601811873";
-			ButtonContinue.Background = MainWindow.BrushButtonOkBackground;
-			ButtonContinue.Foreground = MainWindow.BrushTextHeaderForeground;
+			EnteredNumber = "1111111111";
+			//ButtonContinue.Background = MainWindow.BrushButtonOkBackground;
+			//ButtonContinue.Foreground = MainWindow.BrushTextHeaderForeground;
 
-			foreach (Control item in GridNumbers.Children)
+			foreach (Control item in GridNumbers.Children) {
 				item.Effect = ControlsFactory.CreateDropShadowEffect();
+				if (item is Button button)
+					button.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+			}
 
 			MainWindow.ConfigurePage(this);
-			MainWindow.AppMainWindow.SetUpWindows(true, Properties.Resources.title_dialer, false);
+			MainWindow.AppMainWindow.SetUpWindow(true, Properties.Resources.title_dialer, false);
 			TextBlockEntered.FontSize = FontSize * 2;
 
 			ButtonClear.IsEnabledChanged += Button_IsEnabledChanged;
 			ButtonRemoveOne.IsEnabledChanged += Button_IsEnabledChanged;
 			ButtonContinue.IsEnabledChanged += Button_IsEnabledChanged;
+
+			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
 		}
 
 		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			Button button = sender as Button;
-			if (button == null)
+			if (!(sender is Button button))
 				return;
 
 			if ((bool)e.NewValue == true) {

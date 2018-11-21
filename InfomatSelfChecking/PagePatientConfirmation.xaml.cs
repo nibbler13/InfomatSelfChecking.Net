@@ -29,8 +29,8 @@ namespace InfomatSelfChecking {
 
 			string title;
 			if (patients.Count == 1) {
-				TextBlockName.Text = patients[0].FirstName + " " + patients[0].MiddleName;
-				TextBlockBirhtday.Text = "Дата рождения: " + patients[0].Birthday;
+				TextBlockName.Text = patients[0].Name;
+				TextBlockBirthday.Text = "Дата рождения: " + patients[0].Birthday;
 				title = Properties.Resources.title_name_confirm;
 			} else {
 				GridSinglePatient.Visibility = Visibility.Hidden;
@@ -44,14 +44,17 @@ namespace InfomatSelfChecking {
 				isLogoVisible = true;
 				returnBack = true;
 			}
-			
-			ButtonContinue.Background = MainWindow.BrushButtonOkBackground;
-			ButtonContinue.Foreground = MainWindow.BrushTextHeaderForeground;
+
+			ButtonWrong.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
 
 			MainWindow.ConfigurePage(this);
 
+			TextBlockName.FontSize = FontSize * 1.3;
+			TextBlockBirthday.FontSize = FontSize * 1.3;
+
 			Loaded += (s, e) => {
-				MainWindow.AppMainWindow.SetUpWindows(isLogoVisible, title, false);
+				MainWindow.AppMainWindow.SetUpWindow(isLogoVisible, title, false);
 			};
         }
 
@@ -62,8 +65,7 @@ namespace InfomatSelfChecking {
 				if (row > 1)
 					GridMultiplePatients.RowDefinitions.Add(new RowDefinition());
 
-				string text = patient.FirstName + " " +
-						patient.MiddleName + Environment.NewLine +
+				string text = patient.Name + Environment.NewLine +
 						"Дата рождения: " + patient.Birthday;
 				TextBlock textBlock = ControlsFactory.CreateTextBlock(text, margin: new Thickness(10));
 				Button button = ControlsFactory.CreateButton(textBlock, margin: new Thickness(20), tag: patient);
@@ -77,7 +79,7 @@ namespace InfomatSelfChecking {
 				Grid.SetRow(image, row);
 				Grid.SetColumn(image, 3);
 				GridMultiplePatients.Children.Add(image);
-				patient.image = image;
+				patient.CheckStateImage = image;
 				
 				row++;
 			}
@@ -116,7 +118,7 @@ namespace InfomatSelfChecking {
 				return;
 			}
 
-			patient.Appointments = DataHandle.GetAppointments(patient.PCode);
+			DataHandle.UpdatePatientAppointments(ref patient);
 			bool isOk;
 
 			if (patient.Appointments.Count == 0) {
@@ -138,11 +140,11 @@ namespace InfomatSelfChecking {
 		}
 
 		private void SetImage(ItemPatient patient, bool isOk) {
-			if (patient.image != null) {
+			if (patient.CheckStateImage != null) {
 				if (!isOk) 
-					patient.image.Source = ControlsFactory.GetImage(ControlsFactory.ImageType.NotificationRegistry);
+					patient.CheckStateImage.Source = ControlsFactory.GetImage(ControlsFactory.ImageType.NotificationRegistry);
 
-				patient.image.Visibility = Visibility.Visible;
+				patient.CheckStateImage.Visibility = Visibility.Visible;
 			}
 		}
 	}

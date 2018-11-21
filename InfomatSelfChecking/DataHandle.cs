@@ -8,13 +8,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
-    public class DataHandle {
-		private static string sqlGetPatients = Properties.Settings.Default.MisDbSqlGetPatients;
-		private static string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
-		private static string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckState;
-		private static FirebirdClient fbClient = new FirebirdClient(
+    public static class DataHandle {
+		private static readonly string sqlGetPatients = Properties.Settings.Default.MisDbSqlGetPatients;
+		private static readonly string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
+		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckState;
+		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
+		private static bool isThisAMoscowFilial;
+
+		static DataHandle() {
+			isThisAMoscowFilial = IsThisMoscowFilial();
+		}
+
+		private static readonly FirebirdClient fbClient = new FirebirdClient(
 			Properties.Settings.Default.MisDbAddress,
 			Properties.Settings.Default.MisDbName,
+			Properties.Settings.Default.MisDbUser,
+			Properties.Settings.Default.MisDbPassword);
+
+		private static readonly FirebirdClient fbClientCentralDb = new FirebirdClient(
+			Properties.Settings.Default.MisDbCentralAddress,
+			Properties.Settings.Default.MisDbCentralName,
 			Properties.Settings.Default.MisDbUser,
 			Properties.Settings.Default.MisDbPassword);
 
@@ -31,13 +44,8 @@ namespace InfomatSelfChecking {
 					ItemPatient itemPatient = new ItemPatient() {
 						PhoneNumber = prefix + number,
 						PCode = row["PCODE"].ToString(),
-						FirstName = row["FIRSTNAME"].ToString(),
-						MiddleName = row["MIDNAME"].ToString(),
-						Birthday = row["BDATE"].ToString(),
-						IsFirstVisit = row["FIRSTVISIT"].ToString().Equals("1") ? true : false,
-						IsCardBlocked = row["CARDBLOCKED"].ToString().Equals("1") ? true : false,
-						HasOnlineAccount = row["LK"].ToString().Equals("1") ? true : false,
-						Sex = int.Parse(row["POL"].ToString())
+						Name = row["CNAME"].ToString(),
+						Birthday = row["BDATE"].ToString().Split(' ')[0]
 					};
 
 					patients.Add(itemPatient);
@@ -47,17 +55,17 @@ namespace InfomatSelfChecking {
 			}
 
 			if (Debugger.IsAttached) {
-				patients.Add(new ItemPatient() {
-					PhoneNumber = prefix + number,
-					PCode = "00000001",
-					FirstName = "Павел",
-					MiddleName = "Павлович",
-					Birthday = "21.10.1987",
-					IsFirstVisit = false,
-					IsCardBlocked = false,
-					HasOnlineAccount = false,
-					Sex = 0
-				});
+				//patients.Add(new ItemPatient() {
+				//	PhoneNumber = prefix + number,
+				//	PCode = "00000001",
+				//	FirstName = "Павел",
+				//	MiddleName = "Павлович",
+				//	Birthday = "21.10.1987",
+				//	IsFirstVisit = false,
+				//	IsCardBlocked = false,
+				//	HasOnlineAccount = false,
+				//	Sex = 0
+				//});
 
 				//patients.Add(new ItemPatient() {
 				//	PhoneNumber = prefix + number,
@@ -99,10 +107,12 @@ namespace InfomatSelfChecking {
 			return patients;
 		}
 
-		public static List<ItemAppointment> GetAppointments(string pcode) {
-			List<ItemAppointment> appointments = new List<ItemAppointment>();
+		public static void UpdatePatientAppointments(ref ItemPatient patient) {
+			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pCode", patient.PCode } };
 
-			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pcode", pcode } };
+			if (isThisAMoscowFilial && IsCentralDbAvailable())
+				fbClient.ExecuteUpdateQuery(sqlSynchronizeMoscowClientInfo, parameters);
+
 			DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters);
 
 			foreach (DataRow row in dataTable.Rows) {
@@ -121,25 +131,25 @@ namespace InfomatSelfChecking {
 						ClVisit = row["CLVISIT"].ToString()
 					};
 
-					appointments.Add(itemAppointment);
+					patient.Appointments.Add(itemAppointment);
 				} catch (Exception e) {
 					Logging.LogMessageToFile(e.Message + Environment.NewLine + e.StackTrace);
 				}
 			}
 
 			if (Debugger.IsAttached) {
-				appointments.Add(new ItemAppointment() {
-					SchedID = "000001",
-					DateTimeBegin = DateTime.Parse("27.03.2018 15:00"),
-					DName = "Проверкин П.П.",
-					DepName = "Терапия",
-					DepShortName = "ТЕР",
-					RNum = "№201",
-					IsLate = false,
-					IsCash = false,
-					IsRoentgen = false,
-					ClVisit = "",
-				});
+				//appointments.Add(new ItemAppointment() {
+				//	SchedID = "000001",
+				//	DateTimeBegin = DateTime.Parse("27.03.2018 15:00"),
+				//	DName = "Проверкин П.П.",
+				//	DepName = "Терапия",
+				//	DepShortName = "ТЕР",
+				//	RNum = "№201",
+				//	IsLate = false,
+				//	IsCash = false,
+				//	IsRoentgen = false,
+				//	ClVisit = "",
+				//});
 
 				//Random random = new Random();
 				//bool isCash = random.Next(0, 2) == 0 ? true : false;
@@ -197,12 +207,24 @@ namespace InfomatSelfChecking {
 				//	ClVisit = "",
 				//});
 			}
-			
-			return appointments;
+		}
+
+		private static bool IsCentralDbAvailable() {
+			return fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
 		}
 
 		public static bool IsDbAlive() {
 			return fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
+		}
+
+		public static bool IsThisMoscowFilial() {
+			try {
+				return fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial, 
+					new Dictionary<string, object>()).Rows[0][0].ToString().Equals("1");
+			} catch (Exception e) {
+				Logging.LogMessageToFile(e.Message + Environment.NewLine + e.StackTrace);
+				return false;
+			}
 		}
     }
 }

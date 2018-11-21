@@ -29,14 +29,16 @@
                        TextAlignment="Center" 
                        VerticalAlignment="Bottom"
                        Margin="20"
-                       x:Name="TextBlockName"/>
+                       x:Name="TextBlockName"
+                       FontWeight="DemiBold"/>
 
             <TextBlock Grid.Row="1" 
                        Text="Birthday" 
                        TextAlignment="Center" 
                        VerticalAlignment="Top" 
                        Margin="20"
-                       x:Name="TextBlockBirhtday"/>
+                       x:Name="TextBlockBirthday"
+                       FontWeight="DemiBold"/>
         </Grid>
 
         <Grid Grid.ColumnSpan="3" 
@@ -61,7 +63,7 @@
                 BorderThickness="0"
                 Margin="20">
             <Button.Effect>
-                <DropShadowEffect Opacity="0.3"/>
+                <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
             </Button.Effect>
         </Button>
 
@@ -71,9 +73,10 @@
                 x:Name="ButtonContinue"
                 Click="ButtonContinue_Click"
                 BorderThickness="0"
-                Margin="20">
+                Margin="20"
+                Foreground="White">
             <Button.Effect>
-                <DropShadowEffect Opacity="0.3"/>
+                <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
             </Button.Effect>
         </Button>
     </Grid>

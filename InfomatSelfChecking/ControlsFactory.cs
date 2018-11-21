@@ -72,9 +72,9 @@ namespace InfomatSelfChecking {
 			DropShadowEffect effect = new DropShadowEffect {
 				Color = Colors.Black,
 				Direction = 315,
-				BlurRadius = 5,
+				BlurRadius = 10,
 				ShadowDepth = 5,
-				Opacity = 0.3
+				Opacity = 0.2
 			};
 			return effect;
 		}

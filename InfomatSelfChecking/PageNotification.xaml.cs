@@ -95,7 +95,7 @@ namespace InfomatSelfChecking {
 				TextBlockAboutDeveloper.FontSize = FontSize / 2;
 			}
 
-			MainWindow.AppMainWindow.SetUpWindows(true, title, isError);
+			MainWindow.AppMainWindow.SetUpWindow(true, title, isError);
 		}
 
 		private void PageNotification_PreviewMouseDown(object sender, MouseButtonEventArgs e) {

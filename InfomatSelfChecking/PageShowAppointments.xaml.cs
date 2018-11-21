@@ -97,13 +97,13 @@ namespace InfomatSelfChecking {
 
 				Label label = new Label() {
 					Content = Properties.Resources.show_appointments_warning,
-					Background = MainWindow.ConvertColorToBrush(Properties.Settings.Default.ColorHeaderErrorBackground),
+					Background = Brushes.Orange,
 					Foreground = MainWindow.BrushTextHeaderForeground,
 					VerticalAlignment = VerticalAlignment.Stretch,
 					VerticalContentAlignment = VerticalAlignment.Center,
 					HorizontalAlignment = HorizontalAlignment.Stretch,
 					HorizontalContentAlignment = HorizontalAlignment.Center,
-					FontFamily = new FontFamily(Properties.Settings.Default.FontAppointments.Name),
+					FontFamily = new FontFamily("Franklin Gothic Book"),
 					FontSize = MainWindow.FontSizeMain * 1.0
 				};
 				Grid.SetRow(label, row++);
@@ -130,7 +130,7 @@ namespace InfomatSelfChecking {
 
 					TextBlock textBlock = ControlsFactory.CreateTextBlock(warning.Value, margin: new Thickness(10, 0, 10, 0));
 					textBlock.FontSize = MainWindow.FontSizeMain * 0.9;
-					textBlock.FontFamily = new FontFamily(Properties.Settings.Default.FontAppointments.Name);
+					textBlock.FontFamily = new FontFamily("Franklin Gothic Book");
 					stackPanel.Children.Add(textBlock);
 				}
 
@@ -138,12 +138,12 @@ namespace InfomatSelfChecking {
 				Grid.SetColumnSpan(stackPanel, 8);
 				GridAppointments.Children.Add(stackPanel);
 			} else {
-				ButtonBeNotedAndPrint.Foreground = MainWindow.BrushTextHeaderForeground;
-				ButtonBeNotedAndPrint.Background = MainWindow.BrushButtonOkBackground;
+				//ButtonBeNotedAndPrint.Foreground = MainWindow.BrushTextHeaderForeground;
+				//ButtonBeNotedAndPrint.Background = MainWindow.BrushButtonOkBackground;
 			}
 
-			string title = Properties.Resources.title_appointments.Replace("*", patient.FirstName + " " + patient.MiddleName);
-			MainWindow.AppMainWindow.SetUpWindows(showLogo, title, false);
+			string title = Properties.Resources.title_appointments.Replace("*", patient.Name);
+			MainWindow.AppMainWindow.SetUpWindow(showLogo, title, false);
         }
 
 		private void AddImage(ControlsFactory.ImageType imageType, int row, int column) {
@@ -156,7 +156,7 @@ namespace InfomatSelfChecking {
 
 		private void AddTextBlock(string text, int row, int column, HorizontalAlignment horizontalAlignment) {
 			TextBlock textBlock = ControlsFactory.CreateTextBlock(text, margin: new Thickness(10, 0, 10, 0), horizontalAlignment: horizontalAlignment);
-			textBlock.FontFamily = new FontFamily(Properties.Settings.Default.FontAppointments.Name);
+			textBlock.FontFamily = new FontFamily("Franklin Gothic Book");
 			Grid.SetRow(textBlock, row);
 			Grid.SetColumn(textBlock, column);
 			GridAppointments.Children.Add(textBlock);

@@ -16,44 +16,40 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace InfomatSelfChecking {
-	/// <summary>
-	/// Логика взаимодействия для MainWindow.xaml
-	/// </summary>
 	public partial class MainWindow : Window {
 		public static MainWindow AppMainWindow { get; private set; }
-		public static Brush BrushTextForeground { get; private set; }
 		public static double FontSizeMain { get; private set; } = 10;
-		public static FontFamily FontFamilyMain { get; private set; }
-		public static Brush BrushButtonOkBackground { get; private set; }
-		public static Brush BrushTextDisabledForeground { get; private set; }
-		public static Brush BrushButtonDisabledBackground { get; private set; }
-		public static Brush BrushTextHeaderForeground { get; private set; }
-		public static Brush BrushHeaderErrorBackground { get; private set; }
-
+		public static FontFamily FontFamilyMain { get; private set; } = new FontFamily("Franklin Gothic");
+		public static FontFamily FontFamilySub { get; private set; } = new FontFamily("Franklin Gothic Book");
+		public static Brush BrushTextForeground { get; private set; } = new SolidColorBrush(Color.FromRgb(44, 61, 63));
+		public static Brush BrushTextDisabledForeground { get; private set; } = new SolidColorBrush(Color.FromRgb(165, 165, 165));
+		public static Brush BrushTextHeaderForeground { get; private set; } = Brushes.White;
+		public static Brush BrushHeaderErrorBackground { get; private set; } = new SolidColorBrush(Color.FromRgb(249, 141, 60));
+		public static Brush BrushHeaderBackground { get; private set; } = new SolidColorBrush(Color.FromRgb(78, 155, 68));
 
 		public MainWindow() {
 			InitializeComponent();
 
-			KeyDown += MainWindow_KeyDown;
-			AppMainWindow = this;
+			KeyDown += (s, e) => {
+				if (!e.Key.Equals(Key.Escape))
+					return;
 
-			FontFamilyMain = new FontFamily(Properties.Settings.Default.FontMain.FontFamily.Name);
-			BrushTextHeaderForeground = ConvertColorToBrush(Properties.Settings.Default.ColorTextHeaderForeground);
+				Logging.LogMessageToFile("---------------------------------" +
+					Environment.NewLine + "Закрытие по нажатию клавиши ESC");
+				Application.Current.Shutdown();
+			};
+
+			AppMainWindow = this;
+			
 			TextBlockTimeHours.Foreground = BrushTextHeaderForeground;
 			TextBlockTimeSplitter.Foreground = BrushTextHeaderForeground;
 			TextBlockTimeMinutes.Foreground = BrushTextHeaderForeground;
 
 			FontFamily = FontFamilyMain;
 			FontWeight = FontWeights.Light;
-			Background = ConvertColorToBrush(Properties.Settings.Default.ColorMainWindowBackground);
 			LabelTitle.Foreground = BrushTextHeaderForeground;
 			LabelTitle.FontWeight = FontWeights.DemiBold;
-
-			BrushTextForeground = ConvertColorToBrush(Properties.Settings.Default.ColorTextMainForeground);
-			BrushButtonOkBackground = ConvertColorToBrush(Properties.Settings.Default.ColorButtonNextBackground);
-			BrushTextDisabledForeground = ConvertColorToBrush(Properties.Settings.Default.ColorTextDisabledForeground);
-			BrushButtonDisabledBackground = ConvertColorToBrush(Properties.Settings.Default.ColorButtonDisabled);
-			BrushHeaderErrorBackground = ConvertColorToBrush(Properties.Settings.Default.ColorHeaderErrorBackground);
+			
 			FrameMain.Foreground = BrushTextForeground;
 		
 			Loaded += (o, e) => {
@@ -64,11 +60,14 @@ namespace InfomatSelfChecking {
 				TextBlockTimeMinutes.FontSize = FontSizeMain;
 			};
 
-			DispatcherTimer timerSeconds = new DispatcherTimer();
-			timerSeconds.Interval = TimeSpan.FromSeconds(1);
+			DispatcherTimer timerSeconds = new DispatcherTimer {
+				Interval = TimeSpan.FromSeconds(1)
+			};
+
 			timerSeconds.Tick += (s, e) => {
 				Application.Current.Dispatcher.Invoke((Action)delegate {
-					TextBlockTimeSplitter.Visibility = TextBlockTimeSplitter.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
+					TextBlockTimeSplitter.Visibility = TextBlockTimeSplitter.Visibility == 
+					Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
 					TextBlockTimeHours.Text = DateTime.Now.Hour.ToString();
 					TextBlockTimeMinutes.Text = DateTime.Now.ToString("mm");
 				});
@@ -79,25 +78,17 @@ namespace InfomatSelfChecking {
 			FrameMain.Navigate(pageNotification);
 		}
 
-		private void MainWindow_KeyDown(object sender, KeyEventArgs e) {
-			if (e.Key.Equals(Key.Escape)) {
-				Logging.LogMessageToFile("---------------------------------" +
-					Environment.NewLine + "Закрытие по нажатию клавиши ESC");
-				Application.Current.Shutdown();
-			}
-		}
-
-		public void SetUpWindows(bool isLogoVisible, string title, bool isError) {
+		public void SetUpWindow(bool isLogoVisible, string title, bool isError) {
 			ImageLogo.Visibility = isLogoVisible ? Visibility.Visible : Visibility.Hidden;
 			TextBlockTitle.Text = title;
-			System.Drawing.Color color;
-			if (isError) color = Properties.Settings.Default.ColorHeaderErrorBackground;
-			else color = Properties.Settings.Default.ColorHeaderBackground;
-			LabelTitle.Background = ConvertColorToBrush(color);
-		}
+			Brush brush;
 
-		public static Brush ConvertColorToBrush(System.Drawing.Color color) {
-			return new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
+			if (isError)
+				brush = BrushHeaderErrorBackground;
+			else
+				brush = BrushHeaderBackground;
+
+			LabelTitle.Background = brush;
 		}
 
 		public void CloseAllWindows() {
