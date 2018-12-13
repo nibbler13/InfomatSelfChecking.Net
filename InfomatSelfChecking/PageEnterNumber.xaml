@@ -16,11 +16,61 @@
             <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="+7 (___) ___-__-__" 
-                   TextAlignment="Center" 
-                   FontWeight="DemiBold"
-                   VerticalAlignment="Center" 
-                   x:Name="TextBlockEntered"/>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <WrapPanel Grid.Column="1" VerticalAlignment="Center" x:Name="WrapPanelEntered">
+                <TextBlock Text="+"/>
+                <TextBlock Text="7" x:Name="TextBlockTemplate"/>
+                <TextBlock Text=" ("/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum1"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum2"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum3"/>
+                <TextBlock Text=") "/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum4"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum5"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum6"/>
+                <TextBlock Text="-"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum7"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum8"/>
+                <TextBlock Text="-"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum9"/>
+                <TextBlock Text="_" Width="{Binding ElementName=TextBlockTemplate, Path=ActualWidth}"
+                           x:Name="TextBlockNum10"/>
+            </WrapPanel>
+            <!--<TextBlock Text="+7 (___) ___-__-__" 
+                       TextAlignment="Center" 
+                       FontWeight="DemiBold"
+                       VerticalAlignment="Center" 
+                       x:Name="TextBlockEntered"
+                       Grid.Column="1"/>-->
+            
+            <Button Grid.Column="2" 
+                    x:Name="ButtonClear" 
+                    Click="ButtonClear_Click" 
+                    BorderThickness="0"
+                    Width="{Binding ElementName=Button1, Path=ActualWidth}"
+                    Height="{Binding ElementName=Button1, Path=ActualHeight}"
+                    HorizontalAlignment="Left"
+                    Margin="40,0,0,0">
+                <Image Source="Media/ButtonClear.png" 
+                       Margin="20" 
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
+
+        </Grid>
 
         <Grid Grid.Row="1" 
               HorizontalAlignment="Center"
@@ -42,32 +92,59 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button Content="1" Grid.Row="0" Grid.Column="0" Click="Button_Click" BorderThickness="0" x:Name="Button1"/>
-            <Button Content="2" Grid.Row="0" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="3" Grid.Row="0" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="4" Grid.Row="2" Grid.Column="0" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="5" Grid.Row="2" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="6" Grid.Row="2" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="7" Grid.Row="4" Grid.Column="0" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="8" Grid.Row="4" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="9" Grid.Row="4" Grid.Column="4" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="C" Grid.Row="6" Grid.Column="0" x:Name="ButtonClear" Click="ButtonClear_Click" IsEnabled="False" BorderThickness="0"/>
-            <Button Content="0" Grid.Row="6" Grid.Column="2" Click="Button_Click" BorderThickness="0"/>
-            <Button Content="&lt;" Grid.Row="6" Grid.Column="4" x:Name="ButtonRemoveOne" Click="ButtonRemoveOne_Click" IsEnabled="False" BorderThickness="0"/>
+            <Button Content="1" Grid.Row="0" Grid.Column="0" 
+                    Click="ButtonNumber_Click" BorderThickness="0" x:Name="Button1"/>
+            <Button Content="2" Grid.Row="0" Grid.Column="2" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="3" Grid.Row="0" Grid.Column="4"
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="4" Grid.Row="2" Grid.Column="0" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="5" Grid.Row="2" Grid.Column="2" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="6" Grid.Row="2" Grid.Column="4" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="7" Grid.Row="4" Grid.Column="0" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="8" Grid.Row="4" Grid.Column="2" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="9" Grid.Row="4" Grid.Column="4" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Content="0" Grid.Row="6" Grid.Column="2" 
+                    Click="ButtonNumber_Click" BorderThickness="0"/>
+            <Button Grid.Row="6" 
+                    Grid.Column="4"
+                    x:Name="ButtonRemoveOne"
+                    Click="ButtonRemoveOne_Click"
+                    BorderThickness="0">
+                <Image Source="Media/ButtonBackspace2.png" 
+                       Margin="20"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Button>
         </Grid>
         
-        <Button Content="Продолжить" 
-                Grid.Row="3" 
+        <Button Grid.Row="3" 
                 Margin="20" 
                 x:Name="ButtonContinue"
                 Click="ButtonContinue_Click"
-                IsEnabled="False"
                 BorderThickness="0" 
                 Width="{Binding ElementName=GridNumbers,Path=ActualWidth}"
                 Foreground="White">
             <Button.Effect>
                 <DropShadowEffect Opacity="0.3"/>
             </Button.Effect>
+            <Button.Content>
+                <WrapPanel>
+                    <Image Source="Media/ButtonOk.png" 
+                           Margin="0,20,20,20" 
+                           VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    
+                    <TextBlock Text="Продолжить" 
+                               VerticalAlignment="Center"
+                               x:Name="TextBlockButtonContinue"/>
+                </WrapPanel>
+            </Button.Content>
         </Button>
     </Grid>
 </Page>

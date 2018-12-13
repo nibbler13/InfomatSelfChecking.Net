@@ -6,9 +6,17 @@ using System.Windows;
 
 namespace InfomatSelfChecking {
 	public class FirebirdClient {
-		private FbConnection connection;
+		private readonly FbConnection connection;
 
-		public FirebirdClient(string ipAddress, string baseName, string user, string pass) {
+//[yekuk_learn]
+//server=172.16.9.90
+//port=3050
+//DATABASE=yekuk_learn
+//name = FOR LEARNING
+//comment = Версия 18.1 
+
+
+        public FirebirdClient(string ipAddress, string baseName, string user, string pass) {
 			FbConnectionStringBuilder cs = new FbConnectionStringBuilder {
 				DataSource = ipAddress,
 				Database = baseName,
@@ -19,79 +27,44 @@ namespace InfomatSelfChecking {
 			};
 
 			connection = new FbConnection(cs.ToString());
-			IsConnectionOpened();
+			CheckConnectionState();
 		}
 
 		public void Close() {
 			connection.Close();
 		}
 
-		private bool IsConnectionOpened() {
-			if (connection.State != ConnectionState.Open) {
-				try {
+		private void CheckConnectionState() {
+			if (connection.State != ConnectionState.Open) 
 					connection.Open();
-				} catch (Exception e) {
-					string subject = "Ошибка подключения к БД";
-					string body = e.Message + Environment.NewLine + e.StackTrace;
-					Mail.SendMail(subject, body, Properties.Settings.Default.MailCopy);
-					Logging.LogMessageToFile(subject + " " + body);
-				}
-			}
-
-			return connection.State == ConnectionState.Open;
 		}
 
 		public DataTable GetDataTable(string query, Dictionary<string, object> parameters) {
-			DataTable dataTable = new DataTable();
+            CheckConnectionState();
 
-			if (!IsConnectionOpened())
-				return dataTable;
+            DataTable dataTable = new DataTable();
+			FbCommand command = new FbCommand(query, connection);
 
-			try {
-				FbCommand command = new FbCommand(query, connection);
+            if (parameters.Count > 0)
+                foreach (KeyValuePair<string, object> parameter in parameters)
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
 
-				if (parameters.Count > 0) {
-					foreach (KeyValuePair<string, object> parameter in parameters)
-						command.Parameters.AddWithValue(parameter.Key, parameter.Value);
-				}
-
-				FbDataAdapter fbDataAdapter = new FbDataAdapter(command);
-				fbDataAdapter.Fill(dataTable);
-			} catch (Exception e) {
-				string subject = "Ошибка выполнения запроса к БД";
-				string body = e.Message + Environment.NewLine + e.StackTrace;
-				Mail.SendMail(subject, body, Properties.Settings.Default.MailCopy);
-				Logging.LogMessageToFile(subject + " " + body);
-				connection.Close();
-			}
+            FbDataAdapter fbDataAdapter = new FbDataAdapter(command);
+			fbDataAdapter.Fill(dataTable);
 
 			return dataTable;
 		}
 
 		public bool ExecuteUpdateQuery(string query, Dictionary<string, object> parameters) {
-			bool updated = false;
+            CheckConnectionState();
 
-			if (!IsConnectionOpened())
-				return updated;
+            FbCommand update = new FbCommand(query, connection);
 
-			try {
-				FbCommand update = new FbCommand(query, connection);
+            if (parameters.Count > 0)
+                foreach (KeyValuePair<string, object> parameter in parameters)
+                    update.Parameters.AddWithValue(parameter.Key, parameter.Value);
 
-				if (parameters.Count > 0) {
-					foreach (KeyValuePair<string, object> parameter in parameters)
-						update.Parameters.AddWithValue(parameter.Key, parameter.Value);
-				}
-
-				updated = update.ExecuteNonQuery() > 0 ? true : false;
-			} catch (Exception e) {
-				string subject = "Ошибка выполнения запроса к БД";
-				string body = e.Message + Environment.NewLine + e.StackTrace;
-				Mail.SendMail(subject, body, Properties.Settings.Default.MailCopy);
-				Logging.LogMessageToFile(subject + " " + body);
-				connection.Close();
-			}
-
-			return updated;
+            return update.ExecuteNonQuery() > 0 ? true : false; ;
 		}
 	}
 }

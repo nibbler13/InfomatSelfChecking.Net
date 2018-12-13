@@ -18,8 +18,8 @@ namespace InfomatSelfChecking {
     /// Логика взаимодействия для PagePatientSelectedSingle.xaml
     /// </summary>
     public partial class PagePatientConfirmation : Page {
-		private List<ItemPatient> patients;
-		private bool returnBack = false;
+		private readonly List<ItemPatient> patients;
+		private readonly bool returnBack = false;
 
         public PagePatientConfirmation(List<ItemPatient> patients) {
 			InitializeComponent();
@@ -30,31 +30,32 @@ namespace InfomatSelfChecking {
 			string title;
 			if (patients.Count == 1) {
 				TextBlockName.Text = patients[0].Name;
-				TextBlockBirthday.Text = "Дата рождения: " + patients[0].Birthday;
+				TextBlockBirthday.Text = "Дата рождения: " + patients[0].Birthday.ToLongDateString();
 				title = Properties.Resources.title_name_confirm;
 			} else {
 				GridSinglePatient.Visibility = Visibility.Hidden;
 				GridMultiplePatients.Visibility = Visibility.Visible;
-				ButtonWrong.Content = "Закрыть";
-				Grid.SetColumn(ButtonWrong, 1);
-				ButtonContinue.Visibility = Visibility.Hidden;
+				TextBlockButtonWrong.Text = "Закрыть";
+                Grid.SetColumn(ButtonWrong, 1);
+                ButtonContinue.Visibility = Visibility.Hidden;
 				title = Properties.Resources.title_name_confirm_multiple;
 				KeepAlive = true;
-				DrawPatients();
-				isLogoVisible = true;
+                DrawPatients();
+                isLogoVisible = true;
 				returnBack = true;
 			}
 
 			ButtonWrong.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+            TextBlockButtonWrong.Foreground = MainWindow.BrushTextForeground;
 			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
 
 			MainWindow.ConfigurePage(this);
 
-			TextBlockName.FontSize = FontSize * 1.3;
-			TextBlockBirthday.FontSize = FontSize * 1.3;
+			TextBlockName.FontSize = FontSize * 1.2;
+			TextBlockBirthday.FontSize = FontSize * 1.2;
 
 			Loaded += (s, e) => {
-				MainWindow.AppMainWindow.SetUpWindow(isLogoVisible, title, false);
+				MainWindow.CurrentMainWindow.SetUpMainWindow(isLogoVisible, title, false);
 			};
         }
 
@@ -62,24 +63,72 @@ namespace InfomatSelfChecking {
 			int row = 0;
 
 			foreach (ItemPatient patient in patients) {
-				if (row > 1)
-					GridMultiplePatients.RowDefinitions.Add(new RowDefinition());
+                if (row > 1)
+                    GridMultiplePatients.RowDefinitions.Add(new RowDefinition());
 
-				string text = patient.Name + Environment.NewLine +
-						"Дата рождения: " + patient.Birthday;
-				TextBlock textBlock = ControlsFactory.CreateTextBlock(text, margin: new Thickness(10));
-				Button button = ControlsFactory.CreateButton(textBlock, margin: new Thickness(20), tag: patient);
-				button.Click += ButtonPatient_Click;
+                Grid grid = new Grid {
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
+
+                grid.RowDefinitions.Add(new RowDefinition());
+                grid.RowDefinitions.Add(new RowDefinition());
+
+                ColumnDefinition col0 = new ColumnDefinition {
+                    Width = new GridLength(10, GridUnitType.Star)
+                };
+                grid.ColumnDefinitions.Add(col0);
+
+                ColumnDefinition col1 = new ColumnDefinition {
+                    Width = new GridLength(80, GridUnitType.Star)
+                };
+                grid.ColumnDefinitions.Add(col1);
+
+                ColumnDefinition col2 = new ColumnDefinition {
+                    Width = new GridLength(10, GridUnitType.Star)
+                };
+                grid.ColumnDefinitions.Add(col2);
+
+                string textTop = patient.Name;
+                string textBottom = "дата рождения: " + patient.Birthday.ToLongDateString();
+
+                TextBlock textBlockTop = ControlsFactory.CreateTextBlock(textTop);
+                textBlockTop.Foreground = MainWindow.BrushTextForeground;
+                Grid.SetColumn(textBlockTop, 1);
+
+                TextBlock textBlockBottom = ControlsFactory.CreateTextBlock(textBottom);
+                textBlockBottom.Foreground = MainWindow.BrushTextDisabledForeground;
+                Grid.SetRow(textBlockBottom, 1);
+                Grid.SetColumn(textBlockBottom, 1);
+
+                Image image = ControlsFactory.CreateImage(
+                    ControlsFactory.ImageType.NotificationOk, 
+                    horizontalAlignment: HorizontalAlignment.Right, 
+                    margin: new Thickness(20));
+
+                Grid.SetColumn(image, 2);
+                Grid.SetRowSpan(image, 2);
+                image.Visibility = Visibility.Hidden;
+
+                grid.Children.Add(textBlockTop);
+                grid.Children.Add(textBlockBottom);
+                grid.Children.Add(image);
+
+                Button button = new Button {
+                    Tag = patient,
+                    Style = Application.Current.MainWindow.FindResource("RoundCornerStretch") as Style,
+                    Content = grid,
+                    Margin = new Thickness(20)
+                };
+
+                button.Effect = ControlsFactory.CreateDropShadowEffect();
+                button.Click += ButtonPatient_Click;
+
 				Grid.SetRow(button, row);
-				Grid.SetColumnSpan(button, 3);
 				GridMultiplePatients.Children.Add(button);
 
-				Image image = ControlsFactory.CreateImage(ControlsFactory.ImageType.NotificationOk, margin: new Thickness(0, 20, 40, 20));
-				image.Visibility = Visibility.Hidden;
-				Grid.SetRow(image, row);
-				Grid.SetColumn(image, 3);
-				GridMultiplePatients.Children.Add(image);
-				patient.CheckStateImage = image;
+                button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                
+                patient.CheckStateImage = image;
 				
 				row++;
 			}
@@ -94,9 +143,8 @@ namespace InfomatSelfChecking {
 			if (patients.Count == 1) {
 				PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.NameNotCorrect);
 				NavigationService.Navigate(pageNotification);
-			} else {
-				MainWindow.AppMainWindow.CloseAllWindows();
-			}
+			} else
+				MainWindow.CurrentMainWindow.CloseAllWindows();
 		}
 
 		private void ButtonContinue_Click(object sender, RoutedEventArgs e) {
@@ -106,11 +154,11 @@ namespace InfomatSelfChecking {
 		private void CheckPatientStateAndShowAppointments(ItemPatient patient) {
 			Page pageError = null;
 
-			if (patient.IsCardBlocked)
-				pageError = new PageNotification(PageNotification.NotificationType.CardBlocked, returnBack: returnBack);
+			//if (patient.IsCardBlocked)
+			//	pageError = new PageNotification(PageNotification.NotificationType.CardBlocked, returnBack: returnBack);
 
-			if (patient.IsFirstVisit)
-				pageError = new PageNotification(PageNotification.NotificationType.FirstVisit, returnBack: returnBack);
+			//if (patient.IsFirstVisit)
+			//	pageError = new PageNotification(PageNotification.NotificationType.FirstVisit, returnBack: returnBack);
 
 			if (pageError != null) {
 				NavigationService.Navigate(pageError);
@@ -119,25 +167,25 @@ namespace InfomatSelfChecking {
 			}
 
 			DataHandle.UpdatePatientAppointments(ref patient);
-			bool isOk;
+            bool isOk = true;
 
-			if (patient.Appointments.Count == 0) {
+            if (patient.AppointmentsAvailable.Count == 0) {
 				PageNotification pageAppointmentsNotFound = 
 					new PageNotification(PageNotification.NotificationType.NoAppointmentsForNow, returnBack: returnBack);
 				NavigationService.Navigate(pageAppointmentsNotFound);
-				isOk = false;
-			} else {
-				bool isAnyCash = patient.Appointments.Where(e => e.IsCash).Count() > 0;
-				bool isLate = patient.Appointments.Where(e => e.IsLate).Count() > 0;
-				bool isAnyRoentgen = patient.Appointments.Where(e => e.IsRoentgen).Count() > 0;
-				isOk = !isAnyCash && !isLate && !isAnyRoentgen;
+                isOk = false;
+            } else {
+				//bool isAnyCash = patient.AppointmentsVisited.Where(e => e.IsCash).Count() > 0;
+				//bool isLate = patient.AppointmentsVisited.Where(e => e.IsLate).Count() > 0;
+				//bool isAnyRoentgen = patient.AppointmentsVisited.Where(e => e.IsRoentgen).Count() > 0;
+				//isOk = !isAnyCash && !isLate && !isAnyRoentgen;
 
 				PageShowAppointments pageAppointmentsShow = new PageShowAppointments(patient, returnBack);
 				NavigationService.Navigate(pageAppointmentsShow);
 			}
 
-			SetImage(patient, isOk);
-		}
+            SetImage(patient, isOk);
+        }
 
 		private void SetImage(ItemPatient patient, bool isOk) {
 			if (patient.CheckStateImage != null) {

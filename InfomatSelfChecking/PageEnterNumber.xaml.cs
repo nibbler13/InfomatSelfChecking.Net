@@ -20,7 +20,7 @@ namespace InfomatSelfChecking {
 	/// Логика взаимодействия для PageEnterNumber.xaml
 	/// </summary>
 	public partial class PageEnterNumber : Page {
-		private string phoneMask = "+7 (___) ___-__-__";
+        private readonly List<TextBlock> TextBlockEntered;
 		private string enteredNumber = string.Empty;
 		private string EnteredNumber {
 			get {
@@ -33,12 +33,13 @@ namespace InfomatSelfChecking {
 				ButtonRemoveOne.IsEnabled = enteredNumber.Length > 0;
 				ButtonContinue.IsEnabled = enteredNumber.Length == 10;
 
-				string enteredPhone = phoneMask;
-				Regex regex = new Regex(Regex.Escape("_"));
-				foreach (char symbol in enteredNumber)
-					enteredPhone = regex.Replace(enteredPhone, symbol.ToString(), 1);
+                for (int i = 0; i <= 9; i++) {
+                    string symbol = "_";
+                    if (i < enteredNumber.Length)
+                        symbol = enteredNumber.Substring(i, 1);
 
-				TextBlockEntered.Text = enteredPhone;
+                    TextBlockEntered[i].Text = symbol;
+                }
 			}
 		}
 
@@ -48,26 +49,48 @@ namespace InfomatSelfChecking {
 		public PageEnterNumber() {
 			InitializeComponent();
 
-			EnteredNumber = "1111111111";
-			//ButtonContinue.Background = MainWindow.BrushButtonOkBackground;
-			//ButtonContinue.Foreground = MainWindow.BrushTextHeaderForeground;
-
 			foreach (Control item in GridNumbers.Children) {
 				item.Effect = ControlsFactory.CreateDropShadowEffect();
-				if (item is Button button)
-					button.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+				if (item is Button button) {
+                    button.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+                    button.Foreground = MainWindow.BrushTextForeground;
+                }
 			}
 
-			MainWindow.ConfigurePage(this);
-			MainWindow.AppMainWindow.SetUpWindow(true, Properties.Resources.title_dialer, false);
-			TextBlockEntered.FontSize = FontSize * 2;
+            ButtonClear.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
+
+            MainWindow.ConfigurePage(this);
+			MainWindow.CurrentMainWindow.SetUpMainWindow(true, Properties.Resources.title_dialer, false);
+
+            foreach (TextBlock textBlock in WrapPanelEntered.Children) {
+                textBlock.FontSize = FontSize * 1.5;
+            }
+
+            TextBlockEntered = new List<TextBlock>() {
+                TextBlockNum1,
+                TextBlockNum2,
+                TextBlockNum3,
+                TextBlockNum4,
+                TextBlockNum5,
+                TextBlockNum6,
+                TextBlockNum7,
+                TextBlockNum8,
+                TextBlockNum9,
+                TextBlockNum10,
+            };
 
 			ButtonClear.IsEnabledChanged += Button_IsEnabledChanged;
 			ButtonRemoveOne.IsEnabledChanged += Button_IsEnabledChanged;
 			ButtonContinue.IsEnabledChanged += Button_IsEnabledChanged;
 
 			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
-		}
+
+            ButtonClear.IsEnabled = false;
+            ButtonRemoveOne.IsEnabled = false;
+            ButtonContinue.IsEnabled = false;
+
+            EnteredNumber = "0000000000";
+        }
 
 		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
 			if (!(sender is Button button))
@@ -75,11 +98,11 @@ namespace InfomatSelfChecking {
 
 			if ((bool)e.NewValue == true) {
 				button.Effect = ControlsFactory.CreateDropShadowEffect();
-				if (button == ButtonContinue) {
+
+				if (button == ButtonContinue)
 					button.Foreground = MainWindow.BrushTextHeaderForeground;
-				} else {
+				else
 					button.Foreground = MainWindow.BrushTextForeground;
-				}
 
 			} else {
 				button.Effect = null;
@@ -87,7 +110,7 @@ namespace InfomatSelfChecking {
 			}
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e) {
+		private void ButtonNumber_Click(object sender, RoutedEventArgs e) {
 			if (EnteredNumber.Length == 10)
 				return;
 
@@ -106,16 +129,28 @@ namespace InfomatSelfChecking {
 			if (enteredNumber.Length < 10)
 				return;
 
-			List<ItemPatient> patients = DataHandle.GetPatients(enteredNumber.Substring(0, 3), enteredNumber.Substring(3, 7));
+            List<ItemPatient> patients;
+            try {
+                patients = DataHandle.GetPatients(enteredNumber.Substring(0, 3), enteredNumber.Substring(3, 7));
+            } catch (Exception exc) {
+                NavigationService.Navigate(new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
+                return;
+            }
+
 			Page page = null;
 
-			if (patients.Count == 0) {
-				page = new PageNotification(PageNotification.NotificationType.NumberNotFound, TextBlockEntered.Text);
-			} else if (patients.Count > 4) {
+            if (patients.Count == 0) {
+                string entered = "+7 (" + enteredNumber.Substring(0, 3) +
+                    ") " + enteredNumber.Substring(3, 3) + "-" +
+                    enteredNumber.Substring(5, 2) + "-" +
+                    enteredNumber.Substring(7, 2);
+
+                page = new PageNotification(PageNotification.NotificationType.NumberNotFound, entered);
+            }
+			else if (patients.Count > 4)
 				page = new PageNotification(PageNotification.NotificationType.TooManyPatients);
-			} else {
+			else
 				page = new PagePatientConfirmation(patients);
-			}
 
 			NavigationService.Navigate(page);
 		}

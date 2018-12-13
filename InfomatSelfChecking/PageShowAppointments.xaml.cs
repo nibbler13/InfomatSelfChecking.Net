@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,135 +19,178 @@ namespace InfomatSelfChecking {
     /// Логика взаимодействия для PageAppointmentsShow.xaml
     /// </summary>
     public partial class PageShowAppointments : Page {
-		private bool returnBack;
+		private readonly bool returnBack;
+        private readonly ItemPatient patient;
 
         public PageShowAppointments(ItemPatient patient, bool returnBack) {
             InitializeComponent();
 
+            this.patient = patient;
 			this.returnBack = returnBack;
-			bool isLate = false;
-			bool isAnyCash = false;
-			bool isAnyRoentgen = false;
 			bool showLogo = true;
 
 			MainWindow.ConfigurePage(this);
+            ButtonCheckIn.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
 
-			//foreach (Button button in new Button[] { ButtonBeNotedAndPrint, ButtonPrintAndClose, ButtonClose }) 
-			//	button.FontSize = MainWindow.FontSizeMain * 0.8;
-			
-			int row = 1;
-			foreach (ItemAppointment item in patient.Appointments) {
-				int column = 7;
-				AddTextBlock(item.DateTimeBegin.ToShortTimeString(), row, 1, HorizontalAlignment.Center);
-				AddTextBlock(item.RNum, row, 2, HorizontalAlignment.Center);
-				AddTextBlock(item.DepShortName, row, 3, HorizontalAlignment.Center);
-				AddTextBlock(item.DName, row, 4, HorizontalAlignment.Left);
+            //Loaded += PageShowAppointments_Loaded;
 
-				if (item.IsLate) {
-					AddImage(ControlsFactory.ImageType.AppointmentsLate, row, column--);
-					isLate = true;
-				}
 
-				if (item.IsCash) {
-					AddImage(ControlsFactory.ImageType.AppointmentsCash, row, column--);
-					isAnyCash = true;
-				}
+            int row = 0;
+            foreach (ItemAppointment item in patient.AppointmentsAvailable) {
+                TextBlock textBlockTime = ControlsFactory.CreateTextBlock(ControlsFactory.ClearTimeString(item.DateTimeSchedule));
+                textBlockTime.FontSize = MainWindow.FontSizeMain;// * 0.8;
+                Grid.SetRow(textBlockTime, row);
+                GridAppointments.Children.Add(textBlockTime);
 
-				if (item.IsRoentgen) {
-					AddImage(ControlsFactory.ImageType.AppointmentsRoentgen, row, column--);
-					isAnyRoentgen = true;
-				}
+                TextBlock textBlockRoom = ControlsFactory.CreateTextBlock("Кабинет " + item.RNum);
+                textBlockRoom.FontSize = MainWindow.FontSizeMain;// * 0.8;
+                textBlockRoom.HorizontalAlignment = HorizontalAlignment.Left;
+                Grid.SetRow(textBlockRoom, row);
+                Grid.SetColumn(textBlockRoom, 2);
+                GridAppointments.Children.Add(textBlockRoom);
 
-				if (item.IsLate || item.IsCash || item.IsRoentgen) {
-					Label label = new Label() {
-						Background = MainWindow.BrushHeaderErrorBackground,
-						Foreground = MainWindow.BrushTextHeaderForeground,
-						Content = " ! ",
-						VerticalContentAlignment = VerticalAlignment.Center,
-						HorizontalContentAlignment = HorizontalAlignment.Center,
-						Margin = new Thickness(2, 2, 0, 0)
-					};
-					Grid.SetRow(label, row);
-					GridAppointments.Children.Add(label);
-				}
+                Image imageDept = ControlsFactory.CreateImage(ControlsFactory.ImageType.Department, margin: new Thickness(0, 20, 0, 20), searchName: item.DepName);
+                imageDept.MaxHeight = 80;
 
-				if (row > 1) {
-					Label label = new Label {
-						Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
-						Height = 5,
-						VerticalAlignment = VerticalAlignment.Top,
-						Margin = new Thickness(2, 0, 0, 2)
-					};
-					Grid.SetRow(label, row);
-					Grid.SetColumnSpan(label, 8);
-					GridAppointments.Children.Add(label);
-				}
-				
-				row++;
 
-				if ((row == 5 && (isLate || isAnyCash || isAnyRoentgen)) || (row == 9))
-					break;
-			}
+                //TextBlock textBlockDept = ControlsFactory.CreateTextBlock(item.DepShortName);
+                //textBlockDept.FontSize = MainWindow.FontSizeMain * 0.8;
+                //textBlockDept.FontFamily = MainWindow.FontFamilySub;
+                //textBlockDept.FontWeight = FontWeights.Light;
+                //textBlockDept.TextWrapping = TextWrapping.WrapWithOverflow;
+                //textBlockDept.HorizontalAlignment = HorizontalAlignment.Left;
+                //textBlockDept.TextAlignment = TextAlignment.Left;
+                Grid.SetRow(imageDept, row);
+                Grid.SetColumn(imageDept, 4);
+                GridAppointments.Children.Add(imageDept);
 
-			if (isLate || isAnyCash || isAnyRoentgen) {
-				row = 6;
-				ButtonClose.Visibility = Visibility.Visible;
-				ButtonBeNotedAndPrint.Visibility = Visibility.Hidden;
-				ButtonPrintAndClose.Visibility = Visibility.Visible;
-				showLogo = false;
+                Regex regex = new Regex(Regex.Escape(" "));
+                string docName = regex.Replace(item.DName, Environment.NewLine, 1);
+                TextBlock textBlockDoc = ControlsFactory.CreateTextBlock(docName);
+                textBlockDoc.FontSize = MainWindow.FontSizeMain;// * 0.8;
+                textBlockDoc.FontWeight = FontWeights.Light;
+                textBlockDoc.FontFamily = MainWindow.FontFamilySub;
+                textBlockDoc.TextAlignment = TextAlignment.Center;
+                textBlockDoc.HorizontalAlignment = HorizontalAlignment.Left;
+                Grid.SetRow(textBlockDoc, row);
+                Grid.SetColumn(textBlockDoc, 6);
+                GridAppointments.Children.Add(textBlockDoc);
 
-				Label label = new Label() {
-					Content = Properties.Resources.show_appointments_warning,
-					Background = Brushes.Orange,
-					Foreground = MainWindow.BrushTextHeaderForeground,
-					VerticalAlignment = VerticalAlignment.Stretch,
-					VerticalContentAlignment = VerticalAlignment.Center,
-					HorizontalAlignment = HorizontalAlignment.Stretch,
-					HorizontalContentAlignment = HorizontalAlignment.Center,
-					FontFamily = new FontFamily("Franklin Gothic Book"),
-					FontSize = MainWindow.FontSizeMain * 1.0
-				};
-				Grid.SetRow(label, row++);
-				Grid.SetColumnSpan(label, 8);
-				GridAppointments.Children.Add(label);
+                if (row > 0) {
+                    GridAppointments.RowDefinitions.Add(new RowDefinition());
 
-				StackPanel stackPanel = new StackPanel() {
-					Orientation = Orientation.Horizontal,
-					VerticalAlignment = VerticalAlignment.Center,
-					HorizontalAlignment = HorizontalAlignment.Center
-				};
+                    Label label = new Label {
+                        Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
+                        Height = 5,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        Margin = new Thickness(2, 0, 0, 2)
+                    };
+                    Grid.SetRow(label, row);
+                    Grid.SetColumnSpan(label, 8);
+                    GridAppointments.Children.Add(label);
+                }
 
-				Dictionary<ControlsFactory.ImageType, string> warnings = new Dictionary<ControlsFactory.ImageType, string>();
-				if (isLate)
-					warnings.Add(ControlsFactory.ImageType.AppointmentsLate, Properties.Resources.show_appointments_late);
-				if (isAnyCash)
-					warnings.Add(ControlsFactory.ImageType.AppointmentsCash, Properties.Resources.show_appointments_cash);
-				if (isAnyRoentgen)
-					warnings.Add(ControlsFactory.ImageType.AppointmentsRoentgen, Properties.Resources.show_appointments_roentgen);
+                row++;
 
-				foreach (KeyValuePair<ControlsFactory.ImageType, string> warning in warnings) {
-					Image image = ControlsFactory.CreateImage(warning.Key, margin: new Thickness(5, 10, 5, 10));
-					stackPanel.Children.Add(image);
+                if (row == 6)
+                    break;
+            }
 
-					TextBlock textBlock = ControlsFactory.CreateTextBlock(warning.Value, margin: new Thickness(10, 0, 10, 0));
-					textBlock.FontSize = MainWindow.FontSizeMain * 0.9;
-					textBlock.FontFamily = new FontFamily("Franklin Gothic Book");
-					stackPanel.Children.Add(textBlock);
-				}
-
-				Grid.SetRow(stackPanel, row);
-				Grid.SetColumnSpan(stackPanel, 8);
-				GridAppointments.Children.Add(stackPanel);
-			} else {
-				//ButtonBeNotedAndPrint.Foreground = MainWindow.BrushTextHeaderForeground;
-				//ButtonBeNotedAndPrint.Background = MainWindow.BrushButtonOkBackground;
-			}
-
-			string title = Properties.Resources.title_appointments.Replace("*", patient.Name);
-			MainWindow.AppMainWindow.SetUpWindow(showLogo, title, false);
+            string title = Properties.Resources.title_appointments.Replace("*", patient.Name);
+			MainWindow.CurrentMainWindow.SetUpMainWindow(showLogo, title, false);
         }
 
-		private void AddImage(ControlsFactory.ImageType imageType, int row, int column) {
+        private void PageShowAppointments_Loaded(object sender, RoutedEventArgs e) {
+            double thickness = 8;
+            double availableWidth = GridAppointments.ActualWidth;
+            double availableHeight = GridAppointments.ActualHeight;
+            double elementWidth = (availableWidth - thickness * 6) / 3;
+            double elementHeight = (availableHeight - thickness * 4) / 2;
+
+            foreach (ItemAppointment item in patient.AppointmentsAvailable) {
+                Border border = new Border {
+                    Background = new SolidColorBrush(Color.FromRgb(245, 245, 245)),
+                    Width = elementWidth,
+                    Height = elementHeight,
+                    CornerRadius = new CornerRadius(8),
+                    Margin = new Thickness(8)
+                };
+
+                Grid grid = new Grid {
+                    Margin = new Thickness(10)
+                };
+
+                RowDefinition rowDefinition0 = new RowDefinition {
+                    Height = new GridLength(0, GridUnitType.Auto)
+                };
+
+                RowDefinition rowDefinition1 = new RowDefinition {
+                    Height = new GridLength(1, GridUnitType.Star)
+                };
+
+                RowDefinition rowDefinition2 = new RowDefinition {
+                    Height = new GridLength(2, GridUnitType.Star)
+                };
+
+                grid.RowDefinitions.Add(rowDefinition0);
+                grid.RowDefinitions.Add(rowDefinition1);
+                grid.RowDefinitions.Add(rowDefinition2);
+
+                TextBlock textBlockTimeRoom = ControlsFactory.CreateTextBlock(
+                    ControlsFactory.ClearTimeString(item.DateTimeSchedule) + Environment.NewLine + "Кабинет " + item.RNum, margin: new Thickness(0));
+                textBlockTimeRoom.FontSize = MainWindow.FontSizeMain * 0.8;
+                Grid.SetColumnSpan(textBlockTimeRoom, 2);
+                grid.Children.Add(textBlockTimeRoom);
+
+                WrapPanel stackPanelDept = new WrapPanel {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    MaxWidth = elementWidth - 20
+                };
+
+                Image imageDept = ControlsFactory.CreateImage(
+                    ControlsFactory.ImageType.Department, margin: new Thickness(10), searchName:item.DepName);
+                stackPanelDept.Children.Add(imageDept);
+
+                TextBlock textBlockDept = ControlsFactory.CreateTextBlock(item.DepName, margin: new Thickness(10, 0, 0, 0));
+                textBlockDept.FontSize = MainWindow.FontSizeMain * 0.6;
+                textBlockDept.FontFamily = MainWindow.FontFamilySub;
+                textBlockDept.FontWeight = FontWeights.Light;
+                textBlockDept.TextWrapping = TextWrapping.WrapWithOverflow;
+                stackPanelDept.Children.Add(textBlockDept);
+
+                Grid.SetRow(stackPanelDept, 1);
+                grid.Children.Add(stackPanelDept);
+
+                StackPanel stackPanelDoc = new StackPanel {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    MaxWidth = elementWidth - 20
+                };
+
+                Image imageDoc = ControlsFactory.CreateImage(
+                    ControlsFactory.ImageType.Doctor, margin: new Thickness(10), searchName: item.DName);
+                stackPanelDoc.Children.Add(imageDoc);
+
+                string docName = string.Join(Environment.NewLine, item.DName.Split(' '));
+                TextBlock textBlockDoc = ControlsFactory.CreateTextBlock(docName, margin: new Thickness(10, 0, 0, 0));
+                textBlockDoc.FontSize = MainWindow.FontSizeMain * 0.6;
+                textBlockDoc.FontWeight = FontWeights.Light;
+                textBlockDoc.FontFamily = MainWindow.FontFamilySub;
+                stackPanelDoc.Children.Add(textBlockDoc);
+
+                Grid.SetRow(stackPanelDoc, 2);
+                grid.Children.Add(stackPanelDoc);
+
+                border.Child = grid;
+
+                WrapPanelAppointments.Children.Add(border);
+            }
+        }
+
+        private void AddImage(ControlsFactory.ImageType imageType, int row, int column) {
 			Image image = ControlsFactory.CreateImage(imageType, margin: new Thickness(5, 10, 5, 10));
 			RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
 			Grid.SetRow(image, row);
@@ -162,35 +206,12 @@ namespace InfomatSelfChecking {
 			GridAppointments.Children.Add(textBlock);
 		}
 
-		private void ButtonBeNotedAndPrint_CLick(object sender, RoutedEventArgs e) {
-			SetMarks();
-			Print();
-			Close();
-		}
-
-		private void ButtonPrintAndClose_Click(object sender, RoutedEventArgs e) {
-			Print();
-			Close();
-		}
-
-		private void ButtonClose_Click(object sender, RoutedEventArgs e) {
-			Close();
-		}
-
-		private void Close() {
-			if (returnBack) {
-				NavigationService.GoBack();
-			} else {
-				MainWindow.AppMainWindow.CloseAllWindows();
-			}
-		}
-
-		private void Print() {
-
-		}
-
-		private void SetMarks() {
-
-		}
+		private void ButtonCheckIn_CLick(object sender, RoutedEventArgs e) {
+            if (returnBack) {
+                NavigationService.GoBack();
+            } else {
+                MainWindow.CurrentMainWindow.CloseAllWindows();
+            }
+        }
 	}
 }

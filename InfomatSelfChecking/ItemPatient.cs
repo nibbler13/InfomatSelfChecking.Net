@@ -7,14 +7,31 @@ using System.Windows.Controls;
 
 namespace InfomatSelfChecking {
     public class ItemPatient {
+		public enum StopCodes {
+			Cash,
+			FirstTime,
+			Lock,
+			Late,
+			NotAvailableNow,
+			DepOut
+		}
+
+		public enum InfoCodes {
+			InformAboutLK
+		}
+
 		public string PhoneNumber { get; set; } = string.Empty;
 		public string PCode { get; set; } = string.Empty;
 		public string Name { get; set; } = string.Empty;
-		public string Birthday { get; set; } = string.Empty;
-		public bool IsFirstVisit { get; set; } = false;
-		public bool IsCardBlocked { get; set; } = false;
-		public bool HasOnlineAccount { get; set; } = false;
-		public List<ItemAppointment> Appointments { get; set; } = new List<ItemAppointment>();
+		public DateTime Birthday { get; set; }
+
+		public List<StopCodes> StopCodesCurrent { get; set; } = new List<StopCodes>();
+		public List<InfoCodes> InfoCodesCurrent { get; set; } = new List<InfoCodes>();
+
+		public List<ItemAppointment> AppointmentsVisited { get; set; } = new List<ItemAppointment>();
+		public List<ItemAppointment> AppointmentsAvailable { get; set; } = new List<ItemAppointment>();
+		public List<ItemAppointment> AppointmentsNotAvailable { get; set; } = new List<ItemAppointment>();
+		
 		public Image CheckStateImage { get; set; } = null;
 	}
 }

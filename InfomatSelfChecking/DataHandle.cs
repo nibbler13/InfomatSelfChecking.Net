@@ -13,7 +13,7 @@ namespace InfomatSelfChecking {
 		private static readonly string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
 		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckState;
 		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
-		private static bool isThisAMoscowFilial;
+		private static readonly bool isThisAMoscowFilial;
 
 		static DataHandle() {
 			isThisAMoscowFilial = IsThisMoscowFilial();
@@ -41,67 +41,18 @@ namespace InfomatSelfChecking {
 
 			foreach (DataRow row in dataTable.Rows) {
 				try {
-					ItemPatient itemPatient = new ItemPatient() {
-						PhoneNumber = prefix + number,
-						PCode = row["PCODE"].ToString(),
-						Name = row["CNAME"].ToString(),
-						Birthday = row["BDATE"].ToString().Split(' ')[0]
+                    ItemPatient itemPatient = new ItemPatient() {
+                        PhoneNumber = prefix + number,
+                        PCode = row["PCODE"].ToString(),
+                        Name = row["CNAME"].ToString(),
+                        Birthday = DateTime.Parse(row["BDATE"].ToString())
 					};
 
 					patients.Add(itemPatient);
 				} catch (Exception e) {
-					Logging.LogMessageToFile(e.Message + Environment.NewLine + e.StackTrace);
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+
 				}
-			}
-
-			if (Debugger.IsAttached) {
-				//patients.Add(new ItemPatient() {
-				//	PhoneNumber = prefix + number,
-				//	PCode = "00000001",
-				//	FirstName = "Павел",
-				//	MiddleName = "Павлович",
-				//	Birthday = "21.10.1987",
-				//	IsFirstVisit = false,
-				//	IsCardBlocked = false,
-				//	HasOnlineAccount = false,
-				//	Sex = 0
-				//});
-
-				//patients.Add(new ItemPatient() {
-				//	PhoneNumber = prefix + number,
-				//	PCode = "00000001",
-				//	FirstName = "Сергей",
-				//	MiddleName = "Анатольевич",
-				//	Birthday = "01.01.1989",
-				//	IsFirstVisit = true,
-				//	IsCardBlocked = false,
-				//	HasOnlineAccount = false,
-				//	Sex = 0
-				//});
-
-				//patients.Add(new ItemPatient() {
-				//	PhoneNumber = prefix + number,
-				//	PCode = "00000001",
-				//	FirstName = "Майя",
-				//	MiddleName = "Николаевна",
-				//	Birthday = "25.05.1992",
-				//	IsFirstVisit = false,
-				//	IsCardBlocked = true,
-				//	HasOnlineAccount = false,
-				//	Sex = 1
-				//});
-
-				//patients.Add(new ItemPatient() {
-				//	PhoneNumber = prefix + number,
-				//	PCode = "00000001",
-				//	FirstName = "Тамара",
-				//	MiddleName = "Павловна",
-				//	Birthday = "11.05.1959",
-				//	IsFirstVisit = false,
-				//	IsCardBlocked = false,
-				//	HasOnlineAccount = false,
-				//	Sex = 1
-				//});
 			}
 
 			return patients;
@@ -117,95 +68,91 @@ namespace InfomatSelfChecking {
 
 			foreach (DataRow row in dataTable.Rows) {
 				try {
-					ItemAppointment itemAppointment = new ItemAppointment() {
-						SchedID = row["SCHEDID"].ToString(),
-						DateTimeBegin = DateTime.Parse(
-							row["WORKDATE"].ToString() + " " +
-							row["BHOUR"].ToString() + ":" +
-							row["BMIN"].ToString()),
-						DName = row["DNAME"].ToString(),
-						DepName = row["DEPNAME"].ToString(),
-						RNum = row["RNUM"].ToString(),
-						IsCash = row["ISCASH"].ToString().Equals("1") ? true : false,
-						IsRoentgen = row["ISROENTGEN"].ToString().Equals("1") ? true : false,
-						ClVisit = row["CLVISIT"].ToString()
-					};
+					string group = row["GROUPS"].ToString().TrimStart(' ').TrimEnd(' ');
+					string info = row["INFO"].ToString().TrimStart(' ').TrimEnd(' ');
 
-					patient.Appointments.Add(itemAppointment);
+					if (info.Equals("0"))
+						continue;
+
+					string[] infoData = info.Split('@');
+					if (infoData.Length == 0)
+						continue;
+
+					switch (group) {
+						case "_STOP_CODE":
+							foreach (string code in infoData) {
+								switch (code) {
+									case "cash":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Cash);
+										break;
+									case "firsttime":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.FirstTime);
+										break;
+									case "lock":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Lock);
+										break;
+									case "late":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Late);
+										break;
+									case "not_available_now":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.NotAvailableNow);
+										break;
+									case "depout":
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.DepOut);
+										break;
+									default:
+										Logging.ToLog("Не удается распознать StopCode: " + code);
+										break;
+								}
+							}
+							break;
+						case "_INFO_CODE":
+							foreach (string code in infoData) {
+								switch (code) {
+									case "inform_about_lk":
+										patient.InfoCodesCurrent.Add(ItemPatient.InfoCodes.InformAboutLK);
+										break;
+									default:
+										Logging.ToLog("Не удается распознать InfoCode: " + code);
+										break;
+								}
+							}
+							break;
+						default:
+							if (infoData.Length != 6) {
+								Logging.ToLog("Количество элементов в строке не равно 6: " + info);
+								break;
+							}
+
+							ItemAppointment itemAppointment = new ItemAppointment() {
+								DateTimeSchedule = infoData[0],
+								DepShortName = infoData[1],
+								DepName = infoData[2],
+								DName = infoData[3],
+								RNum = infoData[4],
+								SchedID = infoData[5]
+							};
+
+							switch (group) {
+								case "visited":
+									patient.AppointmentsVisited.Add(itemAppointment);
+									break;
+								case "available":
+									patient.AppointmentsAvailable.Add(itemAppointment);
+									break;
+								case "not_available":
+									patient.AppointmentsNotAvailable.Add(itemAppointment);
+									break;
+								default:
+									break;
+							}
+
+							break;
+					}
+
 				} catch (Exception e) {
-					Logging.LogMessageToFile(e.Message + Environment.NewLine + e.StackTrace);
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
 				}
-			}
-
-			if (Debugger.IsAttached) {
-				//appointments.Add(new ItemAppointment() {
-				//	SchedID = "000001",
-				//	DateTimeBegin = DateTime.Parse("27.03.2018 15:00"),
-				//	DName = "Проверкин П.П.",
-				//	DepName = "Терапия",
-				//	DepShortName = "ТЕР",
-				//	RNum = "№201",
-				//	IsLate = false,
-				//	IsCash = false,
-				//	IsRoentgen = false,
-				//	ClVisit = "",
-				//});
-
-				//Random random = new Random();
-				//bool isCash = random.Next(0, 2) == 0 ? true : false;
-				//bool isLage = random.Next(0, 2) == 0 ? true : false;
-				//bool isRoentgen = random.Next(0, 2) == 0 ? true : false;
-				//appointments.Add(new ItemAppointment() {
-				//	SchedID = "000002",
-				//	DateTimeBegin = DateTime.Parse("27.03.2018 15:30"),
-				//	DName = "Алехина С.П.",
-				//	DepName = "Хирургия",
-				//	DepShortName = "ХРГ",
-				//	RNum = "№204",
-				//	IsLate = isLage,
-				//	IsCash = isCash,
-				//	IsRoentgen = isRoentgen,
-				//	ClVisit = "",
-				//});
-
-				//appointments.Add(new ItemAppointment() {
-				//	SchedID = "000002",
-				//	DateTimeBegin = DateTime.Parse("27.03.2018 16:00"),
-				//	DName = "ОченьДлиннаяФамилияДоктора-ПлюсЕщеЧастьФамилии П.П.",
-				//	DepName = "Функциональная диагностика",
-				//	DepShortName = "ФДИАГ",
-				//	RNum = "№501",
-				//	IsLate = false,
-				//	IsCash = false,
-				//	IsRoentgen = false,
-				//	ClVisit = "",
-				//});
-
-				//appointments.Add(new ItemAppointment() {
-				//	SchedID = "000002",
-				//	DateTimeBegin = DateTime.Parse("27.03.2018 16:30"),
-				//	DName = "Иванов И.И.",
-				//	DepName = "Неврология",
-				//	DepShortName = "НЕВР",
-				//	RNum = "№501",
-				//	IsLate = false,
-				//	IsCash = false,
-				//	IsRoentgen = false,
-				//	ClVisit = "",
-				//});
-
-				//appointments.Add(new ItemAppointment() {
-				//	SchedID = "000002",
-				//	DateTimeBegin = DateTime.Parse("27.03.2018 17:00"),
-				//	DName = "Петров П.П.",
-				//	DepName = "Массаж",
-				//	DepShortName = "МСЖ",
-				//	RNum = "№501",
-				//	IsLate = false,
-				//	IsCash = false,
-				//	IsRoentgen = false,
-				//	ClVisit = "",
-				//});
 			}
 		}
 
@@ -213,18 +160,14 @@ namespace InfomatSelfChecking {
 			return fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
 		}
 
-		public static bool IsDbAlive() {
-			return fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
+		public static void CheckDbAvailable() {
+            if (fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count == 0)
+                throw new Exception("DataHandle - CheckDbAvailable - result is empty");
 		}
 
 		public static bool IsThisMoscowFilial() {
-			try {
-				return fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial, 
-					new Dictionary<string, object>()).Rows[0][0].ToString().Equals("1");
-			} catch (Exception e) {
-				Logging.LogMessageToFile(e.Message + Environment.NewLine + e.StackTrace);
-				return false;
-			}
+			return fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial, 
+				new Dictionary<string, object>()).Rows[0][0].ToString().Equals("1");
 		}
     }
 }

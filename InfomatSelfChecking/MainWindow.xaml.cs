@@ -17,7 +17,7 @@ using System.Windows.Threading;
 
 namespace InfomatSelfChecking {
 	public partial class MainWindow : Window {
-		public static MainWindow AppMainWindow { get; private set; }
+		public static MainWindow CurrentMainWindow { get; private set; }
 		public static double FontSizeMain { get; private set; } = 10;
 		public static FontFamily FontFamilyMain { get; private set; } = new FontFamily("Franklin Gothic");
 		public static FontFamily FontFamilySub { get; private set; } = new FontFamily("Franklin Gothic Book");
@@ -34,12 +34,12 @@ namespace InfomatSelfChecking {
 				if (!e.Key.Equals(Key.Escape))
 					return;
 
-				Logging.LogMessageToFile("---------------------------------" +
+				Logging.ToLog("---------------------------------" +
 					Environment.NewLine + "Закрытие по нажатию клавиши ESC");
 				Application.Current.Shutdown();
 			};
 
-			AppMainWindow = this;
+			CurrentMainWindow = this;
 			
 			TextBlockTimeHours.Foreground = BrushTextHeaderForeground;
 			TextBlockTimeSplitter.Foreground = BrushTextHeaderForeground;
@@ -53,11 +53,11 @@ namespace InfomatSelfChecking {
 			FrameMain.Foreground = BrushTextForeground;
 		
 			Loaded += (o, e) => {
-				FontSize = LabelTitle.ActualHeight / 3;
-				FontSizeMain = FontSize * 0.8;
-				TextBlockTimeHours.FontSize = FontSizeMain;
-				TextBlockTimeSplitter.FontSize = FontSizeMain;
-				TextBlockTimeMinutes.FontSize = FontSizeMain;
+				FontSize = LabelTitle.ActualHeight / 3.2;
+				FontSizeMain = FontSize * 1.0;
+				TextBlockTimeHours.FontSize = FontSizeMain * 0.8;
+				TextBlockTimeSplitter.FontSize = FontSizeMain * 0.8;
+				TextBlockTimeMinutes.FontSize = FontSizeMain * 0.8;
 			};
 
 			DispatcherTimer timerSeconds = new DispatcherTimer {
@@ -74,11 +74,36 @@ namespace InfomatSelfChecking {
 			};
 			timerSeconds.Start();
 
+            DispatcherTimer timerDbAvailability = new DispatcherTimer();
+
+            timerDbAvailability.Tick += (s, e) => {
+                Logging.ToLog("MainWindow - Проверка доступности БД");
+
+                if (FrameMain.NavigationService.Content is PageNotification) {
+                    PageNotification currentPage = FrameMain.NavigationService.Content as PageNotification;
+                    if (currentPage.CurrentNotificationType == PageNotification.NotificationType.DbError)
+                        return;
+                }
+
+                DispatcherTimer dt = s as DispatcherTimer;
+                if (dt.Interval == TimeSpan.FromSeconds(0))
+                    dt.Interval = TimeSpan.FromMinutes(1);
+
+                try {
+                    DataHandle.CheckDbAvailable();
+                } catch (Exception exc) {
+                    FrameMain.NavigationService.Navigate(
+                        new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
+                }
+            };
+            timerDbAvailability.Start();
+
+
 			PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.Welcome);
 			FrameMain.Navigate(pageNotification);
 		}
 
-		public void SetUpWindow(bool isLogoVisible, string title, bool isError) {
+        public void SetUpMainWindow(bool isLogoVisible, string title, bool isError) {
 			ImageLogo.Visibility = isLogoVisible ? Visibility.Visible : Visibility.Hidden;
 			TextBlockTitle.Text = title;
 			Brush brush;
@@ -103,5 +128,5 @@ namespace InfomatSelfChecking {
 			page.Foreground = BrushTextForeground;
 			try { page.FontSize = FontSizeMain; } catch (Exception) { }
 		}
-	}
+    }
 }

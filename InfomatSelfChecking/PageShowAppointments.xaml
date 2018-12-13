@@ -19,29 +19,24 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Grid x:Name="GridAppointments" Grid.ColumnSpan="3">
+        <Grid x:Name="GridAppointments" 
+              Grid.ColumnSpan="3" 
+              Visibility="Visible"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"
+            <!--<Label Grid.Column="0"
                    Grid.ColumnSpan="8"
                    Background="#FFF0F0F0"/>
 
@@ -59,58 +54,44 @@
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"/>
             </Border>
-            
+
             <Border Grid.Column="3" BorderThickness="2" BorderBrush="White">
                 <TextBlock Text="Отделение" 
                            Margin="10,0"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"/>
             </Border>
-            
+
             <Border Grid.Column="4" Grid.ColumnSpan="4" BorderThickness="2" BorderBrush="White">
                 <TextBlock Text="Специалист" 
                            Margin="10,0"
                            VerticalAlignment="Center"/>
-            </Border>
+            </Border>-->
         </Grid>
 
-        <Button Grid.Row="1"
-                Grid.Column="0"
-                Content="Закрыть"
-                Margin="20"
-                BorderThickness="0"
-                x:Name="ButtonClose"
-                Visibility="Hidden"
-                Click="ButtonClose_Click">
-            <Button.Effect>
-            <DropShadowEffect Opacity="0.3"/>
-            </Button.Effect> 
-        </Button>
+        <WrapPanel x:Name="WrapPanelAppointments" 
+                   Grid.ColumnSpan="3" 
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Visibility="Hidden"/>
 
         <Button Grid.Row="1" 
                 Grid.Column="1" 
                 Margin="20" 
-                Click="ButtonBeNotedAndPrint_CLick"
+                Click="ButtonCheckIn_CLick"
                 BorderThickness="0"
-                x:Name="ButtonBeNotedAndPrint"
-                VerticalContentAlignment="Center">
+                Foreground="White"
+                x:Name="ButtonCheckIn"
+                VerticalAlignment="Center">
             <Button.Content>
-                <TextBlock Text="Отметиться" TextAlignment="Center" VerticalAlignment="Center"/>
-            </Button.Content>
-            <Button.Effect>
-                <DropShadowEffect Opacity="0.3"/>
-            </Button.Effect>
-        </Button>
-
-        <Button Grid.Row="1"
-                Grid.Column="2"
-                Margin="20"
-                BorderThickness="0"
-                x:Name="ButtonPrintAndClose"
-                Visibility="Hidden"
-                Click="ButtonPrintAndClose_Click">
-            <Button.Content>
-                <TextBlock Text="Распечатать" TextAlignment="Center"/>
+                <WrapPanel>
+                    <Image Source="Media/ButtonOk.png" 
+                           Margin="0,20,20,20" 
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="Отметиться" 
+                               TextAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </WrapPanel>
             </Button.Content>
             <Button.Effect>
                 <DropShadowEffect Opacity="0.3"/>

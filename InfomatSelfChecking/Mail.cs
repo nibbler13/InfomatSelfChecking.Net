@@ -4,12 +4,13 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
 	public class Mail {
-		public static void SendMail (string subject, string body, string receiver, string attachmentPath = "") {
-			Logging.LogMessageToFile("Отправка сообщения, тема: " + subject + ", текст: " + body);
-			Logging.LogMessageToFile("Получатели: " + receiver);
+		public static async void SendMail (string subject, string body, string receiver, string attachmentPath = "") {
+			Logging.ToLog("Отправка сообщения, тема: " + subject + ", текст: " + body);
+			Logging.ToLog("Получатели: " + receiver);
 
 			if (string.IsNullOrEmpty(receiver))
 				return;
@@ -73,19 +74,20 @@ namespace InfomatSelfChecking {
 				if (!string.IsNullOrEmpty(Properties.Settings.Default.MailCopy))
 					message.CC.Add(Properties.Settings.Default.MailCopy);
 
-				SmtpClient client = new SmtpClient(Properties.Settings.Default.MailSmtpServer, 25);
-				client.UseDefaultCredentials = false;
-				client.Credentials = new System.Net.NetworkCredential(
-					Properties.Settings.Default.MailUser,
-					Properties.Settings.Default.MailPassword,
-					Properties.Settings.Default.MailDomain);
+                SmtpClient client = new SmtpClient(Properties.Settings.Default.MailSmtpServer, 25) {
+                    UseDefaultCredentials = false,
+                    Credentials = new System.Net.NetworkCredential(
+                    Properties.Settings.Default.MailUser,
+                    Properties.Settings.Default.MailPassword,
+                    Properties.Settings.Default.MailDomain)
+                };
 
-				client.Send(message);
+                await Task.Run(() => { client.Send(message); });
 				client.Dispose();
 				message.Dispose();
-				Logging.LogMessageToFile("Письмо отправлено успешно");
+				Logging.ToLog("Письмо отправлено успешно");
 			} catch (Exception e) {
-				Logging.LogMessageToFile("SendMail exception: " + e.Message + Environment.NewLine + e.StackTrace);
+				Logging.ToLog("SendMail exception: " + e.Message + Environment.NewLine + e.StackTrace);
 			}
 		}
 	}

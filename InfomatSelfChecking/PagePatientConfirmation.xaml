@@ -20,7 +20,8 @@
         </Grid.ColumnDefinitions>
 
         <Grid Grid.ColumnSpan="3"
-              x:Name="GridSinglePatient">
+              x:Name="GridSinglePatient"
+              Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -46,18 +47,33 @@
               VerticalAlignment="Center"
               Visibility="Hidden">
             <Grid.RowDefinitions>
-                <RowDefinition MinHeight="50"/>
-                <RowDefinition MinHeight="50"/>
+                <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10*"/>
-                <ColumnDefinition Width="80*"/>
-                <ColumnDefinition Width="10*"/>
-            </Grid.ColumnDefinitions>
+
+            <!--<Button Grid.Row="0" Margin="20" HorizontalContentAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="15*"/>
+                        <ColumnDefinition Width="70*"/>
+                        <ColumnDefinition Width="15*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="LightGreen" Grid.RowSpan="2"/>
+
+                    <TextBlock Grid.Column="1" Text="Name" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="BD" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Image Grid.Column="2" Grid.RowSpan="2" Source="Media/PicOk.png" Margin="20"/>
+                </Grid>
+            </Button>-->
         </Grid>
         
         <Button Grid.Row="2" 
-                Content="Неверно"
                 x:Name="ButtonWrong"
                 Click="ButtonWrong_Click"
                 BorderThickness="0"
@@ -65,11 +81,20 @@
             <Button.Effect>
                 <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
             </Button.Effect>
+            <Button.Content>
+                <WrapPanel>
+                    <Image Source="Media/ButtonClose.png" 
+                           Margin="0,20,20,20" 
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="Неверно" 
+                               VerticalAlignment="Center" 
+                               x:Name="TextBlockButtonWrong"/>
+                </WrapPanel>
+            </Button.Content>
         </Button>
 
         <Button Grid.Row="2"
                 Grid.Column="2"
-                Content="Продолжить"
                 x:Name="ButtonContinue"
                 Click="ButtonContinue_Click"
                 BorderThickness="0"
@@ -78,6 +103,15 @@
             <Button.Effect>
                 <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
             </Button.Effect>
+            <Button.Content>
+                <WrapPanel>
+                    <Image Margin="0,20,20,20"
+                           Source="Media/ButtonOk.png"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           />
+                    <TextBlock Text="Продолжить" VerticalAlignment="Center"/>
+                </WrapPanel>
+            </Button.Content>
         </Button>
     </Grid>
 </Page>

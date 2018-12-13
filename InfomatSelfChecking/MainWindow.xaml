@@ -59,6 +59,51 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="RoundCornerStretch" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid x:Name="grid">
+                            <Border x:Name="border" CornerRadius="12" BorderBrush="#00000000" BorderThickness="2">
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                                        <GradientStop Color="#FFFAFAFA" Offset="0"/>
+                                        <GradientStop Color="#FFF0F0F0" Offset="0.5"/>
+                                        <GradientStop Color="#FFE6E6E6" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <ContentPresenter HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"
+                                          TextElement.FontWeight="Bold">
+                                </ContentPresenter>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFF0F0F0" Offset="0"/>
+                                            <GradientStop Color="#FFE6E6E6" Offset="0.5"/>
+                                            <GradientStop Color="Gainsboro" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#7FC8C8C8"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="grid" Value="0.25"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <Style x:Key="RoundCornerGreen" TargetType="{x:Type Button}">
             <Setter Property="Template">
@@ -215,14 +260,24 @@
                        x:Name="TextBlockTitle"/>
         </Label>
 
+        <!--Clock-->
         <WrapPanel Orientation="Horizontal" 
                    HorizontalAlignment="Right" 
                    VerticalAlignment="Top"
                    Height="{Binding ElementName=TextBlockTimeHours,Path=ActualHeight}" 
                    Margin="20">
-            <Image Source="Media/IconTime.png" 
-                   Margin="0,5,10,5"
-                   RenderOptions.BitmapScalingMode="HighQuality"/>
+            <Grid Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15*"/>
+                    <RowDefinition Height="70*"/>
+                    <RowDefinition Height="15*"/>
+                </Grid.RowDefinitions>
+                
+                <Image Source="Media/IconTime.png" 
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       VerticalAlignment="Center"
+                       Grid.Row="1"/>
+            </Grid>
             
             <TextBlock Text="00" 
                        x:Name="TextBlockTimeHours"
