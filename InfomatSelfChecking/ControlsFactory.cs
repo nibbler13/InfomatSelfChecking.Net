@@ -24,17 +24,19 @@ namespace InfomatSelfChecking {
 			NotificationNumberNotFound,
 			NotificationOk,
             Department,
-            Doctor
+            Doctor,
+            Room
 		}
 
         private static readonly string rootFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly string localDoctorPhotosPath = Path.Combine(rootFolder, "DoctorsPhotos");
         private static readonly string localDepartmentPhotosPath = Path.Combine(rootFolder, "DepartmentsPhotos");
 
-        public static TextBlock CreateTextBlock(string text, 
-			TextAlignment textAlignment = TextAlignment.Center, 
+        public static TextBlock CreateTextBlock(
+            string text, 
+			TextAlignment textAlignment = TextAlignment.Left, 
 			VerticalAlignment verticalAlignment = VerticalAlignment.Center, 
-			HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center,
+			HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left,
 			Thickness? margin = null) {
 			return new TextBlock {
 				Text = text,
@@ -119,6 +121,9 @@ namespace InfomatSelfChecking {
 				case ImageType.NotificationOk:
 					fileName = "PicOk.png";
 					break;
+                case ImageType.Room:
+                    fileName = "PicRoom.png";
+                    break;
                 case ImageType.Department:
                     return GetImageForDepartment(searchName);
                 case ImageType.Doctor:
@@ -215,6 +220,14 @@ namespace InfomatSelfChecking {
                 text = timeString;
 
             return text;
+        }
+
+        public static string FirstCharToUpper(string input) {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            input = input.ToLower();
+            return input.First().ToString().ToUpper() + string.Join("", input.Skip(1));
         }
     }
 }

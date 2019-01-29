@@ -46,17 +46,17 @@ namespace InfomatSelfChecking {
 			}
 
 			ButtonWrong.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
-            TextBlockButtonWrong.Foreground = MainWindow.BrushTextForeground;
+            TextBlockButtonWrong.Foreground = Properties.Settings.Default.BrushTextForeground;
 			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
 
-			MainWindow.ConfigurePage(this);
+			//MainWindow.ConfigurePage(this);
 
 			TextBlockName.FontSize = FontSize * 1.2;
 			TextBlockBirthday.FontSize = FontSize * 1.2;
 
-			Loaded += (s, e) => {
-				MainWindow.CurrentMainWindow.SetUpMainWindow(isLogoVisible, title, false);
-			};
+			//Loaded += (s, e) => {
+			//	MainWindow.CurrentMainWindow.SetUpMainWindow(isLogoVisible, title, false);
+			//};
         }
 
 		private void DrawPatients() {
@@ -92,11 +92,11 @@ namespace InfomatSelfChecking {
                 string textBottom = "дата рождения: " + patient.Birthday.ToLongDateString();
 
                 TextBlock textBlockTop = ControlsFactory.CreateTextBlock(textTop);
-                textBlockTop.Foreground = MainWindow.BrushTextForeground;
+                textBlockTop.Foreground = Properties.Settings.Default.BrushTextForeground;
                 Grid.SetColumn(textBlockTop, 1);
 
                 TextBlock textBlockBottom = ControlsFactory.CreateTextBlock(textBottom);
-                textBlockBottom.Foreground = MainWindow.BrushTextDisabledForeground;
+                textBlockBottom.Foreground = Properties.Settings.Default.BrushTextDisabledForeground;
                 Grid.SetRow(textBlockBottom, 1);
                 Grid.SetColumn(textBlockBottom, 1);
 
@@ -143,8 +143,9 @@ namespace InfomatSelfChecking {
 			if (patients.Count == 1) {
 				PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.NameNotCorrect);
 				NavigationService.Navigate(pageNotification);
-			} else
-				MainWindow.CurrentMainWindow.CloseAllWindows();
+			}
+    //        else
+				//MainWindow.CurrentMainWindow.CloseAllWindows();
 		}
 
 		private void ButtonContinue_Click(object sender, RoutedEventArgs e) {

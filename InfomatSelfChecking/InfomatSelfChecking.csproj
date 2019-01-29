@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BindingValues.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -183,6 +184,7 @@
     <Resource Include="Media\ButterflyClear.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Media\PicRoom.png" />
     <Resource Include="Media\UnknownDepartment.png" />
     <Resource Include="Media\DoctorWithoutAPhoto.png" />
     <Resource Include="Media\ButtonClose.png" />

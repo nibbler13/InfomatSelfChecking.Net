@@ -5,16 +5,17 @@ using System.Reflection;
 
 namespace InfomatSelfChecking {
 	class Logging {
-		private static string LOG_FILE_NAME = Assembly.GetExecutingAssembly().GetName().Name + "_*.log";
+        private static readonly string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";
+        private static readonly string LOG_FILE_NAME = Assembly.GetExecutingAssembly().GetName().Name + "_*.log";
 		private const int MAX_LOGFILES_QUANTITY = 7;
 
 		public static void ToLog(string msg) {
 			string today = DateTime.Now.ToString("yyyyMMdd");
-			string logFileName = App.AssemblyDirectory + LOG_FILE_NAME.Replace("*", today);
+			string logFileName = Path.Combine(AssemblyDirectory, LOG_FILE_NAME.Replace("*", today));
 
 			try {
 				using (System.IO.StreamWriter sw = System.IO.File.AppendText(logFileName)) {
-					string logLine = System.String.Format("{0:G}: {1}", System.DateTime.Now, msg);
+					string logLine = string.Format("{0:G}: {1}", System.DateTime.Now, msg);
 					sw.WriteLine(logLine);
 				}
 			} catch (Exception e) {
@@ -26,15 +27,15 @@ namespace InfomatSelfChecking {
 			CheckAndCleanOldFiles();
 		}
 
-		public static void WriteStringToFile(string text, string fileFullPath) {
-			ToLog("Запись текста в файл: " + fileFullPath + ", содержание: " + Environment.NewLine + text);
+		//public static void WriteStringToFile(string text, string fileFullPath) {
+		//	ToLog("Запись текста в файл: " + fileFullPath + ", содержание: " + Environment.NewLine + text);
 
-			try {
-				System.IO.File.WriteAllText(fileFullPath, text);
-			} catch (Exception e) {
-				Console.WriteLine("WriteStringToFile exception: " + e.Message + Environment.NewLine + e.StackTrace);
-			}
-		}
+		//	try {
+		//		System.IO.File.WriteAllText(fileFullPath, text);
+		//	} catch (Exception e) {
+		//		Console.WriteLine("WriteStringToFile exception: " + e.Message + Environment.NewLine + e.StackTrace);
+		//	}
+		//}
 
 		private static void CheckAndCleanOldFiles() {
 			try {

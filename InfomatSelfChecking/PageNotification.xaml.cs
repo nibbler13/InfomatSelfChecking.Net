@@ -40,9 +40,9 @@ namespace InfomatSelfChecking {
 
             CurrentNotificationType = type;
 			this.returnBack = returnBack;
-			MainWindow.ConfigurePage(this);
-            TextBlockBottom.Foreground = MainWindow.BrushTextDisabledForeground;
-            TextBlockTapToContinue.Foreground = MainWindow.BrushTextDisabledForeground;
+			//MainWindow.ConfigurePage(this);
+            TextBlockBottom.Foreground = Properties.Settings.Default.BrushTextDisabledForeground;
+            TextBlockTapToContinue.Foreground = Properties.Settings.Default.BrushTextDisabledForeground;
 
 			string textTop = string.Empty;
 			string textBottom = string.Empty;
@@ -128,25 +128,25 @@ namespace InfomatSelfChecking {
             if (CurrentNotificationType == NotificationType.DbError)
                 return;
 
-            if ((bool)e.NewValue)
-                MainWindow.CurrentMainWindow.PreviewMouseDown += PageNotification_PreviewMouseDown;
-            else
-                MainWindow.CurrentMainWindow.PreviewMouseDown -= PageNotification_PreviewMouseDown;
-        }
+			if ((bool)e.NewValue)
+				MainWindow.Instance.PreviewMouseDown += PageNotification_PreviewMouseDown;
+			else
+				MainWindow.Instance.PreviewMouseDown -= PageNotification_PreviewMouseDown;
+		}
 
         private void PageNotification_Loaded(object sender, RoutedEventArgs e) {
 			if (CurrentNotificationType == NotificationType.Welcome || 
                 CurrentNotificationType == NotificationType.DbError) {
-				MainWindow.ConfigurePage(this);
-				TextBlockAboutDeveloper.Foreground = MainWindow.BrushTextDisabledForeground;
+				//MainWindow.ConfigurePage(this);
+				TextBlockAboutDeveloper.Foreground = Properties.Settings.Default.BrushTextDisabledForeground;
 				TextBlockAboutDeveloper.FontSize = FontSize * 0.4;
 			}
 
             TextBlockBottom.FontSize = FontSize * 0.8;
             TextBlockTapToContinue.FontSize = FontSize * 0.8;
 
-			MainWindow.CurrentMainWindow.SetUpMainWindow(true, title, isError);
-		}
+            BindingValues.Instance.SetUpMainWindow(title, true, isError);
+        }
 
 		private void PageNotification_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
             if (NavigationService == null)
@@ -161,7 +161,7 @@ namespace InfomatSelfChecking {
 			if (returnBack)
                 NavigationService.GoBack();
 			else
-				MainWindow.CurrentMainWindow.CloseAllWindows();
+				MainWindow.Instance.CloseAllWindows();
 		}
 
 		private void MediaElementWelcomeAnimation_MediaEnded(object sender, RoutedEventArgs e) {

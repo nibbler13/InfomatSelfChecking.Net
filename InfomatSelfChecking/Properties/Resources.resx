@@ -262,7 +262,7 @@ cервис временно недоступен
     <value>Для продолжения коснитесь экрана</value>
   </data>
   <data name="notification_welcome" xml:space="preserve">
-    <value>Обслуживаетесь по страховке?
+    <value>Обслуживаетесь по страховому полису?
 Здесь можно отметиться на приём!</value>
   </data>
   <data name="about_developer" xml:space="preserve">

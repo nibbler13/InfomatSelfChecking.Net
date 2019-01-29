@@ -100,6 +100,9 @@ namespace InfomatSelfChecking {
 									case "depout":
 										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.DepOut);
 										break;
+                                    case "debt":
+                                        patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
+                                        break;
 									default:
 										Logging.ToLog("Не удается распознать StopCode: " + code);
 										break;
@@ -119,18 +122,19 @@ namespace InfomatSelfChecking {
 							}
 							break;
 						default:
-							if (infoData.Length != 6) {
+							if (infoData.Length != 7) {
 								Logging.ToLog("Количество элементов в строке не равно 6: " + info);
 								break;
 							}
 
 							ItemAppointment itemAppointment = new ItemAppointment() {
-								DateTimeSchedule = infoData[0],
-								DepShortName = infoData[1],
-								DepName = infoData[2],
-								DName = infoData[3],
-								RNum = infoData[4],
-								SchedID = infoData[5]
+								DateTimeScheduleBegin = infoData[0],
+								DateTimeScheduleEnd = infoData[1],
+                                DepShortName = infoData[2],
+								DepName = ControlsFactory.FirstCharToUpper(infoData[3]),
+								DName = infoData[4],
+								RNum = infoData[5],
+								SchedID = infoData[6]
 							};
 
 							switch (group) {

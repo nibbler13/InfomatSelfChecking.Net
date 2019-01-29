@@ -20,7 +20,7 @@ namespace InfomatSelfChecking {
 	/// Логика взаимодействия для PageEnterNumber.xaml
 	/// </summary>
 	public partial class PageEnterNumber : Page {
-        private readonly List<TextBlock> TextBlockEntered;
+        private readonly List<TextBlock> TextBlockEntered = new List<TextBlock>();
 		private string enteredNumber = string.Empty;
 		private string EnteredNumber {
 			get {
@@ -33,63 +33,40 @@ namespace InfomatSelfChecking {
 				ButtonRemoveOne.IsEnabled = enteredNumber.Length > 0;
 				ButtonContinue.IsEnabled = enteredNumber.Length == 10;
 
-                for (int i = 0; i <= 9; i++) {
-                    string symbol = "_";
-                    if (i < enteredNumber.Length)
-                        symbol = enteredNumber.Substring(i, 1);
+                //for (int i = 0; i <= 9; i++) {
+                //    string symbol = "_";
+                //    if (i < enteredNumber.Length)
+                //        symbol = enteredNumber.Substring(i, 1);
 
-                    TextBlockEntered[i].Text = symbol;
-                }
+                //    TextBlockEntered[i].Text = symbol;
+                //}
 			}
 		}
-
-
+		
 
 
 		public PageEnterNumber() {
 			InitializeComponent();
+			
+			BindingValues.Instance.SetUpMainWindow(Properties.Resources.title_dialer, true, false);
+			BindingValues.Instance.InitializeDialerText();
 
-			foreach (Control item in GridNumbers.Children) {
-				item.Effect = ControlsFactory.CreateDropShadowEffect();
-				if (item is Button button) {
-                    button.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
-                    button.Foreground = MainWindow.BrushTextForeground;
-                }
-			}
-
-            ButtonClear.Style = Application.Current.MainWindow.FindResource("RoundCorner") as Style;
-
-            MainWindow.ConfigurePage(this);
-			MainWindow.CurrentMainWindow.SetUpMainWindow(true, Properties.Resources.title_dialer, false);
-
-            foreach (TextBlock textBlock in WrapPanelEntered.Children) {
-                textBlock.FontSize = FontSize * 1.5;
-            }
-
-            TextBlockEntered = new List<TextBlock>() {
-                TextBlockNum1,
-                TextBlockNum2,
-                TextBlockNum3,
-                TextBlockNum4,
-                TextBlockNum5,
-                TextBlockNum6,
-                TextBlockNum7,
-                TextBlockNum8,
-                TextBlockNum9,
-                TextBlockNum10,
-            };
-
-			ButtonClear.IsEnabledChanged += Button_IsEnabledChanged;
-			ButtonRemoveOne.IsEnabledChanged += Button_IsEnabledChanged;
-			ButtonContinue.IsEnabledChanged += Button_IsEnabledChanged;
-
-			ButtonContinue.Style = Application.Current.MainWindow.FindResource("RoundCornerGreen") as Style;
-
-            ButtonClear.IsEnabled = false;
-            ButtonRemoveOne.IsEnabled = false;
-            ButtonContinue.IsEnabled = false;
+            //TextBlockEntered = new List<TextBlock>() {
+            //    TextBlockNum1,
+            //    TextBlockNum2,
+            //    TextBlockNum3,
+            //    TextBlockNum4,
+            //    TextBlockNum5,
+            //    TextBlockNum6,
+            //    TextBlockNum7,
+            //    TextBlockNum8,
+            //    TextBlockNum9,
+            //    TextBlockNum10,
+            //};
 
             EnteredNumber = "0000000000";
+
+			DataContext = BindingValues.Instance;
         }
 
 		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
@@ -100,13 +77,13 @@ namespace InfomatSelfChecking {
 				button.Effect = ControlsFactory.CreateDropShadowEffect();
 
 				if (button == ButtonContinue)
-					button.Foreground = MainWindow.BrushTextHeaderForeground;
+					button.Foreground = BindingValues.Instance.BrushTextTitleForeground;
 				else
-					button.Foreground = MainWindow.BrushTextForeground;
+					button.Foreground = BindingValues.Instance.BrushTextForeground;
 
 			} else {
 				button.Effect = null;
-				button.Foreground = MainWindow.BrushTextDisabledForeground;
+				button.Foreground = BindingValues.Instance.BrushTextDisabledForeground;
 			}
 		}
 
@@ -137,9 +114,9 @@ namespace InfomatSelfChecking {
                 return;
             }
 
-			Page page = null;
+			Page page;
 
-            if (patients.Count == 0) {
+			if (patients.Count == 0) {
                 string entered = "+7 (" + enteredNumber.Substring(0, 3) +
                     ") " + enteredNumber.Substring(3, 3) + "-" +
                     enteredNumber.Substring(5, 2) + "-" +

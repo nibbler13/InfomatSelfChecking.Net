@@ -13,7 +13,8 @@ namespace InfomatSelfChecking {
 			Lock,
 			Late,
 			NotAvailableNow,
-			DepOut
+			DepOut,
+            Debt
 		}
 
 		public enum InfoCodes {

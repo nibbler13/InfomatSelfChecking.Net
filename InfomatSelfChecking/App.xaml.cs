@@ -15,13 +15,11 @@ namespace InfomatSelfChecking {
 	/// Логика взаимодействия для App.xaml
 	/// </summary>
 	public partial class App : Application {
-		public static string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\";
-
 		private void Application_Startup(object sender, StartupEventArgs e) {
-			//DispatcherUnhandledException += App_DispatcherUnhandledException;
-			//AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //DispatcherUnhandledException += App_DispatcherUnhandledException;
+            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-			MainWindow window = new MainWindow();
+            MainWindow window = new MainWindow();
 			window.Show();
 		}
 
