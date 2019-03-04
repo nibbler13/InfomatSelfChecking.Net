@@ -8,6 +8,11 @@
       d:DesignHeight="600" 
       d:DesignWidth="800"
       Title="PagePatientSelectedSingle">
+
+    <Page.DataContext>
+        <local:PagePatientConfirmationViewModel/>
+    </Page.DataContext>
+    
     <Grid x:Name="SinglePatient">
         <Grid.RowDefinitions>
             <RowDefinition Height="85*"/>
@@ -75,7 +80,6 @@
         
         <Button Grid.Row="2" 
                 x:Name="ButtonWrong"
-                Click="ButtonWrong_Click"
                 BorderThickness="0"
                 Margin="20">
             <Button.Effect>
@@ -96,7 +100,6 @@
         <Button Grid.Row="2"
                 Grid.Column="2"
                 x:Name="ButtonContinue"
-                Click="ButtonContinue_Click"
                 BorderThickness="0"
                 Margin="20"
                 Foreground="White">

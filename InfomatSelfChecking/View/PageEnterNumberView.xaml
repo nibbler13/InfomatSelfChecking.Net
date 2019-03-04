@@ -12,6 +12,10 @@
       FontSize="{Binding FontSizeTitle}"
       Foreground="{Binding BrushTextForeground}">
 
+    <Page.DataContext>
+        <local:PageEnterNumberViewModel/>
+    </Page.DataContext>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*"/>
@@ -89,13 +93,11 @@
 
             <Button Grid.Column="2" 
                     x:Name="ButtonClear" 
-                    Click="ButtonClear_Click" 
                     Width="{Binding ElementName=Button1, Path=ActualWidth}"
                     Height="{Binding ElementName=Button1, Path=ActualHeight}"
                     HorizontalAlignment="Left"
                     Margin="40,0,0,0"
                     Style="{Binding StyleRoundCorner}"
-                    IsEnabledChanged="Button_IsEnabledChanged"
                     IsEnabled="False">
                 <Image Source="Media/ButtonClear.png" 
                        Margin="20" 
@@ -129,70 +131,58 @@
             <Button Content="1" 
                     Grid.Row="0" 
                     Grid.Column="0" 
-                    Click="ButtonNumber_Click" 
                     x:Name="Button1"
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="2" 
                     Grid.Row="0" 
                     Grid.Column="2" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="3" 
                     Grid.Row="0" 
                     Grid.Column="4"
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="4" 
                     Grid.Row="2" 
                     Grid.Column="0" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="5" 
                     Grid.Row="2" 
                     Grid.Column="2" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="6" 
                     Grid.Row="2" 
                     Grid.Column="4" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="7" 
                     Grid.Row="4" 
                     Grid.Column="0" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="8"
                     Grid.Row="4" 
                     Grid.Column="2" 
-                    Click="ButtonNumber_Click"
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="9" 
                     Grid.Row="4" 
                     Grid.Column="4" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Content="0" 
                     Grid.Row="6" 
                     Grid.Column="2" 
-                    Click="ButtonNumber_Click" 
                     Style="{Binding StyleRoundCorner}"/>
 
             <Button Grid.Row="6" 
                     Grid.Column="4"
                     x:Name="ButtonRemoveOne"
-                    Click="ButtonRemoveOne_Click"
                     Style="{Binding StyleRoundCorner}"
-                    IsEnabledChanged="Button_IsEnabledChanged"
                     IsEnabled="False">
                 <Image Source="Media/ButtonBackspace2.png" 
                        Margin="20"
@@ -203,10 +193,8 @@
         <Button Grid.Row="3" 
                 Margin="20" 
                 x:Name="ButtonContinue"
-                Click="ButtonContinue_Click"
                 Width="{Binding ElementName=GridNumbers,Path=ActualWidth}"
                 Style="{Binding StyleRoundCornerGreen}"
-                IsEnabledChanged="Button_IsEnabledChanged"
                 IsEnabled="False">
             <Button.Content>
                 <WrapPanel>

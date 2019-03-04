@@ -3,11 +3,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:InfomatSelfChecking.Properties"
+      xmlns:local="clr-namespace:InfomatSelfChecking"
       mc:Ignorable="d" 
       d:DesignHeight="600" 
       d:DesignWidth="800"
       Title="PagePatientNotFound">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25*"/>
@@ -28,7 +29,6 @@
                       Source="Media/check-animation-v2.gif" 
                       x:Name="MediaElementWelcomeAnimation" 
                       UnloadedBehavior="Manual" 
-                      MediaEnded="MediaElementWelcomeAnimation_MediaEnded"
                       Visibility="Hidden"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Center"/>
@@ -51,14 +51,14 @@
                    VerticalAlignment="Center"
                    x:Name="TextBlockBottom"/>
 
-        <TextBlock Text="{x:Static local:Resources.notification_tap_to_continue}"
+        <TextBlock Text="{Binding NotificationTapToContinue}"
                    Grid.Row="3"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Center"
                    x:Name="TextBlockTapToContinue"/>
 
         <TextBlock Grid.RowSpan="4"
-                   Text="{x:Static local:Resources.about_developer}" 
+                   Text="{Binding AboutDeveloper}" 
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Left" 
                    Visibility="Hidden"

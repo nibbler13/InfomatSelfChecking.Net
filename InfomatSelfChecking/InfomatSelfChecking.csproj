@@ -49,12 +49,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=5.12.1.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
-      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.5.12.1\lib\net452\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=6.5.0.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
+      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.6.5.0\lib\net452\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -73,8 +74,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BindingValues.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Page Include="View\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -88,41 +89,47 @@
     <Compile Include="ItemAppointment.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Mail.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="View\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="PageShowAppointments.xaml">
+    <Page Include="View\PageShowAppointmentsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PageEnterNumber.xaml">
+    <Page Include="View\PageEnterNumberView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PageNotification.xaml">
+    <Page Include="View\PageNotificationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PagePatientConfirmation.xaml">
+    <Page Include="View\PagePatientConfirmationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItemPatient.cs" />
-    <Compile Include="PageShowAppointments.xaml.cs">
-      <DependentUpon>PageShowAppointments.xaml</DependentUpon>
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\PageEnterNumberViewModel.cs" />
+    <Compile Include="ViewModel\PageNotificationViewModel.cs" />
+    <Compile Include="ViewModel\PagePatientConfirmationViewModel.cs" />
+    <Compile Include="View\PageShowAppointmentsView.xaml.cs">
+      <DependentUpon>PageShowAppointmentsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PageEnterNumber.xaml.cs">
-      <DependentUpon>PageEnterNumber.xaml</DependentUpon>
+    <Compile Include="View\PageEnterNumberView.xaml.cs">
+      <DependentUpon>PageEnterNumberView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PageNotification.xaml.cs">
-      <DependentUpon>PageNotification.xaml</DependentUpon>
+    <Compile Include="View\PageNotificationView.xaml.cs">
+      <DependentUpon>PageNotificationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PagePatientConfirmation.xaml.cs">
-      <DependentUpon>PagePatientConfirmation.xaml</DependentUpon>
+    <Compile Include="View\PagePatientConfirmationView.xaml.cs">
+      <DependentUpon>PagePatientConfirmationView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\PageShowAppointmentsViewModel.cs" />
+    <Compile Include="PatientInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
