@@ -55,6 +55,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,8 +75,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ViewModel\BaseViewModel.cs" />
-    <Page Include="View\MainView.xaml">
+    <Compile Include="BindingValues.cs" />
+    <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -85,51 +86,47 @@
     </Compile>
     <Compile Include="ControlsFactory.cs" />
     <Compile Include="DataHandle.cs" />
+    <Compile Include="PrintingSystem.cs" />
     <Compile Include="FirebirdClient.cs" />
     <Compile Include="ItemAppointment.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Mail.cs" />
-    <Compile Include="View\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="View\PageShowAppointmentsView.xaml">
+    <Page Include="PageShowAppointments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\PageEnterNumberView.xaml">
+    <Page Include="PageEnterNumber.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\PageNotificationView.xaml">
+    <Page Include="PageNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\PagePatientConfirmationView.xaml">
+    <Page Include="PagePatientConfirmation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItemPatient.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\PageEnterNumberViewModel.cs" />
-    <Compile Include="ViewModel\PageNotificationViewModel.cs" />
-    <Compile Include="ViewModel\PagePatientConfirmationViewModel.cs" />
-    <Compile Include="View\PageShowAppointmentsView.xaml.cs">
-      <DependentUpon>PageShowAppointmentsView.xaml</DependentUpon>
+    <Compile Include="PageShowAppointments.xaml.cs">
+      <DependentUpon>PageShowAppointments.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\PageEnterNumberView.xaml.cs">
-      <DependentUpon>PageEnterNumberView.xaml</DependentUpon>
+    <Compile Include="PageEnterNumber.xaml.cs">
+      <DependentUpon>PageEnterNumber.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\PageNotificationView.xaml.cs">
-      <DependentUpon>PageNotificationView.xaml</DependentUpon>
+    <Compile Include="PageNotification.xaml.cs">
+      <DependentUpon>PageNotification.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\PagePatientConfirmationView.xaml.cs">
-      <DependentUpon>PagePatientConfirmationView.xaml</DependentUpon>
+    <Compile Include="PagePatientConfirmation.xaml.cs">
+      <DependentUpon>PagePatientConfirmation.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\PageShowAppointmentsViewModel.cs" />
-    <Compile Include="PatientInfo.cs" />
+    <Compile Include="PrinterInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -147,6 +144,9 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="ExcelTemplate\PrintTemplate.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -191,6 +191,12 @@
     <Resource Include="Media\ButterflyClear.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Media\Wallet.png" />
+    <Resource Include="Media\Question.png" />
+    <Resource Include="Media\AppointmentsNotAvailable.png" />
+    <Resource Include="Media\FirstVisit.png" />
+    <Resource Include="Media\Info.png" />
+    <Resource Include="Media\WrongNumber.png" />
     <Resource Include="Media\PicRoom.png" />
     <Resource Include="Media\UnknownDepartment.png" />
     <Resource Include="Media\DoctorWithoutAPhoto.png" />

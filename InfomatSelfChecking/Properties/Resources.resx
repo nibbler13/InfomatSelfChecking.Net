@@ -132,11 +132,13 @@
   <data name="appointments_print_problem" xml:space="preserve">
     <value>К сожалению, по техническим причинам
 не удалось распечатать список записей
+
 Информация о проблеме будет передана
 ответственным лицам</value>
   </data>
   <data name="appointments_warning_cash" xml:space="preserve">
     <value>Имеются записи, запланированные за наличный расчет
+
 Необходимо заранее оплатить данные приёмы</value>
   </data>
   <data name="appointments_warning_general" xml:space="preserve">
@@ -144,6 +146,7 @@
   </data>
   <data name="appointments_warning_time" xml:space="preserve">
     <value>Имеются записи с пропущенным временем начала
+
 Необходимо согласовать перенос на другое время</value>
   </data>
   <data name="appointments_warning_xray" xml:space="preserve">
@@ -157,7 +160,7 @@ cервис временно недоступен
 или обратитесь в регистратуру</value>
   </data>
   <data name="notification_first_visit" xml:space="preserve">
-    <value>Вы впервые в нашей клинике,
+    <value>Вы впервые в нашей клинике
 
 Пожалуйста, пройдите в регистратуру
 для оформления необходимых документов</value>
@@ -216,7 +219,7 @@ cервис временно недоступен
   <data name="print_message_information_private_office" xml:space="preserve">
     <value>В нашей клинике
 доступен новый сервис:
-«Личный кабинет пациента»
+ "Личный кабинет пациента"
 
 Получить логин и пароль
 Вы можете при предъявлении
@@ -281,5 +284,28 @@ dev@bzklinika.ru</value>
   </data>
   <data name="show_appointments_warning" xml:space="preserve">
     <value>Имеются записи, по которым Вам нужно обратиться в регистратуру:</value>
+  </data>
+  <data name="notification_info" xml:space="preserve">
+    <value>Отметка о посещении в регистратуре требуется для следующих случаев:
+
+- Опоздание на приём более чем на 5 минут
+- Имеется запись в отделение лучевой диагностики (рентген, КТ, МРТ, МСКТ) или в процедурный кабинет
+- Имеется запись за наличный расчет
+- Имеется задолженность по оплате предыдущих лечений
+- Имеются проблемы со сроком действия страхового полиса
+- Установлена блокировка истории болезни</value>
+  </data>
+  <data name="notification_cash" xml:space="preserve">
+    <value>Имеются записи за наличный расчет
+
+Требуется предварительная оплата приёма
+Для отметки о посещении обратитесь в регистратуру</value>
+  </data>
+  <data name="notification_check_in_failed" xml:space="preserve">
+    <value>К сожалению, не удалось выполнить запрос
+по техническим причинам
+
+Для отметки о посещении
+просьба пройти в регистратуру</value>
   </data>
 </root>

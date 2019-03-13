@@ -104,6 +104,7 @@ namespace InfomatSelfChecking.Properties {
         /// <summary>
         ///   Looks up a localized string similar to К сожалению, по техническим причинам
         ///не удалось распечатать список записей
+        ///
         ///Информация о проблеме будет передана
         ///ответственным лицам.
         /// </summary>
@@ -115,6 +116,7 @@ namespace InfomatSelfChecking.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to Имеются записи, запланированные за наличный расчет
+        ///
         ///Необходимо заранее оплатить данные приёмы.
         /// </summary>
         public static string appointments_warning_cash {
@@ -134,6 +136,7 @@ namespace InfomatSelfChecking.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to Имеются записи с пропущенным временем начала
+        ///
         ///Необходимо согласовать перенос на другое время.
         /// </summary>
         public static string appointments_warning_time {
@@ -152,6 +155,31 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Имеются записи за наличный расчет
+        ///
+        ///Требуется предварительная оплата приёма
+        ///Для отметки о посещении обратитесь в регистратуру.
+        /// </summary>
+        public static string notification_cash {
+            get {
+                return ResourceManager.GetString("notification_cash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to К сожалению, не удалось выполнить запрос
+        ///по техническим причинам
+        ///
+        ///Для отметки о посещении
+        ///просьба пройти в регистратуру.
+        /// </summary>
+        public static string notification_check_in_failed {
+            get {
+                return ResourceManager.GetString("notification_check_in_failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to К сожалению,
         ///cервис временно недоступен
         ///
@@ -165,7 +193,7 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Вы впервые в нашей клинике,
+        ///   Looks up a localized string similar to Вы впервые в нашей клинике
         ///
         ///Пожалуйста, пройдите в регистратуру
         ///для оформления необходимых документов.
@@ -173,6 +201,22 @@ namespace InfomatSelfChecking.Properties {
         public static string notification_first_visit {
             get {
                 return ResourceManager.GetString("notification_first_visit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Отметка о посещении в регистратуре требуется для следующих случаев:
+        ///
+        ///- Опоздание на приём более чем на 5 минут
+        ///- Имеется запись в отделение лучевой диагностики (рентген, КТ, МРТ, МСКТ) или в процедурный кабинет
+        ///- Имеется запись за наличный расчет
+        ///- Имеется задолженность по оплате предыдущих лечений
+        ///- Имеются проблемы со сроком действия страхового полиса
+        ///- Установлена блокировка истории болезни.
+        /// </summary>
+        public static string notification_info {
+            get {
+                return ResourceManager.GetString("notification_info", resourceCulture);
             }
         }
         
@@ -309,7 +353,7 @@ namespace InfomatSelfChecking.Properties {
         /// <summary>
         ///   Looks up a localized string similar to В нашей клинике
         ///доступен новый сервис:
-        ///«Личный кабинет пациента»
+        /// &quot;Личный кабинет пациента&quot;
         ///
         ///Получить логин и пароль
         ///Вы можете при предъявлении

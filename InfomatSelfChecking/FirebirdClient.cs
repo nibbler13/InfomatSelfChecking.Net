@@ -64,7 +64,7 @@ namespace InfomatSelfChecking {
                 foreach (KeyValuePair<string, object> parameter in parameters)
                     update.Parameters.AddWithValue(parameter.Key, parameter.Value);
 
-            return update.ExecuteNonQuery() > 0 ? true : false; ;
+            return update.ExecuteNonQuery() >= 0 ? true : false; ;
 		}
 	}
 }

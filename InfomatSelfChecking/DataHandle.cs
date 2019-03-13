@@ -11,8 +11,9 @@ namespace InfomatSelfChecking {
     public static class DataHandle {
 		private static readonly string sqlGetPatients = Properties.Settings.Default.MisDbSqlGetPatients;
 		private static readonly string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
-		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckState;
+		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckDbState;
 		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
+		private static readonly string sqlUpdateAppointment = Properties.Settings.Default.MisDbSqlUpdateAppointments;
 		private static readonly bool isThisAMoscowFilial;
 
 		static DataHandle() {
@@ -30,6 +31,22 @@ namespace InfomatSelfChecking {
 			Properties.Settings.Default.MisDbCentralName,
 			Properties.Settings.Default.MisDbUser,
 			Properties.Settings.Default.MisDbPassword);
+
+		public static bool SetCheckInForAppointments(List<string> schedIds) {
+			bool result = true;
+
+			foreach (string schedId in schedIds)
+				try {
+					if (!fbClient.ExecuteUpdateQuery(sqlUpdateAppointment,
+						new Dictionary<string, object> { { "@schedId", schedId } }))
+						result = false;
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+					result = false;
+				}
+
+			return result;
+		}
 
 		public static List<ItemPatient> GetPatients(string prefix, string number) {
 			List<ItemPatient> patients = new List<ItemPatient>();
@@ -58,7 +75,7 @@ namespace InfomatSelfChecking {
 			return patients;
 		}
 
-		public static void UpdatePatientAppointments(ref ItemPatient patient) {
+		public static void GetPatientAppointments(ref ItemPatient patient) {
 			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pCode", patient.PCode } };
 
 			if (isThisAMoscowFilial && IsCentralDbAvailable())
@@ -133,12 +150,13 @@ namespace InfomatSelfChecking {
                                 DepShortName = infoData[2],
 								DepName = ControlsFactory.FirstCharToUpper(infoData[3]),
 								DName = infoData[4],
-								RNum = infoData[5],
+								RNum = infoData[5].Replace('№', ' '),
 								SchedID = infoData[6]
 							};
 
 							switch (group) {
 								case "visited":
+									patient.AppointmentsAvailable.Add(itemAppointment);
 									patient.AppointmentsVisited.Add(itemAppointment);
 									break;
 								case "available":

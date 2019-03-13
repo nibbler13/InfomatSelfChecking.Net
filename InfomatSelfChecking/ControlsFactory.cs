@@ -21,7 +21,11 @@ namespace InfomatSelfChecking {
 			NotificationDbError,
 			NotificationPrinterError,
 			NotificationRegistry,
+			NotificationFirstVisit,
+			NotificationWrongNumber,
+			NotificationAppointmentsNotAvailable,
 			NotificationNumberNotFound,
+			NotificationCash,
 			NotificationOk,
             Department,
             Doctor,
@@ -61,6 +65,21 @@ namespace InfomatSelfChecking {
 				Effect = ControlsFactory.CreateDropShadowEffect(),
 				Tag = tag
 			};
+		}
+
+
+		public static Label CreateLabel(int row) {
+			Label label = new Label {
+				Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
+				Height = 2,
+				VerticalAlignment = VerticalAlignment.Top,
+				Margin = new Thickness(2, 0, 0, 2)
+			};
+
+			Grid.SetRow(label, row);
+			Grid.SetColumnSpan(label, 8);
+
+			return label;
 		}
 
 		public static Image CreateImage(ImageType imageType,
@@ -115,8 +134,20 @@ namespace InfomatSelfChecking {
 				case ImageType.NotificationRegistry:
 					fileName = "PicRegistry.png";
 					break;
+				case ImageType.NotificationFirstVisit:
+					fileName = "FirstVisit.png";
+					break;
+				case ImageType.NotificationWrongNumber:
+					fileName = "WrongNumber.png";
+					break;
+				case ImageType.NotificationAppointmentsNotAvailable:
+					fileName = "AppointmentsNotAvailable.png";
+					break;
 				case ImageType.NotificationNumberNotFound:
 					fileName = "PicNotFound.jpg";
+					break;
+				case ImageType.NotificationCash:
+					fileName = "Wallet.png";
 					break;
 				case ImageType.NotificationOk:
 					fileName = "PicOk.png";

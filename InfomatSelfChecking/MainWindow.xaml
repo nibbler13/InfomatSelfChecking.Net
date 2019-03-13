@@ -1,0 +1,104 @@
+﻿<Window x:Class="InfomatSelfChecking.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InfomatSelfChecking"
+        mc:Ignorable="d"
+        Title="InfomatSelfChecking" 
+        Width="1280" 
+        Height="1024" 
+        WindowStartupLocation="CenterScreen"
+        Left="0"
+        Top="0"
+        Topmost="False" 
+        WindowStyle="None" 
+        WindowState="Normal"
+        ResizeMode="NoResize"
+        FontFamily="{Binding FontFamilyMain}"
+        FontSize="{Binding FontSizeMain}"
+        FontWeight="{Binding FontWeightMain}"
+        Foreground="{Binding BrushTextForeground}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="70*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="15"/>
+        </Grid.RowDefinitions>
+
+        <Label x:Name="LabelTitle"
+               Background="{Binding BrushTitleBackground}"
+               Foreground="{Binding BrushTextTitleForeground}"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Center">
+            <TextBlock Text="{Binding Title}" 
+                       FontSize="{Binding FontSizeTitle}"
+                       FontWeight="{Binding FontWeightTitle}"
+                       FontFamily="{Binding FontFamilyTitle}"
+                       TextWrapping="Wrap" 
+                       TextAlignment="Center"
+                       x:Name="TextBlockTitle"/>
+        </Label>
+
+        <!--Clock-->
+        <WrapPanel Orientation="Horizontal" 
+                   HorizontalAlignment="Right" 
+                   VerticalAlignment="Top"
+                   Height="{Binding ElementName=TextBlockTimeHours,Path=ActualHeight}" 
+                   Margin="20">
+            <Grid Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15*"/>
+                    <RowDefinition Height="70*"/>
+                    <RowDefinition Height="15*"/>
+                </Grid.RowDefinitions>
+                
+                <Image Source="Media/IconTime.png" 
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       VerticalAlignment="Center"
+                       Grid.Row="1"/>
+            </Grid>
+            
+            <TextBlock Text="{Binding ClockHours}" 
+                       x:Name="TextBlockTimeHours"
+                       Foreground="{Binding BrushTextTitleForeground}" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"/>
+
+            <TextBlock Text=":" 
+                       Foreground="{Binding BrushTextTitleForeground}" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"
+                       Visibility="{Binding ClockSplitterVisibility}"/>
+
+            <TextBlock Text="{Binding ClockMinutes}" 
+                       Foreground="{Binding BrushTextTitleForeground}" 
+                       HorizontalAlignment="Right" 
+                       VerticalAlignment="Top"/>
+        </WrapPanel>
+
+        <Frame Grid.Row="1" 
+               Grid.RowSpan="2" 
+               NavigationUIVisibility="Hidden" 
+               Margin="20"
+               x:Name="FrameMain"/>
+        
+        <Image Grid.Row="2" 
+               Source="Media/ButterflyClear.png" 
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Bottom" 
+               Margin="0,0,20,20"
+               Visibility="{Binding LogoVisibility}"/>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Media/BottomLineTemplate.png" Stretch="Fill"/>
+            <Image Grid.Column="1" Source="Media/BottomLineContinuesClear.png"/>
+        </Grid>
+    </Grid>
+</Window>

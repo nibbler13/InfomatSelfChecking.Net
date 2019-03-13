@@ -19,7 +19,7 @@ namespace InfomatSelfChecking {
             //DispatcherUnhandledException += App_DispatcherUnhandledException;
             //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            MainView window = new MainView();
+            MainWindow window = new MainWindow();
 			window.Show();
 		}
 
