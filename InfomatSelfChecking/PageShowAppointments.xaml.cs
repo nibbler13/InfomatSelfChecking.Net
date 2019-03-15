@@ -23,6 +23,7 @@ namespace InfomatSelfChecking {
 		private bool? checkInStatus;
 		private readonly List<string> schedIds;
 		private ItemPatient patient;
+		private bool isFirstLoad = true;
 
         public PageShowAppointments(ItemPatient patient, bool returnBack) {
             InitializeComponent();
@@ -45,7 +46,7 @@ namespace InfomatSelfChecking {
                 brushGray = Brushes.DarkGray;
             }
 
-            foreach (ItemAppointment item in patient.AppointmentsAvailable.OrderBy(x => x.DateTimeScheduleBegin)) {
+            foreach (ItemAppointment item in patient.AppointmentsAvailable) {
                 string roomString = "Каб. " + item.RNum;
                 if (totalAppointments == 1)
                     roomString = "Кабинет " + item.RNum;
@@ -166,15 +167,14 @@ namespace InfomatSelfChecking {
                 if (timeLeft >= -5 && timeLeft <= 5) {
                     timeLeftString = "Сейчас";
 
-                    if (totalAppointments == 1)
-                        timeLeftString = "Пожалуйста, проходите на приём";
-
                     brushTimeLeft = new SolidColorBrush(Color.FromRgb(229, 92, 68));
                 } else if (timeLeft > 5) {
-                    timeLeftString = "Через " + timeLeft + " мин.";
+                    timeLeftString = "Через " + timeLeft + " " +
+						Helper.GetDeclension(timeLeft);
 
                     if (totalAppointments == 1)
-                        timeLeftString = "Начало приёма через " + timeLeft + " мин.";
+                        timeLeftString = "Начало приёма через " + timeLeft + " " + 
+							Helper.GetDeclension(timeLeft);
                 }
 
                 if (!string.IsNullOrEmpty(timeLeftString)) {
@@ -229,14 +229,21 @@ namespace InfomatSelfChecking {
             }
 
 			DataContext = BindingValues.Instance;
-
-			Loaded += PageShowAppointments_Loaded;
+			IsVisibleChanged += PageShowAppointments_IsVisibleChanged;
         }
 
-		private async void PageShowAppointments_Loaded(object sender, RoutedEventArgs e) {
-			await Task.Run(() => {
-				checkInStatus = DataHandle.SetCheckInForAppointments(schedIds);
-			});
+		private void PageShowAppointments_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
+			if ((bool)e.NewValue) {
+				if (isFirstLoad) {
+					isFirstLoad = false;
+					return;
+				}
+
+				if (returnBack) {
+					NavigationService.GoBack();
+					NavigationService.RemoveBackEntry();
+				}
+			}
 		}
 
 		private void ButtonCheckIn_CLick(object sender, RoutedEventArgs e) {
@@ -250,14 +257,7 @@ namespace InfomatSelfChecking {
 				return;
 			}
 
-			bool isPrinterOk = PrinterInfo.IsPrinterOk();
-			if (isPrinterOk && !string.IsNullOrEmpty(Properties.Settings.Default.PrinterName))
-				PrintingSystem.Instance.PrintAppointments(patient);
-
-			NavigationService.Navigate(
-				new PageNotification(PageNotification.NotificationType.CheckInCompleted,
-						 returnBack: returnBack,
-						 isPrinterOk: isPrinterOk));
+			NavigationService.Navigate(new PageCheckInCompleted(patient, returnBack));
         }
 	}
 }

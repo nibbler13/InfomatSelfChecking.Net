@@ -120,11 +120,7 @@
   <data name="appointments_mark_ok" xml:space="preserve">
     <value>Отметка о посещении успешно проставлена
 
-Пожалуйста пройдите на приём</value>
-  </data>
-  <data name="appointments_mark_problem" xml:space="preserve">
-    <value>Для отметки о посещении
-просьба пройти в регистратуру</value>
+Пожалуйста, проходите на приём</value>
   </data>
   <data name="appointments_print_ok" xml:space="preserve">
     <value>Список записей успешно распечатан</value>
@@ -134,23 +130,7 @@
 не удалось распечатать список записей
 
 Информация о проблеме будет передана
-ответственным лицам</value>
-  </data>
-  <data name="appointments_warning_cash" xml:space="preserve">
-    <value>Имеются записи, запланированные за наличный расчет
-
-Необходимо заранее оплатить данные приёмы</value>
-  </data>
-  <data name="appointments_warning_general" xml:space="preserve">
-    <value>Для отметки о посещении необходимо обратиться в регистратуру</value>
-  </data>
-  <data name="appointments_warning_time" xml:space="preserve">
-    <value>Имеются записи с пропущенным временем начала
-
-Необходимо согласовать перенос на другое время</value>
-  </data>
-  <data name="appointments_warning_xray" xml:space="preserve">
-    <value>Имеются записи в рентгенологическое отделение</value>
+в службу технической поддержки</value>
   </data>
   <data name="notification_db_not_available" xml:space="preserve">
     <value>К сожалению,
@@ -177,7 +157,8 @@ cервис временно недоступен
 Попробуйте снова или обратитесь в регистратуру</value>
   </data>
   <data name="notification_no_appointmetns_for_now" xml:space="preserve">
-    <value>На ближайшее время у Вас нет записей
+    <value>На ближайшее время у Вас нет записей,
+для которых требуется отметка о посещении
 
 За подробной информацией Вы можете
 обратиться в регистратуру</value>
@@ -188,24 +169,8 @@ cервис временно недоступен
 Попробуйте снова
 или обратитесь в регистратуру</value>
   </data>
-  <data name="print_message_final_cash" xml:space="preserve">
-    <value>У Вас имеются записи за наличный расчет
-Просьба пройти в регистратуру для оплаты приёма</value>
-  </data>
-  <data name="print_message_final_multiple" xml:space="preserve">
-    <value>Для отметки о посещении
-Просьба пройти в регистратуру</value>
-  </data>
   <data name="print_message_final_ok" xml:space="preserve">
-    <value>Просьба проходить на приём</value>
-  </data>
-  <data name="print_message_final_time" xml:space="preserve">
-    <value>У Вас имеются записи, у которых пропущено время начала
-Просьба пройти в регистратуру для согласования переноса</value>
-  </data>
-  <data name="print_message_final_xray" xml:space="preserve">
-    <value>У Вас имеются записи в рентгенологическое отделение
-Просьба пройти в регистратуру для отметки о посещении</value>
+    <value>Пожалуйста, проходите на приём</value>
   </data>
   <data name="print_message_information_loyalty" xml:space="preserve">
     <value>Пожалуйста, оцените качество
@@ -213,8 +178,7 @@ cервис временно недоступен
 воспользовавшись терминалом,
 установленным в холле клиники
 
-Ваше мнение
-очень важно для нас!</value>
+Мы ценим Ваше мнение!</value>
   </data>
   <data name="print_message_information_private_office" xml:space="preserve">
     <value>В нашей клинике
@@ -225,20 +189,8 @@ cервис временно недоступен
 Вы можете при предъявлении
 паспорта в регистратуре</value>
   </data>
-  <data name="print_message_time_late" xml:space="preserve">
-    <value>От начала ближайшего приёма прошло минут: @minutes</value>
-  </data>
-  <data name="print_message_time_ok" xml:space="preserve">
-    <value>До начала ближайшего приёма осталось минут: @minutes</value>
-  </data>
-  <data name="print_notification_cash" xml:space="preserve">
-    <value>Прием запланирован за наличный расчет</value>
-  </data>
-  <data name="print_notification_time" xml:space="preserve">
-    <value>Пропущено время начала приёма</value>
-  </data>
-  <data name="print_notification_xray" xml:space="preserve">
-    <value />
+  <data name="print_message_time_left" xml:space="preserve">
+    <value>До начала ближайшего приёма осталось: </value>
   </data>
   <data name="title_appointments" xml:space="preserve">
     <value>*,
@@ -273,18 +225,6 @@ cервис временно недоступен
 ООО "Клиника ЛМС"
 dev@bzklinika.ru</value>
   </data>
-  <data name="show_appointments_cash" xml:space="preserve">
-    <value>- наличный расчет</value>
-  </data>
-  <data name="show_appointments_late" xml:space="preserve">
-    <value>- пропущено время</value>
-  </data>
-  <data name="show_appointments_roentgen" xml:space="preserve">
-    <value>- лучевая диагностика</value>
-  </data>
-  <data name="show_appointments_warning" xml:space="preserve">
-    <value>Имеются записи, по которым Вам нужно обратиться в регистратуру:</value>
-  </data>
   <data name="notification_info" xml:space="preserve">
     <value>Отметка о посещении в регистратуре требуется для следующих случаев:
 
@@ -302,8 +242,8 @@ dev@bzklinika.ru</value>
 Для отметки о посещении обратитесь в регистратуру</value>
   </data>
   <data name="notification_check_in_failed" xml:space="preserve">
-    <value>К сожалению, не удалось выполнить запрос
-по техническим причинам
+    <value>К сожалению, по техническим причинам
+не удалось выполнить запрос
 
 Для отметки о посещении
 просьба пройти в регистратуру</value>

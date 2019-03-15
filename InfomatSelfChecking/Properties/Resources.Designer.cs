@@ -74,21 +74,11 @@ namespace InfomatSelfChecking.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Отметка о посещении успешно проставлена
         ///
-        ///Пожалуйста пройдите на приём.
+        ///Пожалуйста, проходите на приём.
         /// </summary>
         public static string appointments_mark_ok {
             get {
                 return ResourceManager.GetString("appointments_mark_ok", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Для отметки о посещении
-        ///просьба пройти в регистратуру.
-        /// </summary>
-        public static string appointments_mark_problem {
-            get {
-                return ResourceManager.GetString("appointments_mark_problem", resourceCulture);
             }
         }
         
@@ -106,51 +96,11 @@ namespace InfomatSelfChecking.Properties {
         ///не удалось распечатать список записей
         ///
         ///Информация о проблеме будет передана
-        ///ответственным лицам.
+        ///в службу технической поддержки.
         /// </summary>
         public static string appointments_print_problem {
             get {
                 return ResourceManager.GetString("appointments_print_problem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имеются записи, запланированные за наличный расчет
-        ///
-        ///Необходимо заранее оплатить данные приёмы.
-        /// </summary>
-        public static string appointments_warning_cash {
-            get {
-                return ResourceManager.GetString("appointments_warning_cash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Для отметки о посещении необходимо обратиться в регистратуру.
-        /// </summary>
-        public static string appointments_warning_general {
-            get {
-                return ResourceManager.GetString("appointments_warning_general", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имеются записи с пропущенным временем начала
-        ///
-        ///Необходимо согласовать перенос на другое время.
-        /// </summary>
-        public static string appointments_warning_time {
-            get {
-                return ResourceManager.GetString("appointments_warning_time", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имеются записи в рентгенологическое отделение.
-        /// </summary>
-        public static string appointments_warning_xray {
-            get {
-                return ResourceManager.GetString("appointments_warning_xray", resourceCulture);
             }
         }
         
@@ -167,8 +117,8 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to К сожалению, не удалось выполнить запрос
-        ///по техническим причинам
+        ///   Looks up a localized string similar to К сожалению, по техническим причинам
+        ///не удалось выполнить запрос
         ///
         ///Для отметки о посещении
         ///просьба пройти в регистратуру.
@@ -231,7 +181,8 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to На ближайшее время у Вас нет записей
+        ///   Looks up a localized string similar to На ближайшее время у Вас нет записей,
+        ///для которых требуется отметка о посещении
         ///
         ///За подробной информацией Вы можете
         ///обратиться в регистратуру.
@@ -287,51 +238,11 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to У Вас имеются записи за наличный расчет
-        ///Просьба пройти в регистратуру для оплаты приёма.
-        /// </summary>
-        public static string print_message_final_cash {
-            get {
-                return ResourceManager.GetString("print_message_final_cash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Для отметки о посещении
-        ///Просьба пройти в регистратуру.
-        /// </summary>
-        public static string print_message_final_multiple {
-            get {
-                return ResourceManager.GetString("print_message_final_multiple", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Просьба проходить на приём.
+        ///   Looks up a localized string similar to Пожалуйста, проходите на приём.
         /// </summary>
         public static string print_message_final_ok {
             get {
                 return ResourceManager.GetString("print_message_final_ok", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to У Вас имеются записи, у которых пропущено время начала
-        ///Просьба пройти в регистратуру для согласования переноса.
-        /// </summary>
-        public static string print_message_final_time {
-            get {
-                return ResourceManager.GetString("print_message_final_time", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to У Вас имеются записи в рентгенологическое отделение
-        ///Просьба пройти в регистратуру для отметки о посещении.
-        /// </summary>
-        public static string print_message_final_xray {
-            get {
-                return ResourceManager.GetString("print_message_final_xray", resourceCulture);
             }
         }
         
@@ -341,8 +252,7 @@ namespace InfomatSelfChecking.Properties {
         ///воспользовавшись терминалом,
         ///установленным в холле клиники
         ///
-        ///Ваше мнение
-        ///очень важно для нас!.
+        ///Мы ценим Ваше мнение!.
         /// </summary>
         public static string print_message_information_loyalty {
             get {
@@ -366,83 +276,11 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to От начала ближайшего приёма прошло минут: @minutes.
+        ///   Looks up a localized string similar to До начала ближайшего приёма осталось: .
         /// </summary>
-        public static string print_message_time_late {
+        public static string print_message_time_left {
             get {
-                return ResourceManager.GetString("print_message_time_late", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to До начала ближайшего приёма осталось минут: @minutes.
-        /// </summary>
-        public static string print_message_time_ok {
-            get {
-                return ResourceManager.GetString("print_message_time_ok", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Прием запланирован за наличный расчет.
-        /// </summary>
-        public static string print_notification_cash {
-            get {
-                return ResourceManager.GetString("print_notification_cash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Пропущено время начала приёма.
-        /// </summary>
-        public static string print_notification_time {
-            get {
-                return ResourceManager.GetString("print_notification_time", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string print_notification_xray {
-            get {
-                return ResourceManager.GetString("print_notification_xray", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to - наличный расчет.
-        /// </summary>
-        public static string show_appointments_cash {
-            get {
-                return ResourceManager.GetString("show_appointments_cash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to - пропущено время.
-        /// </summary>
-        public static string show_appointments_late {
-            get {
-                return ResourceManager.GetString("show_appointments_late", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to - лучевая диагностика.
-        /// </summary>
-        public static string show_appointments_roentgen {
-            get {
-                return ResourceManager.GetString("show_appointments_roentgen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Имеются записи, по которым Вам нужно обратиться в регистратуру:.
-        /// </summary>
-        public static string show_appointments_warning {
-            get {
-                return ResourceManager.GetString("show_appointments_warning", resourceCulture);
+                return ResourceManager.GetString("print_message_time_left", resourceCulture);
             }
         }
         

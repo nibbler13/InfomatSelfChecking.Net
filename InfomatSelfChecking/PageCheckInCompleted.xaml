@@ -1,0 +1,92 @@
+﻿<Page x:Class="InfomatSelfChecking.PageCheckInCompleted"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:InfomatSelfChecking.Properties"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" 
+      d:DesignWidth="800"
+      Title="PageCheckInCompleted">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="50*"/>
+            <RowDefinition Height="25*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Идет печать списка назначений..."
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Foreground="{Binding BrushTextForeground}"
+                   FontSize="{Binding FontSizeMain}"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   x:Name="TextBlockPrinting"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap"/>
+
+        <Image Grid.Row="1"
+               x:Name="ImagePrinterError"
+               Visibility="Hidden"
+               Source="Media/PicPrinterError.png"
+               Margin="105"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>
+
+        <MediaElement Source="Media/dots.gif"
+                      Grid.Row="1"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      UnloadedBehavior="Manual"
+                      MediaEnded="MediaElementDots_MediaEnded"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center" 
+                      StretchDirection="DownOnly"
+                      x:Name="MediaElementsDots"/>
+
+        <TextBlock Text="Отметка о посещении успешно поставлена"
+                   TextWrapping="Wrap"
+                   Foreground="{Binding BrushTextForeground}"
+                   FontSize="{Binding FontSizeMain}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   TextAlignment="Center"
+                   Grid.Column="1"
+                   Visibility="Hidden"
+                   x:Name="TextBlockCheckedIn"/>
+
+        <MediaElement Source="Media/check-animation-v2.gif"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      UnloadedBehavior="Manual"
+                      Visibility="Hidden"
+                      x:Name="MediaElementCheckedIn"/>
+
+
+        <TextBlock Text="Пожалуйста, проходите на приём"
+                   Grid.Row="2"
+                   Grid.ColumnSpan="2"
+                   HorizontalAlignment="Center"
+                   Foreground="{Binding BrushTextDisabledForeground}"
+                   FontSize="{Binding FontSizeSubNotification}"
+                   x:Name="TextBlockThanks"
+                   Visibility="Hidden"
+                   VerticalAlignment="Center"/>
+
+        <TextBlock Text="{x:Static local:Resources.notification_tap_to_continue}"
+                   Grid.Row="3"
+                   Grid.ColumnSpan="2"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Center"
+                   Foreground="{Binding BrushTextDisabledForeground}"
+                   FontSize="{Binding FontSizeSubNotification}"
+                   x:Name="TextBlockTapToContinue"
+                   Visibility="Hidden"/>
+    </Grid>
+</Page>

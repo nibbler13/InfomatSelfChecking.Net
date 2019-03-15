@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -43,7 +44,8 @@ namespace InfomatSelfChecking {
 			BindingValues.Instance.SetUpMainWindow(Properties.Resources.title_dialer, true, false);
 			BindingValues.Instance.InitializeDialerText();
 
-			EnteredNumber = "0000000000";
+			if (Debugger.IsAttached)
+				EnteredNumber = "0000000000";
         }
 
 		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {

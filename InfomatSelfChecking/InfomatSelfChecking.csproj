@@ -86,7 +86,8 @@
     </Compile>
     <Compile Include="ControlsFactory.cs" />
     <Compile Include="DataHandle.cs" />
-    <Compile Include="PrintingSystem.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="ExcelInterop.cs" />
     <Compile Include="FirebirdClient.cs" />
     <Compile Include="ItemAppointment.cs" />
     <Compile Include="Logging.cs" />
@@ -95,6 +96,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PageCheckInCompleted.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PageShowAppointments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -114,6 +119,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItemPatient.cs" />
+    <Compile Include="PageCheckInCompleted.xaml.cs">
+      <DependentUpon>PageCheckInCompleted.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PageShowAppointments.xaml.cs">
       <DependentUpon>PageShowAppointments.xaml</DependentUpon>
     </Compile>
@@ -140,12 +148,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Media\dots.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Content Include="ExcelTemplate\PrintTemplate.xlsx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

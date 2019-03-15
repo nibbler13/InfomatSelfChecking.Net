@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,6 +22,7 @@ namespace InfomatSelfChecking {
 	public partial class MainWindow : Window {
 		private static MainWindow instance = null;
 		private static readonly object padlock = new object();
+		private DispatcherTimer autoCloseTimer;
 
 		public static MainWindow Instance {
 			get {
@@ -44,19 +46,60 @@ namespace InfomatSelfChecking {
 
 				Logging.ToLog("---------------------------------" +
 					Environment.NewLine + "Закрытие по нажатию клавиши ESC");
-				PrintingSystem.Instance.CloseExcel();
+				ExcelInterop.Instance.CloseExcel();
 				Application.Current.Shutdown();
 			};
             
             StartCheckDbAvailability();
-			_ = PrintingSystem.Instance;
+			_ = ExcelInterop.Instance;
 
 			PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.Welcome);
 			FrameMain.Navigate(pageNotification);
             DataContext = BindingValues.Instance;
+
+			autoCloseTimer = new DispatcherTimer();
+			autoCloseTimer.Interval = TimeSpan.FromSeconds(Properties.Settings.Default.AutoCloseTimerIntervalInSeconds);
+			autoCloseTimer.Tick += AutoCloseTimer_Tick;
+			FrameMain.Navigated += FrameMain_Navigated;
+			PreviewMouseDown += MainWindow_PreviewMouseDown;
 		}
 
-        private void StartCheckDbAvailability() {
+		private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+			if (FrameMain.Content is PageNotification pageNotification)
+				if (pageNotification.CurrentNotificationType == PageNotification.NotificationType.Welcome)
+					return;
+
+			ResetAutoCloseTimer();
+		}
+
+		public void ResetAutoCloseTimer() {
+			autoCloseTimer.Stop();
+			autoCloseTimer.Start();
+		}
+
+		private void FrameMain_Navigated(object sender, NavigationEventArgs e) {
+			if (e.Content is PageNotification pageNotification) {
+				if (pageNotification.CurrentNotificationType == PageNotification.NotificationType.Welcome ||
+					pageNotification.CurrentNotificationType == PageNotification.NotificationType.DbError) {
+					autoCloseTimer.Stop();
+					return;
+				}
+			}
+
+			if (e.Content is PageCheckInCompleted) {
+				autoCloseTimer.Stop();
+				return;
+			}
+
+			ResetAutoCloseTimer();
+		}
+
+		private void AutoCloseTimer_Tick(object sender, EventArgs e) {
+			Logging.ToLog("=== Автозакрытие страницы по таймеру");
+			CloseAllWindows();
+		}
+
+		private void StartCheckDbAvailability() {
             DispatcherTimer timerDbAvailability = new DispatcherTimer();
 			timerDbAvailability.Tick += TimerDbAvailability_Tick;
 			timerDbAvailability.Interval = TimeSpan.FromMinutes(1);

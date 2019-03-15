@@ -16,7 +16,7 @@
             <RowDefinition Height="25*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.RowSpan="5"
+        <TextBlock Grid.RowSpan="4"
                    Text="{x:Static local:Resources.about_developer}" 
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Left" 

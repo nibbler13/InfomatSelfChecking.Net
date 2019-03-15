@@ -133,7 +133,6 @@ namespace InfomatSelfChecking {
 		}
 
 		private void CheckPatientStateAndShowAppointments(ItemPatient patient) {
-			DataHandle.GetPatientAppointments(ref patient);
 			PageNotification.NotificationType? notificationType = null;
 
 			if (patient.StopCodesCurrent.Contains(ItemPatient.StopCodes.FirstTime))

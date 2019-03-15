@@ -25,8 +25,7 @@ namespace InfomatSelfChecking {
 			Cash,
             DbError,
 			VisitRegistryToCheckIn,
-			CheckInFailed,
-			CheckInCompleted
+			CheckInFailed
 		}
 
 		public NotificationType CurrentNotificationType { get; private set; }
@@ -38,7 +37,7 @@ namespace InfomatSelfChecking {
 						  string replacement = "",
 						  bool returnBack = false,
 						  Exception exception = null,
-						  bool isPrinterOk = true) {
+						  PrinterInfo.State? printerState = null) {
             InitializeComponent();
 
             CurrentNotificationType = type;
@@ -92,15 +91,6 @@ namespace InfomatSelfChecking {
 					isError = true;
 
 					SetupErrorNotification(exception);
-
-					break;
-				case NotificationType.CheckInCompleted:
-
-					if (isPrinterOk) {
-
-					} else {
-
-					}
 
 					break;
 				case NotificationType.Cash:

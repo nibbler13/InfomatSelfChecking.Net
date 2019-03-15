@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
-	class PrinterInfo {
+	public class PrinterInfo {
 		private static readonly string printerName = Properties.Settings.Default.PrinterName;
 		private static readonly string mailReceiver = Properties.Settings.Default.MailTo;
 		private static readonly string nameSpace = @"\root\CIMV2";
@@ -39,10 +39,20 @@ namespace InfomatSelfChecking {
 			{ 8388608, "Server unknown" },
 			{ 6777216, "Power save" }
 		};
+
+		public enum State {
+			Unknown,
+			NotSelect,
+			NotFound,
+			Ready,
+			Error,
+			Printed,
+			NotPrinted
+		}
 		
-		public static bool IsPrinterOk() {
+		public static State GetPrinterState() {
 			if (string.IsNullOrEmpty(printerName))
-				return true;
+				return State.NotSelect;
 
 			try {
 				ManagementObjectSearcher mgmtObjSearcher = new ManagementObjectSearcher(nameSpace, "SELECT * FROM " + className);
@@ -51,7 +61,7 @@ namespace InfomatSelfChecking {
 				if (colPrinters.Count == 0) {
 					Logging.ToLog("Не удалось получить информацию об установленных принтеров в разделе " + 
 						nameSpace + ", " + className);
-					return true;
+					return State.NotFound;
 				}
 
 				foreach (ManagementObject printer in colPrinters) {
@@ -67,7 +77,7 @@ namespace InfomatSelfChecking {
 						printerState == 131072 || //"Toner low"
 						printerState == 131072 + 2048) && //"Toner low" + "Printer output bin full"
 						!printerWorkOffline)
-						return true;
+						return State.Ready;
 
 					string printerStatus = string.Empty;
 
@@ -98,13 +108,13 @@ namespace InfomatSelfChecking {
 						Mail.SendMail(subject, body, mailReceiver);
 					}
 
-					return false;
+					return State.Error;
 				}
 			} catch (Exception e) {
 				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
 			}
 
-			return true;
+			return State.Error;
 		}
 	}
 }

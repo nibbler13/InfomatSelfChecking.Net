@@ -65,6 +65,8 @@ namespace InfomatSelfChecking {
                         Birthday = DateTime.Parse(row["BDATE"].ToString())
 					};
 
+					GetPatientAppointments(ref itemPatient);
+
 					patients.Add(itemPatient);
 				} catch (Exception e) {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
@@ -75,7 +77,7 @@ namespace InfomatSelfChecking {
 			return patients;
 		}
 
-		public static void GetPatientAppointments(ref ItemPatient patient) {
+		private static void GetPatientAppointments(ref ItemPatient patient) {
 			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pCode", patient.PCode } };
 
 			if (isThisAMoscowFilial && IsCentralDbAvailable())
@@ -156,7 +158,6 @@ namespace InfomatSelfChecking {
 
 							switch (group) {
 								case "visited":
-									patient.AppointmentsAvailable.Add(itemAppointment);
 									patient.AppointmentsVisited.Add(itemAppointment);
 									break;
 								case "available":
@@ -176,6 +177,13 @@ namespace InfomatSelfChecking {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
 				}
 			}
+
+			patient.AppointmentsAvailable = 
+				patient.AppointmentsAvailable.OrderBy(x => x.DateTimeScheduleBegin).ToList();
+
+			if (patient.StopCodesCurrent.Count == 0 &&
+				patient.AppointmentsAvailable.Count > 0)
+				patient.CheckPrinterAndCreateWorksheet();
 		}
 
 		private static bool IsCentralDbAvailable() {
