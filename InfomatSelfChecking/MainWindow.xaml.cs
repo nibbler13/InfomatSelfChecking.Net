@@ -22,7 +22,7 @@ namespace InfomatSelfChecking {
 	public partial class MainWindow : Window {
 		private static MainWindow instance = null;
 		private static readonly object padlock = new object();
-		private DispatcherTimer autoCloseTimer;
+		private readonly DispatcherTimer autoCloseTimer;
 
 		public static MainWindow Instance {
 			get {
@@ -44,8 +44,7 @@ namespace InfomatSelfChecking {
 				if (!e.Key.Equals(Key.Escape))
 					return;
 
-				Logging.ToLog("---------------------------------" +
-					Environment.NewLine + "Закрытие по нажатию клавиши ESC");
+				Logging.ToLog("MainWindow - Закрытие по нажатию клавиши ESC");
 				ExcelInterop.Instance.CloseExcel();
 				Application.Current.Shutdown();
 			};
@@ -95,7 +94,7 @@ namespace InfomatSelfChecking {
 		}
 
 		private void AutoCloseTimer_Tick(object sender, EventArgs e) {
-			Logging.ToLog("=== Автозакрытие страницы по таймеру");
+			Logging.ToLog("MainWindow - Автозакрытие страницы по таймеру");
 			CloseAllWindows();
 		}
 
@@ -127,6 +126,8 @@ namespace InfomatSelfChecking {
 		}
 
 		public void CloseAllWindows() {
+			Logging.ToLog("MainWindow - закрытие всех страниц");
+
 			while (FrameMain.NavigationService.CanGoBack) {
 				FrameMain.NavigationService.GoBack();
 				FrameMain.NavigationService.RemoveBackEntry();

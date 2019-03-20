@@ -181,7 +181,7 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to На ближайшее время у Вас нет записей,
+        ///   Looks up a localized string similar to На ближайшие 3 часа у Вас нет записей,
         ///для которых требуется отметка о посещении
         ///
         ///За подробной информацией Вы можете

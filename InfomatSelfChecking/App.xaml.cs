@@ -15,11 +15,18 @@ namespace InfomatSelfChecking {
 	/// Логика взаимодействия для App.xaml
 	/// </summary>
 	public partial class App : Application {
-		private void Application_Startup(object sender, StartupEventArgs e) {
-            //DispatcherUnhandledException += App_DispatcherUnhandledException;
-            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+		private string mailTo;
 
-            MainWindow window = new MainWindow();
+		private void Application_Startup(object sender, StartupEventArgs e) {
+			DispatcherUnhandledException += App_DispatcherUnhandledException;
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+			mailTo = InfomatSelfChecking.Properties.Settings.Default.MailTo;
+			string msg = "!!!App - Запуск приложения";
+			Logging.ToLog(msg);
+			Mail.SendMail(msg, msg, mailTo);
+
+			MainWindow window = new MainWindow();
 			window.Show();
 		}
 
@@ -33,14 +40,13 @@ namespace InfomatSelfChecking {
 
 		private void HandleException(Exception exception) {
 			if (exception != null) {
-				Logging.ToLog(exception.Message + Environment.NewLine + exception.StackTrace);
-				Mail.SendMail(
-					"Необработанное исключение",
-					exception.Message + Environment.NewLine + exception.StackTrace,
-					Settings.Default.MailCopy);
+				string msg = exception.Message + Environment.NewLine + exception.StackTrace;
+				Logging.ToLog(msg);
+				Mail.SendMail("Необработанное исключение", msg, mailTo);
 			}
 
 			Logging.ToLog("!!!App - Аварийное завершение работы");
+			ExcelInterop.Instance.CloseExcel();
 			Process.GetCurrentProcess().Kill();
 		}
 	}

@@ -27,16 +27,6 @@ namespace InfomatSelfChecking {
 			CheckAndCleanOldFiles();
 		}
 
-		//public static void WriteStringToFile(string text, string fileFullPath) {
-		//	ToLog("Запись текста в файл: " + fileFullPath + ", содержание: " + Environment.NewLine + text);
-
-		//	try {
-		//		System.IO.File.WriteAllText(fileFullPath, text);
-		//	} catch (Exception e) {
-		//		Console.WriteLine("WriteStringToFile exception: " + e.Message + Environment.NewLine + e.StackTrace);
-		//	}
-		//}
-
 		private static void CheckAndCleanOldFiles() {
 			try {
 				DirectoryInfo dirInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);

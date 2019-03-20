@@ -35,8 +35,8 @@ namespace InfomatSelfChecking {
 		}
 
 		private void CheckConnectionState() {
-			if (connection.State != ConnectionState.Open) 
-					connection.Open();
+			if (connection.State != ConnectionState.Open)
+				connection.Open();
 		}
 
 		public DataTable GetDataTable(string query, Dictionary<string, object> parameters) {

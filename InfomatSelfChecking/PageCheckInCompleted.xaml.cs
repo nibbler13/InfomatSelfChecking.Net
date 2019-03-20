@@ -18,10 +18,13 @@ namespace InfomatSelfChecking {
 	/// Interaction logic for PageCheckInCompleted.xaml
 	/// </summary>
 	public partial class PageCheckInCompleted : Page {
-		private ItemPatient patient;
-		private bool returnBack;
+		private readonly ItemPatient patient;
+		private readonly bool returnBack;
 		public PageCheckInCompleted(ItemPatient patient, bool returnBack) {
 			InitializeComponent();
+
+			Logging.ToLog("PageCheckInCompleted - Отображение страницы с отметкой о посещении");
+
 			DataContext = BindingValues.Instance;
 			this.patient = patient;
 			this.returnBack = returnBack;

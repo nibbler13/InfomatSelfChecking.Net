@@ -27,6 +27,9 @@ namespace InfomatSelfChecking {
 		private readonly string saveFolder;
 		private readonly string clinic_address;
 		private readonly string clinic_phone_number;
+		private readonly string stpAddress = Properties.Settings.Default.MailSTP;
+		private readonly string subject = "Ошибка в работе инфомата";
+		private readonly string templateFileName = "PrintTemplate.xlsx";
 
 		private const int ROW_CLINIC_ADDRESS = 2;
 		private const int ROW_CLINIC_PHONE_NUMBER = 3;
@@ -38,18 +41,22 @@ namespace InfomatSelfChecking {
 		private const int ROW_START = 9;
 
 		public ExcelInterop() {
-			Logging.ToLog("Запуск Excel");
+			Logging.ToLog("ExcelInterop - Запуск Excel");
 			xlApp = new Excel.Application();
-			if (xlApp == null) { 
-				Logging.ToLog("Не удалось открыть приложение Excel");
+			if (xlApp == null) {
+				string msg = "ExcelInterop - Не удалось открыть приложение Excel";
+				Logging.ToLog(msg);
+				Mail.SendMail(subject, msg, stpAddress);
 				return;
 			}
 
 			xlApp.Visible = false;
 			string currentDir = Directory.GetCurrentDirectory();
-			templateFullPath = Path.Combine(currentDir, "ExcelTemplate", "PrintTemplate.xlsx");
+			templateFullPath = Path.Combine(currentDir, "ExcelTemplate", templateFileName);
 			if (!File.Exists(templateFullPath)) {
-				Logging.ToLog("Не удалось получить доступ к файлу шаблона: " + templateFullPath);
+				string msg = "ExcelInterop - Не удалось получить доступ к файлу шаблона: " + templateFullPath;
+				Logging.ToLog(msg);
+				Mail.SendMail(subject, msg, stpAddress);
 				return;
 			}
 
@@ -65,22 +72,51 @@ namespace InfomatSelfChecking {
 
 			clinic_address = Properties.Settings.Default.ClinicAddress;
 			clinic_phone_number = Properties.Settings.Default.ClinicPhoneNumber;
+
+			DeleteOldFiles();
+		}
+
+		private void DeleteOldFiles() {
+			Logging.ToLog("ExcelInterop - Удаление старых файлов Excel");
+
+			try {
+				DirectoryInfo dirInfo = new DirectoryInfo(saveFolder);
+				FileInfo[] files = dirInfo.GetFiles("*.xlsx");
+
+				for (int i = 0; i < files.Length; i++) {
+					FileInfo info = files[i];
+
+					if ((DateTime.Now - info.CreationTime).TotalDays < 7)
+						continue;
+
+					files[i].Delete();
+				}
+			} catch (Exception e) {
+				Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
+			}
 		}
 
 		private Excel.Worksheet OpenTemplate(out Excel.Workbook wb) {
 			try {
-				Logging.ToLog("Открытие книги: " + templateFullPath);
+				Logging.ToLog("ExcelInterop - Открытие книги: " + templateFullPath);
+
+				CheckIfTemplateIsOpened();
+
 				wb = xlApp.Workbooks.Open(templateFullPath, ReadOnly: true);
 
 				if (wb == null) {
-					Logging.ToLog("Не удалось открыть книгу: " + templateFullPath);
+					string msg = "ExcelInterop - Не удалось открыть книгу: " + templateFullPath;
+					Logging.ToLog(msg);
+					Mail.SendMail(subject, msg, stpAddress);
 					return null;
 				}
 
-				Logging.ToLog("Открытие листа: Template");
+				Logging.ToLog("ExcelInterop - Открытие листа: Template");
 				Excel.Worksheet ws = wb.Sheets["Template"];
 				if (ws == null) {
-					Logging.ToLog("Не удалось открыть лист: Template");
+					string msg = "ExcelInterop - Не удалось открыть лист: Template";
+					Logging.ToLog(msg);
+					Mail.SendMail(subject, msg, stpAddress);
 					return null;
 				}
 
@@ -93,12 +129,20 @@ namespace InfomatSelfChecking {
 			return null;
 		}
 
+		private void CheckIfTemplateIsOpened() {
+			Excel.Workbook wb = xlApp.Workbooks[templateFileName];
+			if (wb == null)
+				return;
+
+			wb.Close(false);
+		}
+
 		public Excel.Worksheet CreateWorksheetAppointmentsAvailable(ItemPatient patient, out Excel.Workbook wb) {
-			Logging.ToLog("Печать назначений для пациента: " + patient.Name + ", pcode: " + patient.PCode);
+			Logging.ToLog("ExcelInterop - Печать назначений для пациента: " + patient.Name + ", pcode: " + patient.PCode);
 			wb = null;
 
 			if (xlApp == null) {
-				Logging.ToLog("Не запущен Excel, пропуск");
+				Logging.ToLog("ExcelInterop - Не запущен Excel, пропуск");
 				return null;
 			}
 
@@ -106,7 +150,7 @@ namespace InfomatSelfChecking {
 			if (ws == null)
 				return null;
 
-			Logging.ToLog("Запись информации о назначениях");
+			Logging.ToLog("ExcelInterop - Запись информации о назначениях");
 			string[] nameSplitted = patient.Name.Split(' ');
 			string name = nameSplitted[0];
 			string family = patient.Name.Replace(name + " ", "");
@@ -149,8 +193,6 @@ namespace InfomatSelfChecking {
 			SetValue(ws, currentRow, notificationMessage);
 			PasteFormat(ws, ROW_STYLE, currentRow);
 
-			Console.WriteLine("-----Возврат созданного листа-----");
-
 			return ws;
 		}
 
@@ -181,13 +223,11 @@ namespace InfomatSelfChecking {
 		}
 
 		public void PrintWorksheetAndCloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb, string filePostfix) {
-			Console.WriteLine("--- печать листа Excel");
 			ws.PrintOutEx();
 			CloseWorkbook(ref ws, ref wb, filePostfix);
 		}
 
 		private void CloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb, string filePostfix) {
-			Console.WriteLine("--- сохранение книги Excel");
 			if (!string.IsNullOrEmpty(saveFolder))
 				wb.SaveAs(Path.Combine(saveFolder, "PrintResult_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + filePostfix));
 
@@ -196,7 +236,6 @@ namespace InfomatSelfChecking {
 				ws = null;
 			}
 
-			Console.WriteLine("--- закрытие книги Excel");
 			if (wb != null) {
 				wb.Close(false);
 				Marshal.ReleaseComObject(wb);

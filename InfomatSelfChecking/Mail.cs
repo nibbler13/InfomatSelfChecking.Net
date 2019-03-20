@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace InfomatSelfChecking {
 	public class Mail {
 		public static async void SendMail (string subject, string body, string receiver, string attachmentPath = "") {
-			Logging.ToLog("Отправка сообщения, тема: " + subject + ", текст: " + body);
-			Logging.ToLog("Получатели: " + receiver);
+			Logging.ToLog("Mail - Отправка сообщения, тема: " + subject + ", текст: " + body);
+			Logging.ToLog("Mail - Получатели: " + receiver);
 
 			if (string.IsNullOrEmpty(receiver))
 				return;
@@ -85,7 +85,7 @@ namespace InfomatSelfChecking {
                 await Task.Run(() => { client.Send(message); });
 				client.Dispose();
 				message.Dispose();
-				Logging.ToLog("Письмо отправлено успешно");
+				Logging.ToLog("Mail - Письмо отправлено успешно");
 			} catch (Exception e) {
 				Logging.ToLog("SendMail exception: " + e.Message + Environment.NewLine + e.StackTrace);
 			}

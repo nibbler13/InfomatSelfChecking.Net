@@ -41,7 +41,6 @@ namespace InfomatSelfChecking {
 		private Excel.Worksheet worksheet = null;
 		private Excel.Workbook workbook = null;
 		private PrinterInfo.State? printerState = null;
-		//private BackgroundWorker backgroundWorker = null;
 		public ManualResetEvent BackgroundWorkCompletedEvent { get; private set; } = new ManualResetEvent(false);
 		public bool IsWorksheetCreated { get; private set; } = false;
 		private bool IsWorksheetCreatingStarted = false;
@@ -50,13 +49,22 @@ namespace InfomatSelfChecking {
 			if (IsWorksheetCreated)
 				return;
 
+			Logging.ToLog("ItemPatient - создание книги со списком назначений");
+
 			IsWorksheetCreatingStarted = true;
 
 			await Task.Run(() => {
 				printerState = PrinterInfo.GetPrinterState();
+				Logging.ToLog("ItemPatient - Полученный статус принтера: " + printerState);
 
-				if (printerState == PrinterInfo.State.Ready)
-					worksheet = ExcelInterop.Instance.CreateWorksheetAppointmentsAvailable(this, out workbook);
+				try {
+					if (printerState == PrinterInfo.State.DoNotCheck ||
+						printerState == PrinterInfo.State.Ready)
+						worksheet = ExcelInterop.Instance.CreateWorksheetAppointmentsAvailable(this, out workbook);
+				} catch (Exception e) {
+					printerState = PrinterInfo.State.NotPrinted;
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+				}
 
 				IsWorksheetCreated = true;
 				BackgroundWorkCompletedEvent.Set();
@@ -64,46 +72,52 @@ namespace InfomatSelfChecking {
 		}
 
 		public PrinterInfo.State PrintAppointmentsAvailable() {
-			Console.WriteLine("--- Печать назначений пациента");
+			Logging.ToLog("ItemPatient - печать списка назначений");
+
 			if (!IsWorksheetCreatingStarted)
 				CheckPrinterAndCreateWorksheet();
 
 			if (!IsWorksheetCreated)
 				BackgroundWorkCompletedEvent.WaitOne();
 
-				Console.WriteLine("=== Проверка состояния принтера");
-				if (printerState.HasValue) {
-					switch (printerState.Value) {
-						case PrinterInfo.State.NotSelect:
-						case PrinterInfo.State.NotFound:
-						case PrinterInfo.State.Error:
-							Console.WriteLine("=== возврат полученного состояния");
-							return printerState.Value;
-					}
-
-					if (worksheet == null) {
-						Console.WriteLine("=== возврат состояние не напечатано");
-						return PrinterInfo.State.NotPrinted;
-					}
-
-					ExcelInterop.Instance.PrintWorksheetAndCloseWorkbook(ref worksheet, ref workbook, Name + "_" + PhoneNumber);
-
-					Console.WriteLine("=== возврат состояния напечатано");
-					return PrinterInfo.State.Printed;
+			if (printerState.HasValue) {
+				switch (printerState.Value) {
+					case PrinterInfo.State.NotSelect:
+					case PrinterInfo.State.NotFound:
+					case PrinterInfo.State.Error:
+						return printerState.Value;
 				}
 
-				Console.WriteLine("=== возврат состояние неизвестно 1");
-				return PrinterInfo.State.Unknown;
+				if (worksheet == null)
+					return PrinterInfo.State.NotPrinted;
+
+				try {
+					ExcelInterop.Instance.PrintWorksheetAndCloseWorkbook(ref worksheet, ref workbook, Name + "_" + PhoneNumber);
+					return PrinterInfo.State.Printed;
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+					return PrinterInfo.State.NotPrinted;
+				}
+			}
+
+			return PrinterInfo.State.Unknown;
 		}
 
-		//public void CancelCreateWorksheet() {
-		//	if (backgroundWorker == null)
-		//		return;
+		public override string ToString() {
+			string result = Environment.NewLine + "-----ItemPatient-----" + Environment.NewLine;
 
-		//	if (!backgroundWorker.IsBusy)
-		//		return;
+			result += "PhoneNumber: " + PhoneNumber + Environment.NewLine;
+			result += "Name: " + Name + Environment.NewLine;
+			result += "PCODE: " + PCode + Environment.NewLine;
+			result += "Birthday: " + Birthday + Environment.NewLine;
+			result += "StopCodes: " + string.Join(", ", StopCodesCurrent) + Environment.NewLine;
+			result += "InfoCodes: " + string.Join(", ", InfoCodesCurrent) + Environment.NewLine;
+			result += "AvailableAppointments: " + string.Join(Environment.NewLine, AppointmentsAvailable) + Environment.NewLine;
+			result += "NotAvailableAppointments: " + string.Join(Environment.NewLine, AppointmentsNotAvailable) + Environment.NewLine;
+			result += "VisitedAppointments: " + string.Join(Environment.NewLine, AppointmentsVisited) + Environment.NewLine;
+			result += "=====End ItemPatient=====";
 
-		//	backgroundWorker.CancelAsync();
-		//}
+			return result;
+		}
 	}
 }

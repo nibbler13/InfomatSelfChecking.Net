@@ -21,5 +21,18 @@ namespace InfomatSelfChecking {
             dateTime = dateTime.AddMinutes(Convert.ToInt32(begins[1]));
             return (int)(dateTime - DateTime.Now).TotalMinutes;
         }
+
+		public override string ToString() {
+			string result = Environment.NewLine + "-----ItemAppointment-----" + Environment.NewLine;
+
+			result += "SchedID: " + SchedID + Environment.NewLine;
+			result += "Interval: " + DateTimeScheduleBegin + " - " + DateTimeScheduleEnd + Environment.NewLine;
+			result += "DoctorName: " + DName + Environment.NewLine;
+			result += "DepartmentName: " + DepName + Environment.NewLine;
+			result += "Room: " + RNum + Environment.NewLine;
+			result += "=====End ItemAppointment=====";
+
+			return result;
+		}
 	}
 }

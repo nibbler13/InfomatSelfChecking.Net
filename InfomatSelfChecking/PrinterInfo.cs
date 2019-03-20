@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
 	public class PrinterInfo {
-		private static readonly string printerName = Properties.Settings.Default.PrinterName;
-		private static readonly string mailReceiver = Properties.Settings.Default.MailTo;
+		private static readonly string printerName = Properties.Settings.Default.PrinterName.ToLower();
+		private static readonly string mailReceiver = Properties.Settings.Default.MailSTP;
 		private static readonly string nameSpace = @"\root\CIMV2";
 		private static readonly string className = "Win32_Printer";
 		private static readonly Dictionary<int, string> statusCodes = new Dictionary<int, string> {
@@ -47,25 +47,31 @@ namespace InfomatSelfChecking {
 			Ready,
 			Error,
 			Printed,
-			NotPrinted
+			NotPrinted,
+			DoNotCheck
 		}
 		
 		public static State GetPrinterState() {
+			Logging.ToLog("PrinterInfo - Получение статуса принтера: " + printerName);
+
 			if (string.IsNullOrEmpty(printerName))
 				return State.NotSelect;
+
+			if (printerName.ToLower().Equals("donotcheck"))
+				return State.DoNotCheck;
 
 			try {
 				ManagementObjectSearcher mgmtObjSearcher = new ManagementObjectSearcher(nameSpace, "SELECT * FROM " + className);
 				ManagementObjectCollection colPrinters = mgmtObjSearcher.Get();
 
 				if (colPrinters.Count == 0) {
-					Logging.ToLog("Не удалось получить информацию об установленных принтеров в разделе " + 
+					Logging.ToLog("PrinterInfo - Не удалось получить информацию об установленных принтеров в разделе " + 
 						nameSpace + ", " + className);
 					return State.NotFound;
 				}
 
 				foreach (ManagementObject printer in colPrinters) {
-					string currentPrinterName = printer["Name"].ToString();
+					string currentPrinterName = printer["Name"].ToString().ToLower();
 
 					if (!currentPrinterName.Equals(printerName))
 						continue;
@@ -75,6 +81,7 @@ namespace InfomatSelfChecking {
 
 					if ((printerState == 0 || //"Printer ready"
 						printerState == 131072 || //"Toner low"
+						printerState == 2048 || //"Printer output bin full"
 						printerState == 131072 + 2048) && //"Toner low" + "Printer output bin full"
 						!printerWorkOffline)
 						return State.Ready;
@@ -100,6 +107,8 @@ namespace InfomatSelfChecking {
 
 						printerStatus += statusCodes[code] + Environment.NewLine;
 					}
+
+					Logging.ToLog("PrinterInfo - статус принтера: " + printerStatus);
 
 					if (!string.IsNullOrEmpty(printerStatus)) {
 						string subject = "Уведомление от инфомата";

@@ -33,6 +33,9 @@ namespace InfomatSelfChecking {
 			Properties.Settings.Default.MisDbPassword);
 
 		public static bool SetCheckInForAppointments(List<string> schedIds) {
+			Logging.ToLog("DataHandle - установка отметок о посещении для следующих назначений SchedID: " +
+				string.Join(", ", schedIds));
+
 			bool result = true;
 
 			foreach (string schedId in schedIds)
@@ -49,6 +52,8 @@ namespace InfomatSelfChecking {
 		}
 
 		public static List<ItemPatient> GetPatients(string prefix, string number) {
+			Logging.ToLog("DataHandle - получения списка пациентов по введенному номеру: " + prefix + number);
+
 			List<ItemPatient> patients = new List<ItemPatient>();
 
 			Dictionary<string, object> parameters = new Dictionary<string, object> {
@@ -74,14 +79,21 @@ namespace InfomatSelfChecking {
 				}
 			}
 
+			Logging.ToLog("DataHandle - полученный список пациентов: " + 
+				string.Join(Environment.NewLine, patients));
+
 			return patients;
 		}
 
 		private static void GetPatientAppointments(ref ItemPatient patient) {
+			Logging.ToLog("DataHandle - получение списка назнчений для пациента. PCODE: " + patient.PCode + ", ФИО: " + patient.Name);
+
 			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pCode", patient.PCode } };
 
-			if (isThisAMoscowFilial && IsCentralDbAvailable())
+			if (isThisAMoscowFilial && IsCentralDbAvailable()) {
+				Logging.ToLog("DataHandle - Синхронизация данных с ЦБД");
 				fbClient.ExecuteUpdateQuery(sqlSynchronizeMoscowClientInfo, parameters);
+			}
 
 			DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters);
 
@@ -122,8 +134,10 @@ namespace InfomatSelfChecking {
                                     case "debt":
                                         patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
                                         break;
+									case "":
+										break;
 									default:
-										Logging.ToLog("Не удается распознать StopCode: " + code);
+										Logging.ToLog("DataHandle - Не удается распознать StopCode: " + code);
 										break;
 								}
 							}
@@ -134,15 +148,17 @@ namespace InfomatSelfChecking {
 									case "inform_about_lk":
 										patient.InfoCodesCurrent.Add(ItemPatient.InfoCodes.InformAboutLK);
 										break;
+									case "":
+										break;
 									default:
-										Logging.ToLog("Не удается распознать InfoCode: " + code);
+										Logging.ToLog("DataHandle - Не удается распознать InfoCode: " + code);
 										break;
 								}
 							}
 							break;
 						default:
 							if (infoData.Length != 7) {
-								Logging.ToLog("Количество элементов в строке не равно 6: " + info);
+								Logging.ToLog("DataHandle - Количество элементов в строке не равно 6: " + info);
 								break;
 							}
 
@@ -187,17 +203,24 @@ namespace InfomatSelfChecking {
 		}
 
 		private static bool IsCentralDbAvailable() {
-			return fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
+			Logging.ToLog("DataHandle - проверка доступности ЦБД");
+			bool result = fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
+			Logging.ToLog("DataHandle - возвращаемое значение: " + result);
+			return result;
 		}
 
 		public static void CheckDbAvailable() {
+			Logging.ToLog("DataHandle - проверка доступности БД");
             if (fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count == 0)
                 throw new Exception("DataHandle - CheckDbAvailable - result is empty");
 		}
 
 		public static bool IsThisMoscowFilial() {
-			return fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial, 
+			Logging.ToLog("DataHandle - определение принадлежности филиала к МСК");
+			bool result = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial,
 				new Dictionary<string, object>()).Rows[0][0].ToString().Equals("1");
+			Logging.ToLog("DataHandle - возвращаемое значение: " + result);
+			return result;
 		}
     }
 }

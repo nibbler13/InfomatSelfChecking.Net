@@ -40,6 +40,8 @@ namespace InfomatSelfChecking {
 		public PageEnterNumber() {
 			InitializeComponent();
 
+			Logging.ToLog("PageEnterNumber - отображение страницы набора номера");
+
 			DataContext = BindingValues.Instance;
 			BindingValues.Instance.SetUpMainWindow(Properties.Resources.title_dialer, true, false);
 			BindingValues.Instance.InitializeDialerText();
@@ -82,12 +84,13 @@ namespace InfomatSelfChecking {
 		}
 
 		private void ButtonContinue_Click(object sender, RoutedEventArgs e) {
-			if (enteredNumber.Length < 10)
+			if (EnteredNumber.Length < 10)
 				return;
 
-            List<ItemPatient> patients;
+			Logging.ToLog("PageEnterNumber - введен номер: " + EnteredNumber);
+			List<ItemPatient> patients;
             try {
-                patients = DataHandle.GetPatients(enteredNumber.Substring(0, 3), enteredNumber.Substring(3, 7));
+                patients = DataHandle.GetPatients(EnteredNumber.Substring(0, 3), EnteredNumber.Substring(3, 7));
             } catch (Exception exc) {
                 NavigationService.Navigate(new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
                 return;
@@ -96,10 +99,10 @@ namespace InfomatSelfChecking {
 			Page page;
 
 			if (patients.Count == 0) {
-                string entered = "+7 (" + enteredNumber.Substring(0, 3) +
-                    ") " + enteredNumber.Substring(3, 3) + "-" +
-                    enteredNumber.Substring(5, 2) + "-" +
-                    enteredNumber.Substring(7, 2);
+                string entered = "+7 (" + EnteredNumber.Substring(0, 3) +
+                    ") " + EnteredNumber.Substring(3, 3) + "-" +
+					EnteredNumber.Substring(5, 2) + "-" +
+					EnteredNumber.Substring(7, 2);
 
                 page = new PageNotification(PageNotification.NotificationType.NumberNotFound, entered);
             } else if (patients.Count > 4)

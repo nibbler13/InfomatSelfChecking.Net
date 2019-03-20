@@ -40,6 +40,8 @@ namespace InfomatSelfChecking {
 						  PrinterInfo.State? printerState = null) {
             InitializeComponent();
 
+			Logging.ToLog("PageNotification - Отображение страницы типа: " + type);
+
             CurrentNotificationType = type;
 			this.returnBack = returnBack;
 
@@ -153,6 +155,8 @@ namespace InfomatSelfChecking {
 			};
 
 			dispatcherTimer.Tick += (s, e) => {
+				Logging.ToLog("PageNotification - проверка доступности БД");
+
 				try {
 					DataHandle.CheckDbAvailable();
 					PageNotification_PreviewMouseDown(null, null);
@@ -192,9 +196,10 @@ namespace InfomatSelfChecking {
 				return;
 			}
 
-			if (returnBack)
-                NavigationService.GoBack();
-			else
+			if (returnBack) {
+				Logging.ToLog("PageNotification - возврат на предыдущую страницу");
+				NavigationService.GoBack();
+			} else
 				MainWindow.Instance.CloseAllWindows();
 		}
 
@@ -204,6 +209,7 @@ namespace InfomatSelfChecking {
 		}
 
 		private void ButtonInfo_Click(object sender, RoutedEventArgs e) {
+			Logging.ToLog("PageNotification - отображение информации об отказе в отметке");
 			SetupInfoNotification();
 		}
 	}

@@ -22,11 +22,13 @@ namespace InfomatSelfChecking {
 		private readonly bool returnBack;
 		private bool? checkInStatus;
 		private readonly List<string> schedIds;
-		private ItemPatient patient;
+		private readonly ItemPatient patient;
 		private bool isFirstLoad = true;
 
         public PageShowAppointments(ItemPatient patient, bool returnBack) {
             InitializeComponent();
+
+			Logging.ToLog("PageShowAppointments - отображение страницы со списком назначений");
 
 			this.returnBack = returnBack;
 			this.patient = patient;

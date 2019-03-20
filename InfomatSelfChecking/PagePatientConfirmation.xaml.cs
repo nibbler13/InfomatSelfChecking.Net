@@ -25,6 +25,8 @@ namespace InfomatSelfChecking {
         public PagePatientConfirmation(List<ItemPatient> patients) {
 			InitializeComponent();
 
+			Logging.ToLog("PagePatientConfirmation - отображение страницы подтверждения ФИО пациента / выбора пациента");
+
 			this.patients = patients;
 
 			if (patients.Count == 1) {
