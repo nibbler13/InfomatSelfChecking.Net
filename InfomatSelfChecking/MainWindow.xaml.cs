@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -61,6 +62,14 @@ namespace InfomatSelfChecking {
 			autoCloseTimer.Tick += AutoCloseTimer_Tick;
 			FrameMain.Navigated += FrameMain_Navigated;
 			PreviewMouseDown += MainWindow_PreviewMouseDown;
+
+			if (Debugger.IsAttached) {
+				Cursor = Cursors.Arrow;
+				WindowState = WindowState.Normal;
+				Width = 1280;
+				Height = 1024;
+				Topmost = false;
+			}
 		}
 
 		private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e) {

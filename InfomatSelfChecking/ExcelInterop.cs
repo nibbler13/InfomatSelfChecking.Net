@@ -130,11 +130,10 @@ namespace InfomatSelfChecking {
 		}
 
 		private void CheckIfTemplateIsOpened() {
-			Excel.Workbook wb = xlApp.Workbooks[templateFileName];
-			if (wb == null)
-				return;
-
-			wb.Close(false);
+			try {
+				Excel.Workbook wb = xlApp.Workbooks.get_Item(templateFileName);
+				wb.Close(false);
+			} catch (Exception) { }
 		}
 
 		public Excel.Worksheet CreateWorksheetAppointmentsAvailable(ItemPatient patient, out Excel.Workbook wb) {
