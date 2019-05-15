@@ -15,9 +15,11 @@ namespace InfomatSelfChecking {
 		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
 		private static readonly string sqlUpdateAppointment = Properties.Settings.Default.MisDbSqlUpdateAppointments;
 		private static readonly bool isThisAMoscowFilial;
+		private static readonly bool isThisASpbFilial;
 
 		static DataHandle() {
-			isThisAMoscowFilial = IsThisMoscowFilial();
+			isThisAMoscowFilial = IsCurrentFilialInList(new string[] { "1", "5", "12" });
+			isThisASpbFilial = IsCurrentFilialInList(new string[] { "3" });
 		}
 
 		private static readonly FirebirdClient fbClient = new FirebirdClient(
@@ -75,7 +77,6 @@ namespace InfomatSelfChecking {
 					patients.Add(itemPatient);
 				} catch (Exception e) {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
-
 				}
 			}
 
@@ -92,7 +93,11 @@ namespace InfomatSelfChecking {
 
 			if (isThisAMoscowFilial && IsCentralDbAvailable()) {
 				Logging.ToLog("DataHandle - Синхронизация данных с ЦБД");
-				fbClient.ExecuteUpdateQuery(sqlSynchronizeMoscowClientInfo, parameters);
+				try {
+					fbClient.ExecuteUpdateQuery(sqlSynchronizeMoscowClientInfo, parameters);
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.StackTrace + e.StackTrace);
+				}
 			}
 
 			DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters);
@@ -134,6 +139,10 @@ namespace InfomatSelfChecking {
                                     case "debt":
                                         patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
                                         break;
+									case "sogl":
+										if (isThisASpbFilial)
+											patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Agreement);
+										break;
 									case "":
 										break;
 									default:
@@ -211,14 +220,19 @@ namespace InfomatSelfChecking {
 
 		public static void CheckDbAvailable() {
 			Logging.ToLog("DataHandle - проверка доступности БД");
+
             if (fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count == 0)
                 throw new Exception("DataHandle - CheckDbAvailable - result is empty");
 		}
 
-		public static bool IsThisMoscowFilial() {
-			Logging.ToLog("DataHandle - определение принадлежности филиала к МСК");
-			bool result = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlCheckIfMoscowFilial,
-				new Dictionary<string, object>()).Rows[0][0].ToString().Equals("1");
+		public static bool IsCurrentFilialInList(string[] filialsID) {
+			Logging.ToLog("DataHandle - определение принадлежности филиала к списку: " + string.Join(",", filialsID));
+
+			string filID = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlGetFilialID,
+				new Dictionary<string, object>()).Rows[0][0].ToString();
+
+			bool result = filialsID.Contains(filID);
+
 			Logging.ToLog("DataHandle - возвращаемое значение: " + result);
 			return result;
 		}

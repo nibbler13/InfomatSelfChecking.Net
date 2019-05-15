@@ -17,7 +17,8 @@ namespace InfomatSelfChecking {
 			Late,
 			NotAvailableNow,
 			DepOut,
-            Debt
+            Debt,
+			Agreement
 		}
 
 		public enum InfoCodes {
@@ -54,7 +55,7 @@ namespace InfomatSelfChecking {
 			IsWorksheetCreatingStarted = true;
 
 			await Task.Run(() => {
-				printerState = PrinterInfo.GetPrinterState();
+				printerState = PrinterInfo.Instance.GetPrinterState();
 				Logging.ToLog("ItemPatient - Полученный статус принтера: " + printerState);
 
 				try {
@@ -92,7 +93,7 @@ namespace InfomatSelfChecking {
 					return PrinterInfo.State.NotPrinted;
 
 				try {
-					ExcelInterop.Instance.PrintWorksheetAndCloseWorkbook(ref worksheet, ref workbook, Name + "_" + PhoneNumber);
+					ExcelInterop.Instance.PrintWorksheetAndCloseWorkbook(ref worksheet, ref workbook);
 					return PrinterInfo.State.Printed;
 				} catch (Exception e) {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);

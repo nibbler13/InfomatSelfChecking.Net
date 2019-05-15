@@ -101,8 +101,8 @@ namespace InfomatSelfChecking {
 			if (patients.Count == 0) {
                 string entered = "+7 (" + EnteredNumber.Substring(0, 3) +
                     ") " + EnteredNumber.Substring(3, 3) + "-" +
-					EnteredNumber.Substring(5, 2) + "-" +
-					EnteredNumber.Substring(7, 2);
+					EnteredNumber.Substring(6, 2) + "-" +
+					EnteredNumber.Substring(8, 2);
 
                 page = new PageNotification(PageNotification.NotificationType.NumberNotFound, entered);
             } else if (patients.Count > 4)
@@ -111,6 +111,9 @@ namespace InfomatSelfChecking {
 				page = new PagePatientConfirmation(patients);
 
 			NavigationService.Navigate(page);
+
+			//960 181 18 73
+			//012 345 67 89
 		}
 	}
 }

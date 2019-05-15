@@ -22,7 +22,7 @@ namespace InfomatSelfChecking {
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
 			mailTo = InfomatSelfChecking.Properties.Settings.Default.MailTo;
-			string msg = "!!!App - Запуск приложения";
+			string msg = "App - Запуск приложения";
 			Logging.ToLog(msg);
 			Mail.SendMail(msg, msg, mailTo);
 

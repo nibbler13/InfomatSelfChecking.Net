@@ -32,6 +32,7 @@ namespace InfomatSelfChecking {
 		private readonly bool isError;
 		private readonly bool returnBack;
 		private readonly string title;
+		private int errorCounter = 0;
 
 		public PageNotification(NotificationType type,
 						  string replacement = "",
@@ -141,15 +142,6 @@ namespace InfomatSelfChecking {
 		}
 
 		private void SetupErrorNotification(Exception exception) {
-			if (exception != null) {
-				string msg = exception.Message + Environment.NewLine + exception.StackTrace;
-				if (exception.InnerException != null)
-					msg += Environment.NewLine + Environment.NewLine + exception.InnerException.Message +
-						Environment.NewLine + exception.InnerException.StackTrace;
-
-				Mail.SendMail("Ошибка в работе инфомата", msg, Properties.Settings.Default.MailTo);
-			}
-
 			DispatcherTimer dispatcherTimer = new DispatcherTimer() {
 				Interval = TimeSpan.FromMinutes(1)
 			};
@@ -160,10 +152,26 @@ namespace InfomatSelfChecking {
 				try {
 					DataHandle.CheckDbAvailable();
 					PageNotification_PreviewMouseDown(null, null);
+
+					Logging.ToLog("PageNotification - возврат на главную страницу");
+					errorCounter = 0;
 				} catch (Exception exc) {
 					Logging.ToLog("PageNotification - " + exc.Message + Environment.NewLine + exc.StackTrace);
+					errorCounter++;
+
+					if (errorCounter == 2) {
+						string msg = "Ошибка в работе инфомата:" + Environment.NewLine +
+							exception.Message + Environment.NewLine + exception.StackTrace;
+
+						if (exception.InnerException != null)
+							msg += Environment.NewLine + Environment.NewLine + exception.InnerException.Message +
+								Environment.NewLine + exception.InnerException.StackTrace;
+
+						Mail.SendMail("Ошибка в работе инфомата", msg, Properties.Settings.Default.MailSTP);
+					}
 				}
 			};
+
 			dispatcherTimer.Start();
 		}
 

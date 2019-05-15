@@ -96,13 +96,16 @@ namespace InfomatSelfChecking {
 			}
 		}
 
-		private Excel.Worksheet OpenTemplate(out Excel.Workbook wb) {
+		private Excel.Worksheet OpenTemplate(out Excel.Workbook wb, string filePostfix) {
 			try {
 				Logging.ToLog("ExcelInterop - Открытие книги: " + templateFullPath);
 
-				CheckIfTemplateIsOpened();
+				//CheckIfTemplateIsOpened();
 
-				wb = xlApp.Workbooks.Open(templateFullPath, ReadOnly: true);
+				string currentTemplate = Path.Combine(saveFolder, "PrintResult_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + filePostfix + ".xlsx");
+				File.Copy(templateFullPath, currentTemplate);
+
+				wb = xlApp.Workbooks.Open(currentTemplate);
 
 				if (wb == null) {
 					string msg = "ExcelInterop - Не удалось открыть книгу: " + templateFullPath;
@@ -129,12 +132,12 @@ namespace InfomatSelfChecking {
 			return null;
 		}
 
-		private void CheckIfTemplateIsOpened() {
-			try {
-				Excel.Workbook wb = xlApp.Workbooks.get_Item(templateFileName);
-				wb.Close(false);
-			} catch (Exception) { }
-		}
+		//private void CheckIfTemplateIsOpened() {
+		//	try {
+		//		Excel.Workbook wb = xlApp.Workbooks.get_Item(templateFileName);
+		//		wb.Close(false);
+		//	} catch (Exception) { }
+		//}
 
 		public Excel.Worksheet CreateWorksheetAppointmentsAvailable(ItemPatient patient, out Excel.Workbook wb) {
 			Logging.ToLog("ExcelInterop - Печать назначений для пациента: " + patient.Name + ", pcode: " + patient.PCode);
@@ -145,7 +148,7 @@ namespace InfomatSelfChecking {
 				return null;
 			}
 
-			Excel.Worksheet ws = OpenTemplate(out wb);
+			Excel.Worksheet ws = OpenTemplate(out wb, patient.Name + "_" + patient.PhoneNumber);
 			if (ws == null)
 				return null;
 
@@ -221,14 +224,14 @@ namespace InfomatSelfChecking {
 			currentRow++;
 		}
 
-		public void PrintWorksheetAndCloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb, string filePostfix) {
+		public void PrintWorksheetAndCloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb) {
 			ws.PrintOutEx();
-			CloseWorkbook(ref ws, ref wb, filePostfix);
+			CloseWorkbook(ref ws, ref wb);
 		}
 
-		private void CloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb, string filePostfix) {
+		private void CloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb) {
 			if (!string.IsNullOrEmpty(saveFolder))
-				wb.SaveAs(Path.Combine(saveFolder, "PrintResult_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + filePostfix));
+				wb.Save();
 
 			if (ws != null) {
 				Marshal.ReleaseComObject(ws);

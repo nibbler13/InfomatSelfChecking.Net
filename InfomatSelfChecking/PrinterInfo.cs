@@ -7,10 +7,25 @@ using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
 	public class PrinterInfo {
+		private static PrinterInfo instance = null;
+		private static readonly object padlock = new object();
+
+		public static PrinterInfo Instance {
+			get {
+				lock (padlock) {
+					if (instance == null)
+						instance = new PrinterInfo();
+
+					return instance;
+				}
+			}
+		}
+
 		private static readonly string printerName = Properties.Settings.Default.PrinterName.ToLower();
 		private static readonly string mailReceiver = Properties.Settings.Default.MailSTP;
 		private static readonly string nameSpace = @"\root\CIMV2";
 		private static readonly string className = "Win32_Printer";
+
 		private static readonly Dictionary<int, string> statusCodes = new Dictionary<int, string> {
 			{ 0,       "Printer ready" },
 			{ 1,       "Printer paused" },
@@ -50,8 +65,10 @@ namespace InfomatSelfChecking {
 			NotPrinted,
 			DoNotCheck
 		}
+
+		private bool isTicketSendToSTP = false;
 		
-		public static State GetPrinterState() {
+		public State GetPrinterState() {
 			Logging.ToLog("PrinterInfo - Получение статуса принтера: " + printerName);
 
 			if (string.IsNullOrEmpty(printerName))
@@ -83,8 +100,10 @@ namespace InfomatSelfChecking {
 						printerState == 131072 || //"Toner low"
 						printerState == 2048 || //"Printer output bin full"
 						printerState == 131072 + 2048) && //"Toner low" + "Printer output bin full"
-						!printerWorkOffline)
+						!printerWorkOffline) {
+						isTicketSendToSTP = false;
 						return State.Ready;
+					}
 
 					string printerStatus = string.Empty;
 
@@ -110,11 +129,12 @@ namespace InfomatSelfChecking {
 
 					Logging.ToLog("PrinterInfo - статус принтера: " + printerStatus);
 
-					if (!string.IsNullOrEmpty(printerStatus)) {
+					if (!string.IsNullOrEmpty(printerStatus) && !isTicketSendToSTP) {
 						string subject = "Уведомление от инфомата";
 						string body = "Инфомату не удалось распечатать список назначений пациента, коды ошибок принтера: " +
 							Environment.NewLine + Environment.NewLine + printerStatus;
 						Mail.SendMail(subject, body, mailReceiver);
+						isTicketSendToSTP = true;
 					}
 
 					return State.Error;

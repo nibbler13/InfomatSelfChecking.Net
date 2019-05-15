@@ -250,7 +250,12 @@ namespace InfomatSelfChecking {
 
 		private void ButtonCheckIn_CLick(object sender, RoutedEventArgs e) {
 			if (!checkInStatus.HasValue)
-				checkInStatus = DataHandle.SetCheckInForAppointments(schedIds);
+				try {
+					checkInStatus = DataHandle.SetCheckInForAppointments(schedIds);
+				} catch (Exception exc) {
+
+					Logging.ToLog(exc.Message + Environment.NewLine + exc.StackTrace);
+				}
 
 			if (!checkInStatus.Value) {
 				NavigationService.Navigate(

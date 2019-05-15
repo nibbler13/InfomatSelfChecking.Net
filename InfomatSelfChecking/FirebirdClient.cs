@@ -40,31 +40,57 @@ namespace InfomatSelfChecking {
 		}
 
 		public DataTable GetDataTable(string query, Dictionary<string, object> parameters) {
-            CheckConnectionState();
+			Exception exc = new Exception();
 
-            DataTable dataTable = new DataTable();
-			FbCommand command = new FbCommand(query, connection);
+			for (int i = 0; i < 3; i++) {
+				try {
+					Logging.ToLog("FirebirdClient.GetDataTable Attempt: " + (i + 1));
+					CheckConnectionState();
 
-            if (parameters.Count > 0)
-                foreach (KeyValuePair<string, object> parameter in parameters)
-                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+					DataTable dataTable = new DataTable();
+					FbCommand command = new FbCommand(query, connection);
 
-            FbDataAdapter fbDataAdapter = new FbDataAdapter(command);
-			fbDataAdapter.Fill(dataTable);
+					if (parameters.Count > 0)
+						foreach (KeyValuePair<string, object> parameter in parameters)
+							command.Parameters.AddWithValue(parameter.Key, parameter.Value);
 
-			return dataTable;
+					FbDataAdapter fbDataAdapter = new FbDataAdapter(command);
+					fbDataAdapter.Fill(dataTable);
+
+					return dataTable;
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+					Close();
+					exc = e;
+				}
+			}
+
+			throw exc;
 		}
 
 		public bool ExecuteUpdateQuery(string query, Dictionary<string, object> parameters) {
-            CheckConnectionState();
+			Exception exc = new Exception();
 
-            FbCommand update = new FbCommand(query, connection);
+			for (int i = 0; i < 3; i++) {
+				try {
+					Logging.ToLog("FirebirdClient.ExecuteUpdateQuery Attempt: " + (i + 1));
+					CheckConnectionState();
 
-            if (parameters.Count > 0)
-                foreach (KeyValuePair<string, object> parameter in parameters)
-                    update.Parameters.AddWithValue(parameter.Key, parameter.Value);
+					FbCommand update = new FbCommand(query, connection);
 
-            return update.ExecuteNonQuery() >= 0 ? true : false; ;
+					if (parameters.Count > 0)
+						foreach (KeyValuePair<string, object> parameter in parameters)
+							update.Parameters.AddWithValue(parameter.Key, parameter.Value);
+
+					return update.ExecuteNonQuery() >= 0 ? true : false; ;
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+					Close();
+					exc = e;
+				}
+			}
+
+			throw exc;
 		}
 	}
 }

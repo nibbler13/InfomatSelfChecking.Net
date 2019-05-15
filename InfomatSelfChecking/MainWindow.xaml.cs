@@ -24,6 +24,7 @@ namespace InfomatSelfChecking {
 		private static MainWindow instance = null;
 		private static readonly object padlock = new object();
 		private readonly DispatcherTimer autoCloseTimer;
+		private DateTime dateTimeStart;
 
 		public static MainWindow Instance {
 			get {
@@ -45,9 +46,7 @@ namespace InfomatSelfChecking {
 				if (!e.Key.Equals(Key.Escape))
 					return;
 
-				Logging.ToLog("MainWindow - Закрытие по нажатию клавиши ESC");
-				ExcelInterop.Instance.CloseExcel();
-				Application.Current.Shutdown();
+				ShutdownApp("Закрытие по нажатию клавиши ESC");
 			};
             
             StartCheckDbAvailability();
@@ -57,8 +56,10 @@ namespace InfomatSelfChecking {
 			FrameMain.Navigate(pageNotification);
             DataContext = BindingValues.Instance;
 
-			autoCloseTimer = new DispatcherTimer();
-			autoCloseTimer.Interval = TimeSpan.FromSeconds(Properties.Settings.Default.AutoCloseTimerIntervalInSeconds);
+			autoCloseTimer = new DispatcherTimer {
+				Interval = TimeSpan.FromSeconds(Properties.Settings.Default.AutoCloseTimerIntervalInSeconds)
+			};
+
 			autoCloseTimer.Tick += AutoCloseTimer_Tick;
 			FrameMain.Navigated += FrameMain_Navigated;
 			PreviewMouseDown += MainWindow_PreviewMouseDown;
@@ -108,7 +109,8 @@ namespace InfomatSelfChecking {
 		}
 
 		private void StartCheckDbAvailability() {
-            DispatcherTimer timerDbAvailability = new DispatcherTimer();
+			dateTimeStart = DateTime.Now;
+			DispatcherTimer timerDbAvailability = new DispatcherTimer();
 			timerDbAvailability.Tick += TimerDbAvailability_Tick;
 			timerDbAvailability.Interval = TimeSpan.FromMinutes(1);
             timerDbAvailability.Start();
@@ -116,6 +118,9 @@ namespace InfomatSelfChecking {
 		}
 
 		private async void TimerDbAvailability_Tick(object sender, EventArgs e) {
+			if (dateTimeStart.Date != DateTime.Now.Date)
+				ShutdownApp("Автоматическое завершение работы");
+
 			Logging.ToLog("MainWindow - Проверка доступности БД");
 
 			if (FrameMain.NavigationService.Content is PageNotification) {
@@ -141,6 +146,12 @@ namespace InfomatSelfChecking {
 				FrameMain.NavigationService.GoBack();
 				FrameMain.NavigationService.RemoveBackEntry();
 			}
+		}
+
+		private void ShutdownApp(string reason) {
+			Logging.ToLog("MainWindow - " + reason);
+			ExcelInterop.Instance.CloseExcel();
+			Application.Current.Shutdown();
 		}
 	}
 }
