@@ -31,7 +31,7 @@ namespace InfomatSelfChecking {
 			Logging.ToLog("PageShowAppointments - отображение страницы со списком назначений");
 
 			this.returnBack = returnBack;
-			this.patient = patient;
+			this.patient = patient ?? throw new ArgumentNullException(nameof(patient));
 			schedIds = patient.AppointmentsAvailable.Select(x => x.SchedID).ToList();
 
 			string title = Properties.Resources.title_appointments.Replace("*", patient.Name);
@@ -70,21 +70,23 @@ namespace InfomatSelfChecking {
                     textBlockRoom.HorizontalAlignment = HorizontalAlignment.Center;
                     textBlockRoom.Margin = new Thickness(10);
                 } else {
-                    Border borderRoom = new Border();
-                    borderRoom.HorizontalAlignment = HorizontalAlignment.Right;
-                    borderRoom.Width = 4;
-                    borderRoom.Background = new SolidColorBrush(Color.FromRgb(171, 208, 71));
-                    borderRoom.Margin = new Thickness(0, 5, 0, 5);
-                    Grid.SetRow(borderRoom, row);
+					Border borderRoom = new Border {
+						HorizontalAlignment = HorizontalAlignment.Right,
+						Width = 4,
+						Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
+						Margin = new Thickness(0, 5, 0, 5)
+					};
+					Grid.SetRow(borderRoom, row);
                     Grid.SetColumn(borderRoom, 0);
                     GridAppointments.Children.Add(borderRoom);
                 }
 
-                StackPanel stackPanelTime = new StackPanel();
-                stackPanelTime.Orientation = Orientation.Vertical;
-                stackPanelTime.Margin = new Thickness(20, 10, 20, 10);
-                stackPanelTime.VerticalAlignment = VerticalAlignment.Center;
-                Grid.SetRow(stackPanelTime, row);
+				StackPanel stackPanelTime = new StackPanel {
+					Orientation = Orientation.Vertical,
+					Margin = new Thickness(20, 10, 20, 10),
+					VerticalAlignment = VerticalAlignment.Center
+				};
+				Grid.SetRow(stackPanelTime, row);
                 Grid.SetColumn(stackPanelTime, 1);
                 GridAppointments.Children.Add(stackPanelTime);
 
@@ -116,21 +118,23 @@ namespace InfomatSelfChecking {
                     textBlockTimeStart.Margin = new Thickness(0, 0, 10, 0);
                     textBlockTimeEnd.Margin = new Thickness(10, 0, 0, 0);
                 } else {
-                    Border borderTime = new Border();
-                    borderTime.HorizontalAlignment = HorizontalAlignment.Right;
-                    borderTime.Width = 4;
-                    borderTime.Background = new SolidColorBrush(Color.FromRgb(171, 208, 71));
-                    borderTime.Margin = new Thickness(0, 5, 0, 5);
-                    Grid.SetRow(borderTime, row);
+					Border borderTime = new Border {
+						HorizontalAlignment = HorizontalAlignment.Right,
+						Width = 4,
+						Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
+						Margin = new Thickness(0, 5, 0, 5)
+					};
+					Grid.SetRow(borderTime, row);
                     Grid.SetColumn(borderTime, 1);
                     GridAppointments.Children.Add(borderTime);
                 }
 
-                StackPanel stackPanelDoc = new StackPanel();
-                stackPanelDoc.Orientation = Orientation.Vertical;
-                stackPanelDoc.Margin = new Thickness(20, 10, 20, 10);
-                stackPanelDoc.VerticalAlignment = VerticalAlignment.Center;
-                Grid.SetRow(stackPanelDoc, row);
+				StackPanel stackPanelDoc = new StackPanel {
+					Orientation = Orientation.Vertical,
+					Margin = new Thickness(20, 10, 20, 10),
+					VerticalAlignment = VerticalAlignment.Center
+				};
+				Grid.SetRow(stackPanelDoc, row);
                 Grid.SetColumn(stackPanelDoc, 2);
                 GridAppointments.Children.Add(stackPanelDoc);
 

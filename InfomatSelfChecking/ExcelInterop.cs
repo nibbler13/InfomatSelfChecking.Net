@@ -46,7 +46,7 @@ namespace InfomatSelfChecking {
 			if (xlApp == null) {
 				string msg = "ExcelInterop - Не удалось открыть приложение Excel";
 				Logging.ToLog(msg);
-				Mail.SendMail(subject, msg, stpAddress);
+				ClientMail.SendMail(subject, msg, stpAddress);
 				return;
 			}
 
@@ -56,7 +56,7 @@ namespace InfomatSelfChecking {
 			if (!File.Exists(templateFullPath)) {
 				string msg = "ExcelInterop - Не удалось получить доступ к файлу шаблона: " + templateFullPath;
 				Logging.ToLog(msg);
-				Mail.SendMail(subject, msg, stpAddress);
+				ClientMail.SendMail(subject, msg, stpAddress);
 				return;
 			}
 
@@ -110,7 +110,7 @@ namespace InfomatSelfChecking {
 				if (wb == null) {
 					string msg = "ExcelInterop - Не удалось открыть книгу: " + templateFullPath;
 					Logging.ToLog(msg);
-					Mail.SendMail(subject, msg, stpAddress);
+					ClientMail.SendMail(subject, msg, stpAddress);
 					return null;
 				}
 
@@ -119,7 +119,7 @@ namespace InfomatSelfChecking {
 				if (ws == null) {
 					string msg = "ExcelInterop - Не удалось открыть лист: Template";
 					Logging.ToLog(msg);
-					Mail.SendMail(subject, msg, stpAddress);
+					ClientMail.SendMail(subject, msg, stpAddress);
 					return null;
 				}
 
@@ -198,7 +198,7 @@ namespace InfomatSelfChecking {
 			return ws;
 		}
 
-		private void SetValue(Excel.Worksheet ws, int row, string value) {
+		private static void SetValue(Excel.Worksheet ws, int row, string value) {
 			ws.Range["A" + row].Value2 = value;
 		}
 
@@ -229,9 +229,13 @@ namespace InfomatSelfChecking {
 			CloseWorkbook(ref ws, ref wb);
 		}
 
-		private void CloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb) {
-			if (!string.IsNullOrEmpty(saveFolder))
-				wb.Save();
+		public void CloseWorkbook(ref Excel.Worksheet ws, ref Excel.Workbook wb) {
+			if (!string.IsNullOrEmpty(saveFolder) && wb != null)
+				try {
+					wb.Save();
+				} catch (Exception e) {
+					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+				}
 
 			if (ws != null) {
 				Marshal.ReleaseComObject(ws);

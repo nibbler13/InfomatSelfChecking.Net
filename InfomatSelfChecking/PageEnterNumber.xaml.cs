@@ -88,9 +88,9 @@ namespace InfomatSelfChecking {
 				return;
 
 			Logging.ToLog("PageEnterNumber - введен номер: " + EnteredNumber);
-			List<ItemPatient> patients;
+
             try {
-                patients = DataHandle.GetPatients(EnteredNumber.Substring(0, 3), EnteredNumber.Substring(3, 7));
+                DataHandle.LoadPatients(EnteredNumber.Substring(0, 3), EnteredNumber.Substring(3, 7));
             } catch (Exception exc) {
                 NavigationService.Navigate(new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
                 return;
@@ -98,22 +98,19 @@ namespace InfomatSelfChecking {
 
 			Page page;
 
-			if (patients.Count == 0) {
+			if (DataHandle.PatientsCurrent.Count == 0) {
                 string entered = "+7 (" + EnteredNumber.Substring(0, 3) +
                     ") " + EnteredNumber.Substring(3, 3) + "-" +
 					EnteredNumber.Substring(6, 2) + "-" +
 					EnteredNumber.Substring(8, 2);
 
                 page = new PageNotification(PageNotification.NotificationType.NumberNotFound, entered);
-            } else if (patients.Count > 4)
+            } else if (DataHandle.PatientsCurrent.Count > 4)
 				page = new PageNotification(PageNotification.NotificationType.VisitRegistryToCheckIn);
 			else
-				page = new PagePatientConfirmation(patients);
+				page = new PagePatientConfirmation(DataHandle.PatientsCurrent);
 
 			NavigationService.Navigate(page);
-
-			//960 181 18 73
-			//012 345 67 89
 		}
 	}
 }

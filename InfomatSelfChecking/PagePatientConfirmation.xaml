@@ -7,57 +7,23 @@
       mc:Ignorable="d" 
       d:DesignHeight="600" 
       d:DesignWidth="800"
-      Title="PagePatientSelectedSingle">
-    <Grid x:Name="SinglePatient">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="15*"/>
-            <RowDefinition Height="70*"/>
-            <RowDefinition Height="15*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-
-        <Grid Grid.ColumnSpan="3"
-              Grid.RowSpan="2"
-              x:Name="GridSinglePatient"
+      Title="PagePatientSelect">
+    <Grid x:Name="PatientConfirmation">
+        <Grid x:Name="GridSinglePatient"
               Visibility="Visible">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="15*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="15*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Name" 
-                       TextAlignment="Center" 
-                       VerticalAlignment="Bottom"
-                       Margin="20"
-                       x:Name="TextBlockName"
-                       FontWeight="DemiBold"
-                       FontSize="{Binding FontSizePatientName}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="1" 
-                       Text="Birthday" 
-                       TextAlignment="Center" 
-                       VerticalAlignment="Top" 
-                       Margin="20"
-                       x:Name="TextBlockBirthday"
-                       FontWeight="DemiBold"
-                       FontSize="{Binding FontSizePatientName}"/>
-        </Grid>
-
-        <Grid Grid.ColumnSpan="3" 
-              Grid.RowSpan="2"
-              x:Name="GridMultiplePatients" 
-              VerticalAlignment="Center"
-              Visibility="Hidden">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-        </Grid>
-        
-        <Button Grid.Row="0"
+            <Button Grid.Row="0"
                 Grid.Column="2"
                 x:Name="ButtonWrong"
                 Click="ButtonWrong_Click"
@@ -65,22 +31,42 @@
                 Margin="20"
                 Style="{Binding StyleRoundCorner}"
                 HorizontalAlignment="Right">
-            <Button.Effect>
-                <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
-            </Button.Effect>
-            <Button.Content>
-                <WrapPanel>
-                    <Image Source="Media/ButtonClose.png" 
+                <Button.Effect>
+                    <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
+                </Button.Effect>
+                <Button.Content>
+                    <WrapPanel>
+                        <Image Source="Media/ButtonClose.png" 
                            Margin="20,20,20,20" 
                            RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="" 
+                        <TextBlock Text="" 
                                VerticalAlignment="Center" 
                                x:Name="TextBlockButtonWrong"/>
-                </WrapPanel>
-            </Button.Content>
-        </Button>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+            
+            <TextBlock Grid.Row="1"
+                       Grid.ColumnSpan="3"
+                       Text="Name" 
+                       TextAlignment="Center" 
+                       VerticalAlignment="Bottom"
+                       Margin="20"
+                       x:Name="TextBlockName"
+                       FontWeight="DemiBold"
+                       FontSize="{Binding FontSizePatientName}"/>
 
-        <Button Grid.Row="2"
+            <TextBlock Grid.Row="2" 
+                       Grid.ColumnSpan="3"
+                       Text="Birthday" 
+                       TextAlignment="Center" 
+                       VerticalAlignment="Top" 
+                       Margin="20"
+                       x:Name="TextBlockBirthday"
+                       FontWeight="DemiBold"
+                       FontSize="{Binding FontSizePatientName}"/>
+
+            <Button Grid.Row="3"
                 Grid.Column="1"
                 x:Name="ButtonContinue"
                 Click="ButtonContinue_Click"
@@ -88,18 +74,124 @@
                 Margin="20"
                 Foreground="White"
                 Style="{Binding StyleRoundCornerGreen}">
-            <Button.Effect>
-                <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
-            </Button.Effect>
-            <Button.Content>
-                <WrapPanel>
-                    <Image Margin="0,20,20,20"
+                <Button.Effect>
+                    <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
+                </Button.Effect>
+                <Button.Content>
+                    <WrapPanel>
+                        <Image Margin="0,20,20,20"
                            Source="Media/ButtonOk.png"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="Продолжить" 
+                        <TextBlock Text="Продолжить" 
                                VerticalAlignment="Center"/>
-                </WrapPanel>
-            </Button.Content>
-        </Button>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
+
+        <Grid x:Name="GridMultiplePatients" 
+              Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="85*"/>
+                <RowDefinition Height="15*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="GridMultiplePatientsInner"
+                  Grid.ColumnSpan="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+            </Grid>
+
+            <Button Grid.Row="1"
+                Grid.Column="1"
+                x:Name="ButtonClose"
+                Click="ButtonClose_Click"
+                BorderThickness="0"
+                Margin="20"
+                Foreground="White"
+                Style="{Binding StyleRoundCorner}">
+                <Button.Effect>
+                    <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
+                </Button.Effect>
+                <Button.Content>
+                    <WrapPanel>
+                        <Image Margin="0,20,20,20"
+                           Source="Media/ButtonClose.png"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <TextBlock Text="Закрыть" 
+                               VerticalAlignment="Center"/>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
+
+        <Grid x:Name="GridVisitedAppointmentsQuestion"
+              Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="85*"/>
+                <RowDefinition Height="15*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.ColumnSpan="3"
+                       Text="Имеющиеся назначения были отмечены ранее&#x0a;&#x0a;Желаете ли Вы увидеть их снова?"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"/>
+
+            <Button Grid.Row="1"
+                Grid.Column="0"
+                x:Name="ButtonNo"
+                Click="ButtonNo_Click"
+                BorderThickness="0"
+                Margin="20"
+                Style="{Binding StyleRoundCorner}">
+                <Button.Effect>
+                    <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
+                </Button.Effect>
+                <Button.Content>
+                    <WrapPanel>
+                        <Image Margin="0,20,20,20"
+                           Source="Media/ButtonClose.png"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <TextBlock Text="Нет" 
+                               VerticalAlignment="Center"/>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+
+            <Button Grid.Row="1"
+                Grid.Column="2"
+                x:Name="ButtonYes"
+                Click="ButtonYes_Click"
+                BorderThickness="0"
+                Margin="20"
+                Foreground="White"
+                Style="{Binding StyleRoundCornerGreen}">
+                <Button.Effect>
+                    <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
+                </Button.Effect>
+                <Button.Content>
+                    <WrapPanel>
+                        <Image Margin="0,20,20,20"
+                           Source="Media/ButtonOk.png"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <TextBlock Text="Да" 
+                               VerticalAlignment="Center"/>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
     </Grid>
 </Page>

@@ -19,15 +19,15 @@ namespace InfomatSelfChecking {
     /// </summary>
     public partial class PagePatientConfirmation : Page {
 		private readonly List<ItemPatient> patients;
+		private ItemPatient selectedPatient;
 		private readonly bool returnBack = false;
 		private readonly string title;
 
         public PagePatientConfirmation(List<ItemPatient> patients) {
 			InitializeComponent();
-
 			Logging.ToLog("PagePatientConfirmation - отображение страницы подтверждения ФИО пациента / выбора пациента");
 
-			this.patients = patients;
+			this.patients = patients ?? throw new ArgumentNullException(nameof(patients));
 
 			if (patients.Count == 1) {
 				TextBlockName.Text = patients[0].Name;
@@ -36,13 +36,7 @@ namespace InfomatSelfChecking {
 			} else {
 				GridSinglePatient.Visibility = Visibility.Hidden;
 				GridMultiplePatients.Visibility = Visibility.Visible;
-				TextBlockButtonWrong.Text = "Закрыть";
-				ButtonWrong.HorizontalAlignment = HorizontalAlignment.Stretch;
-				Grid.SetColumn(ButtonWrong, 1);
-				Grid.SetRow(ButtonWrong, 2);
-                ButtonContinue.Visibility = Visibility.Hidden;
 				title = Properties.Resources.title_name_confirm_multiple;
-				KeepAlive = true;
                 DrawPatients();
 				returnBack = true;
 			}
@@ -123,24 +117,39 @@ namespace InfomatSelfChecking {
 		}
 
 		private void ButtonWrong_Click(object sender, RoutedEventArgs e) {
-			if (patients.Count == 1) {
-				PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.NameNotCorrect);
-				NavigationService.Navigate(pageNotification);
-			} else
-				MainWindow.Instance.CloseAllWindows();
+			PageNotification pageNotification = new PageNotification(PageNotification.NotificationType.NameNotCorrect);
+			NavigationService.Navigate(pageNotification);
 		}
 
 		private void ButtonContinue_Click(object sender, RoutedEventArgs e) {
 			CheckPatientStateAndShowAppointments(patients[0]);
 		}
 
+		private void ButtonClose_Click(object sender, RoutedEventArgs e) {
+			MainWindow.Instance.CloseAllWindows();
+		}
+		private void ButtonYes_Click(object sender, RoutedEventArgs e) {
+
+		}
+		private void ButtonNo_Click(object sender, RoutedEventArgs e) {
+			PageCheckInCompleted pageCheckInCompleted;
+
+			if (patients.Count == 1)
+				pageCheckInCompleted = new PageCheckInCompleted(patients[0], false, true);
+			else
+				pageCheckInCompleted = new PageCheckInCompleted(selectedPatient, true, true);
+
+			NavigationService.Navigate(pageCheckInCompleted);
+		}
+
 		private void CheckPatientStateAndShowAppointments(ItemPatient patient) {
 			PageNotification.NotificationType? notificationType = null;
+			selectedPatient = patient;
 
 			if (patient.StopCodesCurrent.Contains(ItemPatient.StopCodes.FirstTime))
 				notificationType = PageNotification.NotificationType.FirstVisit;
-			else if (patient.StopCodesCurrent.Contains(ItemPatient.StopCodes.NotAvailableNow))
-				notificationType = PageNotification.NotificationType.NoAppointmentsForNow;
+			//else if (patient.StopCodesCurrent.Contains(ItemPatient.StopCodes.NotAvailableNow))
+			//	notificationType = PageNotification.NotificationType.NoAppointmentsForNow;
 			else if (patient.StopCodesCurrent.Contains(ItemPatient.StopCodes.Cash))
 				notificationType = PageNotification.NotificationType.Cash;
 			else if (patient.StopCodesCurrent.Count > 0)
@@ -154,11 +163,24 @@ namespace InfomatSelfChecking {
 
             bool isOk = true;
 
-            if (patient.AppointmentsAvailable.Count == 0) {
-				PageNotification pageAppointmentsNotFound = 
+			if (patient.AppointmentsNotAvailable.Count >= 0 &&
+				patient.AppointmentsAvailable.Count == 0 &&
+				patient.AppointmentsVisited.Count == 0) {
+				PageNotification pageAppointmentsNotFound =
 					new PageNotification(PageNotification.NotificationType.NoAppointmentsForNow, returnBack: returnBack);
 				NavigationService.Navigate(pageAppointmentsNotFound);
-                isOk = false;
+				isOk = false;
+			} else if (
+				patient.AppointmentsVisited.Count >= 0 &&
+				patient.AppointmentsAvailable.Count == 0) {
+				//do you want to see already checked appointments?
+				BindingValues.Instance.SetUpMainWindow(string.Empty, false, false);
+				GridVisitedAppointmentsQuestion.Visibility = Visibility.Visible;
+
+				if (patients.Count == 1) 
+					GridSinglePatient.Visibility = Visibility.Hidden;
+				else 
+					GridMultiplePatients.Visibility = Visibility.Hidden;
             } else {
 				PageShowAppointments pageAppointmentsShow = new PageShowAppointments(patient, returnBack);
 				NavigationService.Navigate(pageAppointmentsShow);
@@ -167,7 +189,7 @@ namespace InfomatSelfChecking {
             SetImage(patient, isOk);
         }
 
-		private void SetImage(ItemPatient patient, bool isOk) {
+		private static void SetImage(ItemPatient patient, bool isOk) {
 			if (patient.CheckStateImage != null) {
 				if (!isOk) 
 					patient.CheckStateImage.Source = ControlsFactory.GetImage(ControlsFactory.ImageType.NotificationRegistry);

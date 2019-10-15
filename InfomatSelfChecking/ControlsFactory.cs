@@ -12,7 +12,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace InfomatSelfChecking {
-	class ControlsFactory {
+	static class ControlsFactory {
 		public enum ImageType {
 			AppointmentsLate,
 			AppointmentsCash,
@@ -224,17 +224,16 @@ namespace InfomatSelfChecking {
             }
         }
 
-        private string ClearDoctorName(string name) {
-            if (name.Contains('(')) {
-                name = name.Substring(0, name.IndexOf('('));
-                name = name.TrimEnd(' ');
-            }
+        //private static string ClearDoctorName(string name) {
+        //    if (name.Contains('(')) {
+        //        name = name.Substring(0, name.IndexOf('('));
+        //        name = name.TrimEnd(' ');
+        //    }
 
-            return name;
-        }
+        //    return name;
+        //}
 
         public static string ClearTimeString(string timeString) {
-            string text = string.Empty;
             string[] timeValues = timeString.Split(new string[] { " - " }, StringSplitOptions.None);
 
             if (timeValues.Length == 2) {
@@ -246,11 +245,9 @@ namespace InfomatSelfChecking {
                 if (partRight.StartsWith(":"))
                     partRight = "0" + partRight;
 
-                text = partLeft + " - " + partRight;
+                return partLeft + " - " + partRight;
             } else
-                text = timeString;
-
-            return text;
+                return timeString;
         }
 
         public static string FirstCharToUpper(string input) {

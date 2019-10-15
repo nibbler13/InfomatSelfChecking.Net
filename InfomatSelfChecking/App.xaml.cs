@@ -24,7 +24,7 @@ namespace InfomatSelfChecking {
 			mailTo = InfomatSelfChecking.Properties.Settings.Default.MailTo;
 			string msg = "App - Запуск приложения";
 			Logging.ToLog(msg);
-			Mail.SendMail(msg, msg, mailTo);
+			ClientMail.SendMail(msg, msg, mailTo);
 
 			MainWindow window = new MainWindow();
 			window.Show();
@@ -42,7 +42,7 @@ namespace InfomatSelfChecking {
 			if (exception != null) {
 				string msg = exception.Message + Environment.NewLine + exception.StackTrace;
 				Logging.ToLog(msg);
-				Mail.SendMail("Необработанное исключение", msg, mailTo);
+				ClientMail.SendMail("Необработанное исключение", msg, mailTo);
 			}
 
 			Logging.ToLog("!!!App - Аварийное завершение работы");

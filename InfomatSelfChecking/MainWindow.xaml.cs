@@ -121,35 +121,54 @@ namespace InfomatSelfChecking {
 			if (dateTimeStart.Date != DateTime.Now.Date)
 				ShutdownApp("Автоматическое завершение работы");
 
-			Logging.ToLog("MainWindow - Проверка доступности БД");
-
 			if (FrameMain.NavigationService.Content is PageNotification) {
 				PageNotification currentPage = FrameMain.NavigationService.Content as PageNotification;
 				if (currentPage.CurrentNotificationType == PageNotification.NotificationType.DbError)
 					return;
 			}
 
+			Logging.ToLog("MainWindow - Проверка доступности БД");
+
 			try {
-				await Task.Run(() => {
-					DataHandle.CheckDbAvailable();
-				});
+				await Task.Run(() => { DataHandle.CheckDbAvailable(); }).ConfigureAwait(false);
 			} catch (Exception exc) {
-				FrameMain.NavigationService.Navigate(
-					new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
+				ShowErrorScreen(exc, false);
 			}
+		}
+
+		public void ShowErrorScreen(Exception e, bool isQueryException) {
+			if (FrameMain.NavigationService.Content is PageNotification) {
+				PageNotification currentPage = FrameMain.NavigationService.Content as PageNotification;
+				if (currentPage.CurrentNotificationType == PageNotification.NotificationType.DbError)
+					return;
+			}
+
+			FrameMain.NavigationService.Navigate(
+				new PageNotification(PageNotification.NotificationType.DbError, exception: e, isQueryException: isQueryException));
 		}
 
 		public void CloseAllWindows() {
 			Logging.ToLog("MainWindow - закрытие всех страниц");
 
-			while (FrameMain.NavigationService.CanGoBack) {
-				FrameMain.NavigationService.GoBack();
-				FrameMain.NavigationService.RemoveBackEntry();
+			foreach (ItemPatient patient in DataHandle.PatientsCurrent)
+				patient.CloseExcelWorkbook();
+
+			try {
+				while (FrameMain.NavigationService.CanGoBack) {
+					FrameMain.NavigationService.GoBack();
+					FrameMain.NavigationService.RemoveBackEntry();
+				}
+			} catch (Exception e) {
+				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
 			}
+
+			GC.Collect();
 		}
 
 		private void ShutdownApp(string reason) {
 			Logging.ToLog("MainWindow - " + reason);
+			CloseAllWindows();
+			DataHandle.CloseDbConnections();
 			ExcelInterop.Instance.CloseExcel();
 			Application.Current.Shutdown();
 		}

@@ -14,27 +14,27 @@ namespace InfomatSelfChecking {
 		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckDbState;
 		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
 		private static readonly string sqlUpdateAppointment = Properties.Settings.Default.MisDbSqlUpdateAppointments;
-		private static readonly bool isThisAMoscowFilial;
-		private static readonly bool isThisASpbFilial;
+		private static readonly bool isThisAMoscowFilial = IsCurrentFilialInList(new string[] { "1", "5", "12" });
+		private static readonly bool isThisASpbFilial = IsCurrentFilialInList(new string[] { "3" });
 
-		static DataHandle() {
-			isThisAMoscowFilial = IsCurrentFilialInList(new string[] { "1", "5", "12" });
-			isThisASpbFilial = IsCurrentFilialInList(new string[] { "3" });
-		}
-
-		private static readonly FirebirdClient fbClient = new FirebirdClient(
+		private static readonly ClientFirebird fbClient = new ClientFirebird(
 			Properties.Settings.Default.MisDbAddress,
 			Properties.Settings.Default.MisDbName,
 			Properties.Settings.Default.MisDbUser,
 			Properties.Settings.Default.MisDbPassword);
 
-		private static readonly FirebirdClient fbClientCentralDb = new FirebirdClient(
+		private static readonly ClientFirebird fbClientCentralDb = new ClientFirebird(
 			Properties.Settings.Default.MisDbCentralAddress,
 			Properties.Settings.Default.MisDbCentralName,
 			Properties.Settings.Default.MisDbUser,
 			Properties.Settings.Default.MisDbPassword);
 
+		public static List<ItemPatient> PatientsCurrent { get; private set; } = new List<ItemPatient>();
+
 		public static bool SetCheckInForAppointments(List<string> schedIds) {
+			if (schedIds == null)
+				throw new ArgumentNullException(nameof(schedIds));
+
 			Logging.ToLog("DataHandle - установка отметок о посещении для следующих назначений SchedID: " +
 				string.Join(", ", schedIds));
 
@@ -53,37 +53,42 @@ namespace InfomatSelfChecking {
 			return result;
 		}
 
-		public static List<ItemPatient> GetPatients(string prefix, string number) {
+		public static void LoadPatients(string prefix, string number) {
 			Logging.ToLog("DataHandle - получения списка пациентов по введенному номеру: " + prefix + number);
 
-			List<ItemPatient> patients = new List<ItemPatient>();
+			PatientsCurrent.Clear();
 
 			Dictionary<string, object> parameters = new Dictionary<string, object> {
 				{ "@prefix", prefix},
 				{ "@number", number }};
-			DataTable dataTable = fbClient.GetDataTable(sqlGetPatients, parameters);
 
-			foreach (DataRow row in dataTable.Rows) {
-				try {
-                    ItemPatient itemPatient = new ItemPatient() {
-                        PhoneNumber = prefix + number,
-                        PCode = row["PCODE"].ToString(),
-                        Name = row["CNAME"].ToString(),
-                        Birthday = DateTime.Parse(row["BDATE"].ToString())
-					};
+			try {
+				using (DataTable dataTable = fbClient.GetDataTable(sqlGetPatients, parameters)) {
+					foreach (DataRow row in dataTable.Rows) {
+						try {
+							ItemPatient itemPatient = new ItemPatient() {
+								PhoneNumber = prefix + number,
+								PCode = row["PCODE"].ToString(),
+								Name = row["CNAME"].ToString(),
+								Birthday = DateTime.Parse(row["BDATE"].ToString())
+							};
 
-					GetPatientAppointments(ref itemPatient);
+							GetPatientAppointments(ref itemPatient);
 
-					patients.Add(itemPatient);
-				} catch (Exception e) {
-					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+							PatientsCurrent.Add(itemPatient);
+						} catch (Exception e) {
+							Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+						}
+					}
 				}
+			} catch (Exception e) {
+				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+				MainWindow.Instance.ShowErrorScreen(e, true);
+				return;
 			}
 
 			Logging.ToLog("DataHandle - полученный список пациентов: " + 
-				string.Join(Environment.NewLine, patients));
-
-			return patients;
+				string.Join(Environment.NewLine, PatientsCurrent));
 		}
 
 		private static void GetPatientAppointments(ref ItemPatient patient) {
@@ -100,141 +105,157 @@ namespace InfomatSelfChecking {
 				}
 			}
 
-			DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters);
-
-			foreach (DataRow row in dataTable.Rows) {
-				try {
-					string group = row["GROUPS"].ToString().TrimStart(' ').TrimEnd(' ');
-					string info = row["INFO"].ToString().TrimStart(' ').TrimEnd(' ');
-
-					if (info.Equals("0"))
-						continue;
-
-					string[] infoData = info.Split('@');
-					if (infoData.Length == 0)
-						continue;
-
-					switch (group) {
-						case "_STOP_CODE":
-							foreach (string code in infoData) {
-								switch (code) {
-									case "cash":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Cash);
-										break;
-									case "firsttime":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.FirstTime);
-										break;
-									case "lock":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Lock);
-										break;
-									case "late":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Late);
-										break;
-									case "not_available_now":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.NotAvailableNow);
-										break;
-									case "depout":
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.DepOut);
-										break;
-                                    case "debt":
-                                        patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
-                                        break;
-									case "sogl":
-										if (isThisASpbFilial)
-											patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Agreement);
-										break;
-									case "":
-										break;
-									default:
-										Logging.ToLog("DataHandle - Не удается распознать StopCode: " + code);
-										break;
-								}
-							}
-							break;
-						case "_INFO_CODE":
-							foreach (string code in infoData) {
-								switch (code) {
-									case "inform_about_lk":
-										patient.InfoCodesCurrent.Add(ItemPatient.InfoCodes.InformAboutLK);
-										break;
-									case "":
-										break;
-									default:
-										Logging.ToLog("DataHandle - Не удается распознать InfoCode: " + code);
-										break;
-								}
-							}
-							break;
-						default:
-							if (infoData.Length != 7) {
-								Logging.ToLog("DataHandle - Количество элементов в строке не равно 6: " + info);
-								break;
-							}
-
-							ItemAppointment itemAppointment = new ItemAppointment() {
-								DateTimeScheduleBegin = infoData[0],
-								DateTimeScheduleEnd = infoData[1],
-                                DepShortName = infoData[2],
-								DepName = ControlsFactory.FirstCharToUpper(infoData[3]),
-								DName = infoData[4],
-								RNum = infoData[5].Replace('№', ' '),
-								SchedID = infoData[6]
-							};
-
-							switch (group) {
-								case "visited":
-									patient.AppointmentsVisited.Add(itemAppointment);
-									break;
-								case "available":
-									patient.AppointmentsAvailable.Add(itemAppointment);
-									break;
-								case "not_available":
-									patient.AppointmentsNotAvailable.Add(itemAppointment);
-									break;
-								default:
-									break;
-							}
-
-							break;
-					}
-
-				} catch (Exception e) {
-					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
-				}
+			try {
+				using (DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters)) 
+					foreach (DataRow row in dataTable.Rows) 
+						ParseRow(row, ref patient);
+			} catch (Exception e) {
+				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+				MainWindow.Instance.ShowErrorScreen(e, true);
+				return;
 			}
 
-			patient.AppointmentsAvailable = 
-				patient.AppointmentsAvailable.OrderBy(x => x.DateTimeScheduleBegin).ToList();
+
+			List<ItemAppointment> appointmentSorted = patient.AppointmentsAvailable.OrderBy(x => x.DateTimeScheduleBegin).ToList();
+			patient.AppointmentsAvailable.Clear();
+			patient.AppointmentsAvailable.AddRange(appointmentSorted);
 
 			if (patient.StopCodesCurrent.Count == 0 &&
 				patient.AppointmentsAvailable.Count > 0)
 				patient.CheckPrinterAndCreateWorksheet();
 		}
 
+		private static void ParseRow(DataRow row, ref ItemPatient patient) {
+			try {
+				string group = row["GROUPS"].ToString().TrimStart(' ').TrimEnd(' ');
+				string info = row["INFO"].ToString().TrimStart(' ').TrimEnd(' ');
+
+				if (info.Equals("0"))
+					return;
+
+				string[] infoData = info.Split('@');
+				if (infoData.Length == 0)
+					return;
+
+				switch (group) {
+					case "_STOP_CODE":
+						foreach (string code in infoData) {
+							switch (code) {
+								case "cash":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Cash);
+									break;
+								case "firsttime":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.FirstTime);
+									break;
+								case "lock":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Lock);
+									break;
+								case "late":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Late);
+									break;
+								//case "not_available_now":
+								//	patient.StopCodesCurrent.Add(ItemPatient.StopCodes.NotAvailableNow);
+								//	break;
+								case "depout":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.DepOut);
+									break;
+								case "debt":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
+									break;
+								case "sogl":
+									if (isThisASpbFilial)
+										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Agreement);
+									break;
+								case "":
+									break;
+								default:
+									Logging.ToLog("DataHandle - Не удается распознать StopCode: " + code);
+									break;
+							}
+						}
+						break;
+					case "_INFO_CODE":
+						foreach (string code in infoData) {
+							switch (code) {
+								case "inform_about_lk":
+									patient.InfoCodesCurrent.Add(ItemPatient.InfoCodes.InformAboutLK);
+									break;
+								case "":
+									break;
+								default:
+									Logging.ToLog("DataHandle - Не удается распознать InfoCode: " + code);
+									break;
+							}
+						}
+						break;
+					default:
+						if (infoData.Length != 7) {
+							Logging.ToLog("DataHandle - Количество элементов в строке не равно 6: " + info);
+							break;
+						}
+
+						ItemAppointment itemAppointment = new ItemAppointment() {
+							DateTimeScheduleBegin = infoData[0],
+							DateTimeScheduleEnd = infoData[1],
+							DepShortName = infoData[2],
+							DepName = ControlsFactory.FirstCharToUpper(infoData[3]),
+							DName = infoData[4],
+							RNum = infoData[5].Replace('№', ' '),
+							SchedID = infoData[6]
+						};
+
+						switch (group) {
+							case "visited":
+								patient.AppointmentsVisited.Add(itemAppointment);
+								break;
+							case "available":
+								patient.AppointmentsAvailable.Add(itemAppointment);
+								break;
+							case "not_available":
+								patient.AppointmentsNotAvailable.Add(itemAppointment);
+								break;
+							default:
+								break;
+						}
+
+						break;
+				}
+
+			} catch (Exception e) {
+				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+			}
+		}
+
 		private static bool IsCentralDbAvailable() {
 			Logging.ToLog("DataHandle - проверка доступности ЦБД");
-			bool result = fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count > 0;
-			Logging.ToLog("DataHandle - возвращаемое значение: " + result);
-			return result;
+			using (DataTable dataTable = fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>())) {
+				bool result = dataTable.Rows.Count > 0;
+				Logging.ToLog("DataHandle - возвращаемое значение: " + result);
+				return result;
+			}
 		}
 
 		public static void CheckDbAvailable() {
 			Logging.ToLog("DataHandle - проверка доступности БД");
-
-            if (fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>()).Rows.Count == 0)
-                throw new Exception("DataHandle - CheckDbAvailable - result is empty");
+			using (DataTable dataTable = fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>())) 
+				if (dataTable.Rows.Count == 0)
+					throw new Exception("DataHandle - CheckDbAvailable - result is empty");
 		}
 
 		public static bool IsCurrentFilialInList(string[] filialsID) {
 			Logging.ToLog("DataHandle - определение принадлежности филиала к списку: " + string.Join(",", filialsID));
 
-			string filID = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlGetFilialID,
-				new Dictionary<string, object>()).Rows[0][0].ToString();
+			using (DataTable dataTable = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlGetFilialID, new Dictionary<string, object>())) {
+				string filID = dataTable.Rows[0][0].ToString();
+				bool result = filialsID.Contains(filID);
+				Logging.ToLog("DataHandle - возвращаемое значение: " + result);
+				return result;
+			}
+		}
 
-			bool result = filialsID.Contains(filID);
-
-			Logging.ToLog("DataHandle - возвращаемое значение: " + result);
-			return result;
+		public static void CloseDbConnections() {
+			fbClient.Close();
+			fbClientCentralDb.Close();
 		}
     }
 }

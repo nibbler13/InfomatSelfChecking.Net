@@ -5,14 +5,16 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace InfomatSelfChecking {
-	public class Mail {
+	public static class ClientMail {
 		public static async void SendMail (string subject, string body, string receiver, string attachmentPath = "") {
 			Logging.ToLog("Mail - Отправка сообщения, тема: " + subject + ", текст: " + body);
 			Logging.ToLog("Mail - Получатели: " + receiver);
 
-			if (string.IsNullOrEmpty(receiver))
+			if (string.IsNullOrEmpty(receiver) || 
+				Debugger.IsAttached)
 				return;
 
 			try {
@@ -48,13 +50,18 @@ namespace InfomatSelfChecking {
 					body = body.Replace(Environment.NewLine, "<br>");
 				
 				if (!string.IsNullOrEmpty(attachmentPath) && File.Exists(attachmentPath)) {
+#pragma warning disable CA2000 // Dispose objects before losing scope
+#pragma warning disable IDE0068 // Use recommended dispose pattern
 					Attachment attachment = new Attachment(attachmentPath);
+#pragma warning restore IDE0068 // Use recommended dispose pattern
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
 					if (message.IsBodyHtml && attachmentPath.EndsWith(".jpg")) {
 						attachment.ContentDisposition.Inline = true;
 
-						LinkedResource inline = new LinkedResource(attachmentPath, MediaTypeNames.Image.Jpeg);
-						inline.ContentId = Guid.NewGuid().ToString();
+						LinkedResource inline = new LinkedResource(attachmentPath, MediaTypeNames.Image.Jpeg) {
+							ContentId = Guid.NewGuid().ToString()
+						};
 
 						body = body.Replace("Фотография с камеры терминала:", "Фотография с камеры терминала:<br>" +
 							string.Format(@"<img src=""cid:{0}"" />", inline.ContentId));
@@ -82,8 +89,12 @@ namespace InfomatSelfChecking {
                     Properties.Settings.Default.MailDomain)
                 };
 
-                await Task.Run(() => { client.Send(message); });
+                await Task.Run(() => { client.Send(message); }).ConfigureAwait(false);
 				client.Dispose();
+
+				foreach (Attachment item in message.Attachments)
+					item.Dispose();
+
 				message.Dispose();
 				Logging.ToLog("Mail - Письмо отправлено успешно");
 			} catch (Exception e) {

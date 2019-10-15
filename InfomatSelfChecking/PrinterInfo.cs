@@ -23,8 +23,8 @@ namespace InfomatSelfChecking {
 
 		private static readonly string printerName = Properties.Settings.Default.PrinterName.ToLower();
 		private static readonly string mailReceiver = Properties.Settings.Default.MailSTP;
-		private static readonly string nameSpace = @"\root\CIMV2";
-		private static readonly string className = "Win32_Printer";
+		private const string NAME_SPACE = @"\root\CIMV2";
+		private const string CLASS_NAME = "Win32_Printer";
 
 		private static readonly Dictionary<int, string> statusCodes = new Dictionary<int, string> {
 			{ 0,       "Printer ready" },
@@ -78,66 +78,67 @@ namespace InfomatSelfChecking {
 				return State.DoNotCheck;
 
 			try {
-				ManagementObjectSearcher mgmtObjSearcher = new ManagementObjectSearcher(nameSpace, "SELECT * FROM " + className);
-				ManagementObjectCollection colPrinters = mgmtObjSearcher.Get();
+				using (ManagementObjectSearcher mgmtObjSearcher = new ManagementObjectSearcher(NAME_SPACE, "SELECT * FROM " + CLASS_NAME)) {
+					ManagementObjectCollection colPrinters = mgmtObjSearcher.Get();
 
-				if (colPrinters.Count == 0) {
-					Logging.ToLog("PrinterInfo - Не удалось получить информацию об установленных принтеров в разделе " + 
-						nameSpace + ", " + className);
-					return State.NotFound;
-				}
-
-				foreach (ManagementObject printer in colPrinters) {
-					string currentPrinterName = printer["Name"].ToString().ToLower();
-
-					if (!currentPrinterName.Equals(printerName))
-						continue;
-
-					long printerState = Convert.ToInt64(printer["PrinterState"]);
-					bool printerWorkOffline = Convert.ToBoolean(printer["WorkOffline"]);
-
-					if ((printerState == 0 || //"Printer ready"
-						printerState == 131072 || //"Toner low"
-						printerState == 2048 || //"Printer output bin full"
-						printerState == 131072 + 2048) && //"Toner low" + "Printer output bin full"
-						!printerWorkOffline) {
-						isTicketSendToSTP = false;
-						return State.Ready;
+					if (colPrinters.Count == 0) {
+						Logging.ToLog("PrinterInfo - Не удалось получить информацию об установленных принтеров в разделе " +
+							NAME_SPACE + ", " + CLASS_NAME);
+						return State.NotFound;
 					}
 
-					string printerStatus = string.Empty;
+					foreach (ManagementObject printer in colPrinters) {
+						string currentPrinterName = printer["Name"].ToString().ToLower();
 
-					if (printerWorkOffline)
-						printerStatus += "Printer is working offline" + Environment.NewLine;
-
-					for (int i = statusCodes.Count - 1; i >= 0; i--) {
-						if (printerState == 0)
-							break;
-
-						int code = statusCodes.ElementAt(i).Key;
-						
-						if ((printerState - code) < 0)
+						if (!currentPrinterName.Equals(printerName))
 							continue;
 
-						printerState -= code;
+						long printerState = Convert.ToInt64(printer["PrinterState"]);
+						bool printerWorkOffline = Convert.ToBoolean(printer["WorkOffline"]);
 
-						if (code == 131073 || code == 2048) //"Toner low" || "Printer output bin full"
-							continue;
+						if ((printerState == 0 || //"Printer ready"
+							printerState == 131072 || //"Toner low"
+							printerState == 2048 || //"Printer output bin full"
+							printerState == 131072 + 2048) && //"Toner low" + "Printer output bin full"
+							!printerWorkOffline) {
+							isTicketSendToSTP = false;
+							return State.Ready;
+						}
 
-						printerStatus += statusCodes[code] + Environment.NewLine;
+						string printerStatus = string.Empty;
+
+						if (printerWorkOffline)
+							printerStatus += "Printer is working offline" + Environment.NewLine;
+
+						for (int i = statusCodes.Count - 1; i >= 0; i--) {
+							if (printerState == 0)
+								break;
+
+							int code = statusCodes.ElementAt(i).Key;
+
+							if ((printerState - code) < 0)
+								continue;
+
+							printerState -= code;
+
+							if (code == 131073 || code == 2048) //"Toner low" || "Printer output bin full"
+								continue;
+
+							printerStatus += statusCodes[code] + Environment.NewLine;
+						}
+
+						Logging.ToLog("PrinterInfo - статус принтера: " + printerStatus);
+
+						if (!string.IsNullOrEmpty(printerStatus) && !isTicketSendToSTP) {
+							string subject = "Уведомление от инфомата";
+							string body = "Инфомату не удалось распечатать список назначений пациента, коды ошибок принтера: " +
+								Environment.NewLine + Environment.NewLine + printerStatus;
+							ClientMail.SendMail(subject, body, mailReceiver);
+							isTicketSendToSTP = true;
+						}
+
+						return State.Error;
 					}
-
-					Logging.ToLog("PrinterInfo - статус принтера: " + printerStatus);
-
-					if (!string.IsNullOrEmpty(printerStatus) && !isTicketSendToSTP) {
-						string subject = "Уведомление от инфомата";
-						string body = "Инфомату не удалось распечатать список назначений пациента, коды ошибок принтера: " +
-							Environment.NewLine + Environment.NewLine + printerStatus;
-						Mail.SendMail(subject, body, mailReceiver);
-						isTicketSendToSTP = true;
-					}
-
-					return State.Error;
 				}
 			} catch (Exception e) {
 				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);

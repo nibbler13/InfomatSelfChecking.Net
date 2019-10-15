@@ -30,12 +30,12 @@ namespace InfomatSelfChecking {
 		public string Name { get; set; } = string.Empty;
 		public DateTime Birthday { get; set; }
 
-		public List<StopCodes> StopCodesCurrent { get; set; } = new List<StopCodes>();
-		public List<InfoCodes> InfoCodesCurrent { get; set; } = new List<InfoCodes>();
+		public List<StopCodes> StopCodesCurrent { get; } = new List<StopCodes>();
+		public List<InfoCodes> InfoCodesCurrent { get; } = new List<InfoCodes>();
 
-		public List<ItemAppointment> AppointmentsVisited { get; set; } = new List<ItemAppointment>();
-		public List<ItemAppointment> AppointmentsAvailable { get; set; } = new List<ItemAppointment>();
-		public List<ItemAppointment> AppointmentsNotAvailable { get; set; } = new List<ItemAppointment>();
+		public List<ItemAppointment> AppointmentsVisited { get; } = new List<ItemAppointment>();
+		public List<ItemAppointment> AppointmentsAvailable { get; } = new List<ItemAppointment>();
+		public List<ItemAppointment> AppointmentsNotAvailable { get; } = new List<ItemAppointment>();
 		
 		public Image CheckStateImage { get; set; } = null;
 
@@ -69,7 +69,7 @@ namespace InfomatSelfChecking {
 
 				IsWorksheetCreated = true;
 				BackgroundWorkCompletedEvent.Set();
-			});
+			}).ConfigureAwait(false);
 		}
 
 		public PrinterInfo.State PrintAppointmentsAvailable() {
@@ -102,6 +102,10 @@ namespace InfomatSelfChecking {
 			}
 
 			return PrinterInfo.State.Unknown;
+		}
+
+		public void CloseExcelWorkbook() {
+			ExcelInterop.Instance.CloseWorkbook(ref worksheet, ref workbook);
 		}
 
 		public override string ToString() {

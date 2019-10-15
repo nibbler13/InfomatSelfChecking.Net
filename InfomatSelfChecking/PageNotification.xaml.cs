@@ -33,12 +33,13 @@ namespace InfomatSelfChecking {
 		private readonly bool returnBack;
 		private readonly string title;
 		private int errorCounter = 0;
+		private readonly bool? isQueryException;
 
 		public PageNotification(NotificationType type,
 						  string replacement = "",
 						  bool returnBack = false,
 						  Exception exception = null,
-						  PrinterInfo.State? printerState = null) {
+						  bool? isQueryException = null) {
             InitializeComponent();
 
 			Logging.ToLog("PageNotification - Отображение страницы типа: " + type);
@@ -51,6 +52,7 @@ namespace InfomatSelfChecking {
 			ControlsFactory.ImageType imageType = ControlsFactory.ImageType.NotificationRegistry;
 			string textToShow = string.Empty;
 			title = Properties.Resources.title_notification;
+			this.isQueryException = isQueryException;
 			
 			switch (type) {
 				case NotificationType.Welcome:
@@ -151,15 +153,13 @@ namespace InfomatSelfChecking {
 
 				try {
 					DataHandle.CheckDbAvailable();
+                    (s as DispatcherTimer).Stop();
 					PageNotification_PreviewMouseDown(null, null);
-
-					Logging.ToLog("PageNotification - возврат на главную страницу");
-					errorCounter = 0;
 				} catch (Exception exc) {
 					Logging.ToLog("PageNotification - " + exc.Message + Environment.NewLine + exc.StackTrace);
 					errorCounter++;
 
-					if (errorCounter == 2) {
+					if (errorCounter == 2 || (isQueryException.HasValue && isQueryException.Value)) {
 						string msg = "Ошибка в работе инфомата:" + Environment.NewLine +
 							exception.Message + Environment.NewLine + exception.StackTrace;
 
@@ -167,7 +167,10 @@ namespace InfomatSelfChecking {
 							msg += Environment.NewLine + Environment.NewLine + exception.InnerException.Message +
 								Environment.NewLine + exception.InnerException.StackTrace;
 
-						Mail.SendMail("Ошибка в работе инфомата", msg, Properties.Settings.Default.MailSTP);
+						ClientMail.SendMail("Ошибка в работе инфомата", msg, Properties.Settings.Default.MailSTP);
+
+						if (isQueryException.HasValue && isQueryException.Value)
+							dispatcherTimer.Stop();
 					}
 				}
 			};
@@ -207,8 +210,9 @@ namespace InfomatSelfChecking {
 			if (returnBack) {
 				Logging.ToLog("PageNotification - возврат на предыдущую страницу");
 				NavigationService.GoBack();
-			} else
-				MainWindow.Instance.CloseAllWindows();
+			} else {
+                MainWindow.Instance.CloseAllWindows();
+            }
 		}
 
 		private void MediaElementWelcomeAnimation_MediaEnded(object sender, RoutedEventArgs e) {

@@ -20,7 +20,9 @@ namespace InfomatSelfChecking {
 	public partial class PageCheckInCompleted : Page {
 		private readonly ItemPatient patient;
 		private readonly bool returnBack;
-		public PageCheckInCompleted(ItemPatient patient, bool returnBack) {
+		private readonly bool isAlreadyChecked;
+
+		public PageCheckInCompleted(ItemPatient patient, bool returnBack, bool isAlreadyChecked = false) {
 			InitializeComponent();
 
 			Logging.ToLog("PageCheckInCompleted - Отображение страницы с отметкой о посещении");
@@ -28,6 +30,7 @@ namespace InfomatSelfChecking {
 			DataContext = BindingValues.Instance;
 			this.patient = patient;
 			this.returnBack = returnBack;
+			this.isAlreadyChecked = isAlreadyChecked;
 			Loaded += PageCheckInCompleted_Loaded;
 			string title = Properties.Resources.title_notification;
 			BindingValues.Instance.SetUpMainWindow(title, true, false);
@@ -35,10 +38,14 @@ namespace InfomatSelfChecking {
 
 		private async void PageCheckInCompleted_Loaded(object sender, RoutedEventArgs e) {
 			await Task.Run(() => {
-				if (!patient.IsWorksheetCreated)
+				if (!patient.IsWorksheetCreated && !isAlreadyChecked)
 					patient.BackgroundWorkCompletedEvent.WaitOne();
 
-				PrinterInfo.State printerState = patient.PrintAppointmentsAvailable();
+				PrinterInfo.State printerState;
+				if (isAlreadyChecked)
+					printerState = PrinterInfo.State.NotSelect;
+				else
+					printerState = patient.PrintAppointmentsAvailable();
 
 				Application.Current.Dispatcher.Invoke(() => {
 					MediaElementsDots.MediaEnded -= MediaElementDots_MediaEnded;
@@ -80,8 +87,7 @@ namespace InfomatSelfChecking {
 					MainWindow.Instance.PreviewMouseDown += Instance_PreviewMouseDown;
 					MainWindow.Instance.ResetAutoCloseTimer();
 				});
-
-			});
+			}).ConfigureAwait(false);
 		}
 
 		private void PageCheckInCompleted_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
