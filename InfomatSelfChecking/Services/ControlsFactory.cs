@@ -68,18 +68,18 @@ namespace InfomatSelfChecking {
 		}
 
 
-		public static Label CreateLabel(int row) {
-			Label label = new Label {
+		public static Border CreateBorder(int row) {
+			Border border = new Border {
 				Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
 				Height = 2,
 				VerticalAlignment = VerticalAlignment.Top,
 				Margin = new Thickness(2, 0, 0, 2)
 			};
 
-			Grid.SetRow(label, row);
-			Grid.SetColumnSpan(label, 8);
+			Grid.SetRow(border, row);
+			Grid.SetColumnSpan(border, 8);
 
-			return label;
+			return border;
 		}
 
 		public static Image CreateImage(ImageType imageType,

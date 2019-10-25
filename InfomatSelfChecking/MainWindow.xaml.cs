@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using InfomatSelfChecking.Pages;
+using InfomatSelfChecking.Items;
 
 namespace InfomatSelfChecking {
 	public partial class MainWindow : Window {
@@ -74,7 +63,7 @@ namespace InfomatSelfChecking {
 		}
 
 		private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
-			if (FrameMain.Content is PageNotification pageNotification)
+			if (FrameMain.Content is Pages.PageNotification pageNotification)
 				if (pageNotification.CurrentNotificationType == PageNotification.NotificationType.Welcome)
 					return;
 
@@ -84,6 +73,7 @@ namespace InfomatSelfChecking {
 		public void ResetAutoCloseTimer() {
 			autoCloseTimer.Stop();
 			autoCloseTimer.Start();
+			Console.WriteLine(@"http://AUTOCLOSETIMER_STARTED");
 		}
 
 		private void FrameMain_Navigated(object sender, NavigationEventArgs e) {
@@ -95,10 +85,10 @@ namespace InfomatSelfChecking {
 				}
 			}
 
-			if (e.Content is PageCheckInCompleted) {
-				autoCloseTimer.Stop();
-				return;
-			}
+			//if (e.Content is PageCheckInCompleted) {
+			//	autoCloseTimer.Stop();
+			//	return;
+			//}
 
 			ResetAutoCloseTimer();
 		}
@@ -130,7 +120,7 @@ namespace InfomatSelfChecking {
 			Logging.ToLog("MainWindow - Проверка доступности БД");
 
 			try {
-				await Task.Run(() => { DataHandle.CheckDbAvailable(); }).ConfigureAwait(false);
+				await Task.Run(() => { DataHandle.Instance.CheckDbAvailable(); }).ConfigureAwait(false);
 			} catch (Exception exc) {
 				ShowErrorScreen(exc, false);
 			}
@@ -163,12 +153,14 @@ namespace InfomatSelfChecking {
 			}
 
 			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
 		}
 
 		private void ShutdownApp(string reason) {
 			Logging.ToLog("MainWindow - " + reason);
 			CloseAllWindows();
-			DataHandle.CloseDbConnections();
+			DataHandle.Instance.CloseDbConnections();
 			ExcelInterop.Instance.CloseExcel();
 			Application.Current.Shutdown();
 		}

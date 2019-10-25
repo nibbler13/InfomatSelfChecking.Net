@@ -1,4 +1,4 @@
-﻿<Page x:Class="InfomatSelfChecking.PageCheckInCompleted"
+﻿<Page x:Class="InfomatSelfChecking.Pages.PageCheckInCompleted"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -34,7 +34,7 @@
         <Image Grid.Row="1"
                x:Name="ImagePrinterError"
                Visibility="Hidden"
-               Source="Media/PicPrinterError.png"
+               Source="/InfomatSelfChecking;component/Media/PicPrinterError.png"
                Margin="105"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"/>
@@ -67,7 +67,6 @@
                       UnloadedBehavior="Manual"
                       Visibility="Hidden"
                       x:Name="MediaElementCheckedIn"/>
-
 
         <TextBlock Text="Пожалуйста, проходите на приём"
                    Grid.Row="2"

@@ -13,8 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using InfomatSelfChecking.Items;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Pages {
     /// <summary>
     /// Логика взаимодействия для PageAppointmentsShow.xaml
     /// </summary>
@@ -27,33 +28,36 @@ namespace InfomatSelfChecking {
 
         public PageShowAppointments(ItemPatient patient, bool returnBack) {
             InitializeComponent();
+			Console.WriteLine(@"http://CONSTRUCT_PageShowAppointments");
 
 			Logging.ToLog("PageShowAppointments - отображение страницы со списком назначений");
 
 			this.returnBack = returnBack;
 			this.patient = patient ?? throw new ArgumentNullException(nameof(patient));
 			schedIds = patient.AppointmentsAvailable.Select(x => x.SchedID).ToList();
+			
+			string title = Properties.Resources.title_appointments.Replace("*", patient.Name); ;
 
-			string title = Properties.Resources.title_appointments.Replace("*", patient.Name);
+			if (patient.AppointmentsAvailable.Count == 0) {
+				ButtonCheckIn.Visibility = Visibility.Hidden;
+
+				if (patient.IsPrinterReady) {
+					ButtonPrint.Visibility = Visibility.Visible;
+					ButtonClose.Visibility = Visibility.Visible;
+				} else {
+					ButtonCloseFull.Visibility = Visibility.Visible;
+				}
+			}
+
 			BindingValues.Instance.SetUpMainWindow(title, true, false);
 
             int row = 0;
-            int totalAppointments = patient.AppointmentsAvailable.Count;
             double fontSize = BindingValues.Instance.FontSizeMain;
             double fontSizeSub = BindingValues.Instance.FontSizeMain * 0.8;
             Brush brushGray = Brushes.LightGray;
-            if (totalAppointments == 1) {
-                fontSize = BindingValues.Instance.FontSizeMain;
-                fontSizeSub = BindingValues.Instance.FontSizeMain;
-                brushGray = Brushes.DarkGray;
-            }
 
-            foreach (ItemAppointment item in patient.AppointmentsAvailable) {
-                string roomString = "Каб. " + item.RNum;
-                if (totalAppointments == 1)
-                    roomString = "Кабинет " + item.RNum;
-
-                TextBlock textBlockRoom = ControlsFactory.CreateTextBlock(roomString);
+			foreach (ItemAppointment item in patient.AppointmentsToShow) {
+                TextBlock textBlockRoom = ControlsFactory.CreateTextBlock("Каб. " + item.RNum);
                 textBlockRoom.FontSize = fontSize;
                 textBlockRoom.FontFamily = BindingValues.Instance.FontFamilyMain;
                 textBlockRoom.FontWeight = FontWeights.Light;
@@ -63,23 +67,15 @@ namespace InfomatSelfChecking {
                 Grid.SetColumn(textBlockRoom, 0);
                 GridAppointments.Children.Add(textBlockRoom);
 
-                if (totalAppointments == 1) {
-                    row++;
-                    GridAppointments.RowDefinitions.Add(new RowDefinition());
-                    Grid.SetColumnSpan(textBlockRoom, 3);
-                    textBlockRoom.HorizontalAlignment = HorizontalAlignment.Center;
-                    textBlockRoom.Margin = new Thickness(10);
-                } else {
-					Border borderRoom = new Border {
-						HorizontalAlignment = HorizontalAlignment.Right,
-						Width = 4,
-						Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
-						Margin = new Thickness(0, 5, 0, 5)
-					};
-					Grid.SetRow(borderRoom, row);
-                    Grid.SetColumn(borderRoom, 0);
-                    GridAppointments.Children.Add(borderRoom);
-                }
+				Border borderRoom = new Border {
+					HorizontalAlignment = HorizontalAlignment.Right,
+					Width = 4,
+					Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
+					Margin = new Thickness(0, 5, 0, 5)
+				};
+				Grid.SetRow(borderRoom, row);
+				Grid.SetColumn(borderRoom, 0);
+				GridAppointments.Children.Add(borderRoom);
 
 				StackPanel stackPanelTime = new StackPanel {
 					Orientation = Orientation.Vertical,
@@ -107,27 +103,15 @@ namespace InfomatSelfChecking {
                 textBlockTimeEnd.Foreground = brushGray;
                 stackPanelTime.Children.Add(textBlockTimeEnd);
 
-                if (totalAppointments == 1) {
-                    row++;
-                    GridAppointments.RowDefinitions.Add(new RowDefinition());
-                    stackPanelTime.HorizontalAlignment = HorizontalAlignment.Center;
-                    stackPanelTime.Orientation = Orientation.Horizontal;
-                    stackPanelTime.Margin = new Thickness(10);
-                    Grid.SetColumnSpan(stackPanelTime, 3);
-                    Grid.SetColumn(stackPanelTime, 0);
-                    textBlockTimeStart.Margin = new Thickness(0, 0, 10, 0);
-                    textBlockTimeEnd.Margin = new Thickness(10, 0, 0, 0);
-                } else {
-					Border borderTime = new Border {
-						HorizontalAlignment = HorizontalAlignment.Right,
-						Width = 4,
-						Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
-						Margin = new Thickness(0, 5, 0, 5)
-					};
-					Grid.SetRow(borderTime, row);
-                    Grid.SetColumn(borderTime, 1);
-                    GridAppointments.Children.Add(borderTime);
-                }
+				Border borderTime = new Border {
+					HorizontalAlignment = HorizontalAlignment.Right,
+					Width = 4,
+					Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
+					Margin = new Thickness(0, 5, 0, 5)
+				};
+				Grid.SetRow(borderTime, row);
+				Grid.SetColumn(borderTime, 1);
+				GridAppointments.Children.Add(borderTime);
 
 				StackPanel stackPanelDoc = new StackPanel {
 					Orientation = Orientation.Vertical,
@@ -142,6 +126,7 @@ namespace InfomatSelfChecking {
                 textBlockDoc.FontSize = fontSize;
                 textBlockDoc.FontWeight = FontWeights.Light;
                 textBlockDoc.FontFamily = BindingValues.Instance.FontFamilyMain;
+				textBlockDoc.TextTrimming = TextTrimming.CharacterEllipsis;
                 stackPanelDoc.Children.Add(textBlockDoc);
 
                 string deptString = item.DepName;
@@ -153,18 +138,8 @@ namespace InfomatSelfChecking {
                 textBlockDept.FontWeight = FontWeights.Light;
                 textBlockDept.FontFamily = BindingValues.Instance.FontFamilyMain;
                 textBlockDept.Foreground = brushGray;
+				textBlockDept.TextTrimming = TextTrimming.CharacterEllipsis;
                 stackPanelDoc.Children.Add(textBlockDept);
-
-                if (totalAppointments == 1) {
-                    row++;
-                    GridAppointments.RowDefinitions.Add(new RowDefinition());
-                    stackPanelDoc.HorizontalAlignment = HorizontalAlignment.Center;
-                    stackPanelDoc.Margin = new Thickness(10);
-                    Grid.SetColumnSpan(stackPanelDoc, 3);
-                    Grid.SetColumn(stackPanelDoc, 0);
-                    textBlockDoc.HorizontalAlignment = HorizontalAlignment.Center;
-                    textBlockDept.HorizontalAlignment = HorizontalAlignment.Center;
-                }
 
                 int timeLeft = item.GetMinutesLeftToBegin();
                 string timeLeftString = string.Empty;
@@ -176,14 +151,20 @@ namespace InfomatSelfChecking {
                     brushTimeLeft = new SolidColorBrush(Color.FromRgb(229, 92, 68));
                 } else if (timeLeft > 5) {
                     timeLeftString = "Через " + timeLeft + " " +
-						Helper.GetDeclension(timeLeft);
+						NumbersEndingHelper.GetDeclension(timeLeft);
+				}
 
-                    if (totalAppointments == 1)
-                        timeLeftString = "Начало приёма через " + timeLeft + " " + 
-							Helper.GetDeclension(timeLeft);
-                }
+				Border borderDoc = new Border {
+					HorizontalAlignment = HorizontalAlignment.Right,
+					Width = 4,
+					Background = new SolidColorBrush(Color.FromRgb(171, 208, 71)),
+					Margin = new Thickness(0, 5, 0, 5)
+				};
+				Grid.SetRow(borderDoc, row);
+				Grid.SetColumn(borderDoc, 2);
+				GridAppointments.Children.Add(borderDoc);
 
-                if (!string.IsNullOrEmpty(timeLeftString)) {
+				if (!string.IsNullOrEmpty(timeLeftString)) {
                     TextBlock textBlockTimeLeft = ControlsFactory.CreateTextBlock(timeLeftString);
                     textBlockTimeLeft.FontSize = fontSizeSub;
                     textBlockTimeLeft.FontWeight = FontWeights.Light;
@@ -193,69 +174,88 @@ namespace InfomatSelfChecking {
                     textBlockTimeLeft.VerticalAlignment = VerticalAlignment.Bottom;
                     textBlockTimeLeft.Margin = new Thickness(0, 10, 10, 10);
                     Grid.SetRow(textBlockTimeLeft, row);
-                    Grid.SetColumn(textBlockTimeLeft, 2);
+                    Grid.SetColumn(textBlockTimeLeft, 3);
                     GridAppointments.Children.Add(textBlockTimeLeft);
-
-                    if (totalAppointments == 1) {
-                        Grid.SetColumn(textBlockTimeLeft, 0);
-                        Grid.SetColumnSpan(textBlockTimeLeft, 3);
-                        textBlockTimeLeft.HorizontalAlignment = HorizontalAlignment.Center;
-                        textBlockTimeLeft.VerticalAlignment = VerticalAlignment.Center;
-                        textBlockTimeLeft.Margin = new Thickness(10);
-                    }
                 }
+
+				if (item.AlreadyChecked) {
+					StackPanel stackPanelChecked = new StackPanel() {
+						Orientation = Orientation.Horizontal,
+						Margin = new Thickness(20, 17, 10, 10),
+						HorizontalAlignment = HorizontalAlignment.Right,
+						VerticalAlignment = VerticalAlignment.Top
+					};
+
+					Image image = new Image() {
+						Source = ControlsFactory.GetImage(ControlsFactory.ImageType.NotificationOk),
+						MaxHeight = 32,
+						MaxWidth = 32,
+						VerticalAlignment = VerticalAlignment.Center
+					};
+					RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+					stackPanelChecked.Children.Add(image);
+
+					TextBlock textBlockChecked = new TextBlock() {
+						Text = "Отмечено ранее",
+						FontSize = fontSizeSub,
+						FontWeight = FontWeights.Light,
+						FontFamily = BindingValues.Instance.FontFamilyMain,
+						Foreground = brushGray,
+						Margin = new Thickness(10, 0, 0, 0),
+						VerticalAlignment = VerticalAlignment.Center
+					};
+					stackPanelChecked.Children.Add(textBlockChecked);
+
+					Grid.SetRow(stackPanelChecked, row);
+					Grid.SetColumn(stackPanelChecked, 3);
+					GridAppointments.Children.Add(stackPanelChecked);
+				}
 
                 if (row > 0) {
                     GridAppointments.RowDefinitions.Add(new RowDefinition());
 
-                    Label label = ControlsFactory.CreateLabel(row);
-                    GridAppointments.Children.Add(label);
-
-                    if (totalAppointments == 1) {
-                        Grid.SetRow(label, 0);
-                        Label labelBottom = ControlsFactory.CreateLabel(row);
-                        labelBottom.VerticalAlignment = VerticalAlignment.Bottom;
-                        GridAppointments.Children.Add(labelBottom);
-                        Grid.SetRow(stackPanelDoc, 0);
-                        Grid.SetRow(textBlockRoom, 1);
-                        Grid.SetRow(stackPanelTime, 2);
-                        textBlockRoom.Margin = new Thickness(0, 40, 0, 0);
-                        stackPanelTime.Margin = new Thickness(0, 0, 0, 40);
-                        Label label1 = ControlsFactory.CreateLabel(1);
-                        Label label3 = ControlsFactory.CreateLabel(3);
-                        GridAppointments.Children.Add(label1);
-                        GridAppointments.Children.Add(label3);
-                    }
+                    Border border = ControlsFactory.CreateBorder(row);
+                    GridAppointments.Children.Add(border);
                 }
 
                 row++;
 
-                if (row == 6)
+				if (patient.AppointmentsAvailable.Count == 0 &&
+					row == 4)
+					break;
+
+				if (row == 6)
                     break;
             }
 
 			DataContext = BindingValues.Instance;
-			IsVisibleChanged += PageShowAppointments_IsVisibleChanged;
-        }
+			IsVisibleChanged += (s, e) => {
+				if ((bool)e.NewValue) {
+					if (isFirstLoad) {
+						isFirstLoad = false;
+						return;
+					}
 
-		private void PageShowAppointments_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			if ((bool)e.NewValue) {
-				if (isFirstLoad) {
-					isFirstLoad = false;
-					return;
+					if (returnBack) {
+						try {
+							NavigationService.GoBack();
+							NavigationService.RemoveBackEntry();
+						} catch (Exception exc) {
+							Logging.ToLog(exc.Message + Environment.NewLine + exc.StackTrace);
+						}
+					}
 				}
+			};
+		}
 
-				if (returnBack) {
-					NavigationService.GoBack();
-					NavigationService.RemoveBackEntry();
-				}
-			}
+		~PageShowAppointments() {
+			Console.WriteLine(@"http://DECONSTRUCT_PageShowAppointments");
 		}
 
 		private void ButtonCheckIn_CLick(object sender, RoutedEventArgs e) {
 			if (!checkInStatus.HasValue)
 				try {
-					checkInStatus = DataHandle.SetCheckInForAppointments(schedIds);
+					checkInStatus = DataHandle.Instance.SetCheckInForAppointments(schedIds);
 				} catch (Exception exc) {
 
 					Logging.ToLog(exc.Message + Environment.NewLine + exc.StackTrace);
@@ -270,5 +270,14 @@ namespace InfomatSelfChecking {
 
 			NavigationService.Navigate(new PageCheckInCompleted(patient, returnBack));
         }
+
+		private void ButtonPrint_Click(object sender, RoutedEventArgs e) {
+			NavigationService.Navigate(new PageCheckInCompleted(patient, returnBack, true));
+		}
+
+		private void ButtonClose_Click(object sender, RoutedEventArgs e) {
+			NavigationService.Navigate(
+				new PageNotification(PageNotification.NotificationType.AlreadyChecked, returnBack: returnBack));
+		}
 	}
 }

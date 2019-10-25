@@ -1,4 +1,4 @@
-﻿<Page x:Class="InfomatSelfChecking.PagePatientConfirmation"
+﻿<Page x:Class="InfomatSelfChecking.Pages.PagePatientConfirmation"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -36,7 +36,7 @@
                 </Button.Effect>
                 <Button.Content>
                     <WrapPanel>
-                        <Image Source="Media/ButtonClose.png" 
+                        <Image Source="/InfomatSelfChecking;component/Media/ButtonClose.png" 
                            Margin="20,20,20,20" 
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="" 
@@ -80,7 +80,7 @@
                 <Button.Content>
                     <WrapPanel>
                         <Image Margin="0,20,20,20"
-                           Source="Media/ButtonOk.png"
+                           Source="/InfomatSelfChecking;component/Media/ButtonOk.png"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="Продолжить" 
                                VerticalAlignment="Center"/>
@@ -123,7 +123,7 @@
                 <Button.Content>
                     <WrapPanel>
                         <Image Margin="0,20,20,20"
-                           Source="Media/ButtonClose.png"
+                           Source="/InfomatSelfChecking;component/Media/ButtonClose.png"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="Закрыть" 
                                VerticalAlignment="Center"/>
@@ -145,7 +145,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.ColumnSpan="3"
-                       Text="Имеющиеся назначения были отмечены ранее&#x0a;&#x0a;Желаете ли Вы увидеть их снова?"
+                       Text="Имеющиеся назначения были отмечены ранее.&#x0a;&#x0a;Желаете ли Вы увидеть их снова?"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        TextAlignment="Center"/>
@@ -163,7 +163,7 @@
                 <Button.Content>
                     <WrapPanel>
                         <Image Margin="0,20,20,20"
-                           Source="Media/ButtonClose.png"
+                           Source="/InfomatSelfChecking;component/Media/ButtonClose.png"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="Нет" 
                                VerticalAlignment="Center"/>
@@ -185,7 +185,7 @@
                 <Button.Content>
                     <WrapPanel>
                         <Image Margin="0,20,20,20"
-                           Source="Media/ButtonOk.png"
+                           Source="/InfomatSelfChecking;component/Media/ButtonOk.png"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="Да" 
                                VerticalAlignment="Center"/>

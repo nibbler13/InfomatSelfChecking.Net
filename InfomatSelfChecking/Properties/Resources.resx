@@ -248,4 +248,10 @@ dev@bzklinika.ru</value>
 Для отметки о посещении
 просьба пройти в регистратуру</value>
   </data>
+  <data name="notification_already_checked" xml:space="preserve">
+    <value>Дополнительную информацию
+Вы можете получить в регистратуре
+
+Благодарим Вас за использование нашего сервиса!</value>
+  </data>
 </root>

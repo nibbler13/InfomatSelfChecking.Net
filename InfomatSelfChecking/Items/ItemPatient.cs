@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Excel = Microsoft.Office.Interop.Excel;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Items {
 	public class ItemPatient {
-		public enum StopCodes {
+		public enum StopCode {
 			Cash,
 			FirstTime,
 			Lock,
@@ -21,7 +21,7 @@ namespace InfomatSelfChecking {
 			Agreement
 		}
 
-		public enum InfoCodes {
+		public enum InfoCode {
 			InformAboutLK
 		}
 
@@ -30,12 +30,22 @@ namespace InfomatSelfChecking {
 		public string Name { get; set; } = string.Empty;
 		public DateTime Birthday { get; set; }
 
-		public List<StopCodes> StopCodesCurrent { get; } = new List<StopCodes>();
-		public List<InfoCodes> InfoCodesCurrent { get; } = new List<InfoCodes>();
+		public List<StopCode> StopCodesCurrent { get; } = new List<StopCode>();
+		public List<InfoCode> InfoCodesCurrent { get; } = new List<InfoCode>();
 
 		public List<ItemAppointment> AppointmentsVisited { get; } = new List<ItemAppointment>();
 		public List<ItemAppointment> AppointmentsAvailable { get; } = new List<ItemAppointment>();
 		public List<ItemAppointment> AppointmentsNotAvailable { get; } = new List<ItemAppointment>();
+
+		public List<ItemAppointment> AppointmentsToShow {
+			get {
+				List<ItemAppointment> items = new List<ItemAppointment>();
+				items.AddRange(AppointmentsAvailable);
+				items.AddRange(AppointmentsVisited);
+				items = items.OrderBy(x => x.DateTimeScheduleBegin).ToList();
+				return items;
+			}
+		}
 		
 		public Image CheckStateImage { get; set; } = null;
 
@@ -45,6 +55,17 @@ namespace InfomatSelfChecking {
 		public ManualResetEvent BackgroundWorkCompletedEvent { get; private set; } = new ManualResetEvent(false);
 		public bool IsWorksheetCreated { get; private set; } = false;
 		private bool IsWorksheetCreatingStarted = false;
+
+		public bool IsPrinterReady {
+			get {
+				if (printerState.HasValue)
+					if (printerState.Value == PrinterInfo.State.Ready ||
+						printerState.Value == PrinterInfo.State.DoNotCheck)
+						return true;
+
+				return false;
+			}
+		}
 
 		public async void CheckPrinterAndCreateWorksheet() {
 			if (IsWorksheetCreated)
@@ -61,7 +82,7 @@ namespace InfomatSelfChecking {
 				try {
 					if (printerState == PrinterInfo.State.DoNotCheck ||
 						printerState == PrinterInfo.State.Ready)
-						worksheet = ExcelInterop.Instance.CreateWorksheetAppointmentsAvailable(this, out workbook);
+						worksheet = ExcelInterop.Instance.CreateWorksheetAppointments(this, out workbook);
 				} catch (Exception e) {
 					printerState = PrinterInfo.State.NotPrinted;
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);

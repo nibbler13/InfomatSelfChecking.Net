@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Pages {
 	/// <summary>
 	/// Логика взаимодействия для PageEnterNumber.xaml
 	/// </summary>
@@ -39,6 +39,7 @@ namespace InfomatSelfChecking {
 
 		public PageEnterNumber() {
 			InitializeComponent();
+			Console.WriteLine(@"http://CONSTRUCT_PageEnterNumber");
 
 			Logging.ToLog("PageEnterNumber - отображение страницы набора номера");
 
@@ -49,6 +50,10 @@ namespace InfomatSelfChecking {
 			if (Debugger.IsAttached)
 				EnteredNumber = "0000000000";
         }
+
+		~PageEnterNumber() {
+			Console.WriteLine(@"http://DECONSTRUCT_PageEnterNumber");
+		}
 
 		private void Button_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e) {
 			if (!(sender is Button button))
@@ -90,7 +95,7 @@ namespace InfomatSelfChecking {
 			Logging.ToLog("PageEnterNumber - введен номер: " + EnteredNumber);
 
             try {
-                DataHandle.LoadPatients(EnteredNumber.Substring(0, 3), EnteredNumber.Substring(3, 7));
+                DataHandle.Instance.LoadPatients(EnteredNumber.Substring(0, 3), EnteredNumber.Substring(3, 7));
             } catch (Exception exc) {
                 NavigationService.Navigate(new PageNotification(PageNotification.NotificationType.DbError, exception: exc));
                 return;

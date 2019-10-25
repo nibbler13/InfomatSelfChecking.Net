@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Pages {
     public partial class PageNotification : Page {
 		public enum NotificationType {
 			Welcome,
@@ -25,7 +25,8 @@ namespace InfomatSelfChecking {
 			Cash,
             DbError,
 			VisitRegistryToCheckIn,
-			CheckInFailed
+			CheckInFailed,
+			AlreadyChecked
 		}
 
 		public NotificationType CurrentNotificationType { get; private set; }
@@ -35,12 +36,10 @@ namespace InfomatSelfChecking {
 		private int errorCounter = 0;
 		private readonly bool? isQueryException;
 
-		public PageNotification(NotificationType type,
-						  string replacement = "",
-						  bool returnBack = false,
-						  Exception exception = null,
-						  bool? isQueryException = null) {
+		public PageNotification(NotificationType type, string replacement = "", bool returnBack = false,
+			Exception exception = null, bool? isQueryException = null) {
             InitializeComponent();
+			Console.WriteLine(@"http://CONSTRUCT_PageNotification.type." + type);
 
 			Logging.ToLog("PageNotification - Отображение страницы типа: " + type);
 
@@ -108,6 +107,10 @@ namespace InfomatSelfChecking {
 					TextBlockAboutDeveloper.Visibility = Visibility.Visible;
 					isError = true;
 					break;
+				case NotificationType.AlreadyChecked:
+					imageType = ControlsFactory.ImageType.NotificationRegistry;
+					textToShow = Properties.Resources.notification_already_checked;
+					break;
 				default:
 					break;
 			}
@@ -120,14 +123,25 @@ namespace InfomatSelfChecking {
 			if (splittedTextToShow.Length > 1)
 				TextBlockBottom.Text = splittedTextToShow[1];
 
-            IsVisibleChanged += PageNotification_IsVisibleChanged;
-
 			DataContext = BindingValues.Instance;
 
 			IsVisibleChanged += (s, e) => {
-				if ((bool)e.NewValue)
+				if ((bool)e.NewValue) {
 					BindingValues.Instance.SetUpMainWindow(title, true, isError);
+
+					if (CurrentNotificationType == NotificationType.DbError)
+						return;
+					Console.WriteLine("---PageNotification_PreviewMouseDown subscribe");
+					MainWindow.Instance.PreviewMouseDown += PageNotification_PreviewMouseDown;
+				} else {
+					Console.WriteLine("---PageNotification_PreviewMouseDown unsubscribe");
+					MainWindow.Instance.PreviewMouseDown -= PageNotification_PreviewMouseDown;
+				}
 			};
+		}
+
+		~PageNotification() {
+			Console.WriteLine(@"http://DECONSTRUCT_PageNotification.type." + CurrentNotificationType);
 		}
 
 		private void SetupInfoNotification() {
@@ -152,7 +166,7 @@ namespace InfomatSelfChecking {
 				Logging.ToLog("PageNotification - проверка доступности БД");
 
 				try {
-					DataHandle.CheckDbAvailable();
+					DataHandle.Instance.CheckDbAvailable();
                     (s as DispatcherTimer).Stop();
 					PageNotification_PreviewMouseDown(null, null);
 				} catch (Exception exc) {
@@ -176,16 +190,6 @@ namespace InfomatSelfChecking {
 			};
 
 			dispatcherTimer.Start();
-		}
-
-        private void PageNotification_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if (CurrentNotificationType == NotificationType.DbError)
-                return;
-
-			if ((bool)e.NewValue)
-				MainWindow.Instance.PreviewMouseDown += PageNotification_PreviewMouseDown;
-			else
-				MainWindow.Instance.PreviewMouseDown -= PageNotification_PreviewMouseDown;
 		}
 
 		private void PageNotification_PreviewMouseDown(object sender, MouseButtonEventArgs e) {

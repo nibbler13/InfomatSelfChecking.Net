@@ -6,32 +6,58 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InfomatSelfChecking.Items;
 
 namespace InfomatSelfChecking {
-    public static class DataHandle {
-		private static readonly string sqlGetPatients = Properties.Settings.Default.MisDbSqlGetPatients;
-		private static readonly string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
-		private static readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckDbState;
-		private static readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
-		private static readonly string sqlUpdateAppointment = Properties.Settings.Default.MisDbSqlUpdateAppointments;
-		private static readonly bool isThisAMoscowFilial = IsCurrentFilialInList(new string[] { "1", "5", "12" });
-		private static readonly bool isThisASpbFilial = IsCurrentFilialInList(new string[] { "3" });
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+	public class DataHandle {
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
 
-		private static readonly ClientFirebird fbClient = new ClientFirebird(
-			Properties.Settings.Default.MisDbAddress,
-			Properties.Settings.Default.MisDbName,
-			Properties.Settings.Default.MisDbUser,
-			Properties.Settings.Default.MisDbPassword);
+		private static DataHandle instance = null;
+		private static readonly object padlock = new object();
 
-		private static readonly ClientFirebird fbClientCentralDb = new ClientFirebird(
-			Properties.Settings.Default.MisDbCentralAddress,
-			Properties.Settings.Default.MisDbCentralName,
-			Properties.Settings.Default.MisDbUser,
-			Properties.Settings.Default.MisDbPassword);
+		public static DataHandle Instance {
+			get {
+				lock (padlock) {
+					if (instance == null)
+						instance = new DataHandle();
+
+					return instance;
+				}
+			}
+		}
+
+		private readonly string sqlGetPatients = Properties.Settings.Default.MisDbSqlGetPatients;
+		private readonly string sqlGetAppointments = Properties.Settings.Default.MisDbSqlGetAppointments;
+		private readonly string sqlGetDbState = Properties.Settings.Default.MisDbSqlCheckDbState;
+		private readonly string sqlSynchronizeMoscowClientInfo = Properties.Settings.Default.MisDbSqlSynchronizeMoscowClientInfo;
+		private readonly string sqlUpdateAppointment = Properties.Settings.Default.MisDbSqlUpdateAppointments;
+		private readonly bool isThisAMoscowFilial;
+		private readonly bool isThisASpbFilial;
+
+		private readonly ClientFirebird fbClient;
+		private readonly ClientFirebird fbClientCentralDb;
+
+		private DataHandle() {
+			fbClient = new ClientFirebird(
+				Properties.Settings.Default.MisDbAddress,
+				Properties.Settings.Default.MisDbName,
+				Properties.Settings.Default.MisDbUser,
+				Properties.Settings.Default.MisDbPassword);
+
+			fbClientCentralDb = new ClientFirebird(
+				Properties.Settings.Default.MisDbCentralAddress,
+				Properties.Settings.Default.MisDbCentralName,
+				Properties.Settings.Default.MisDbUser,
+				Properties.Settings.Default.MisDbPassword);
+
+			isThisAMoscowFilial = IsCurrentFilialInList(new string[] { "1", "5", "12" });
+			isThisASpbFilial = IsCurrentFilialInList(new string[] { "3" });
+		}
 
 		public static List<ItemPatient> PatientsCurrent { get; private set; } = new List<ItemPatient>();
 
-		public static bool SetCheckInForAppointments(List<string> schedIds) {
+		public bool SetCheckInForAppointments(List<string> schedIds) {
 			if (schedIds == null)
 				throw new ArgumentNullException(nameof(schedIds));
 
@@ -39,6 +65,9 @@ namespace InfomatSelfChecking {
 				string.Join(", ", schedIds));
 
 			bool result = true;
+
+			if (Debugger.IsAttached)
+				return result;
 
 			foreach (string schedId in schedIds)
 				try {
@@ -53,7 +82,7 @@ namespace InfomatSelfChecking {
 			return result;
 		}
 
-		public static void LoadPatients(string prefix, string number) {
+		public void LoadPatients(string prefix, string number) {
 			Logging.ToLog("DataHandle - получения списка пациентов по введенному номеру: " + prefix + number);
 
 			PatientsCurrent.Clear();
@@ -91,7 +120,7 @@ namespace InfomatSelfChecking {
 				string.Join(Environment.NewLine, PatientsCurrent));
 		}
 
-		private static void GetPatientAppointments(ref ItemPatient patient) {
+		private void GetPatientAppointments(ref ItemPatient patient) {
 			Logging.ToLog("DataHandle - получение списка назнчений для пациента. PCODE: " + patient.PCode + ", ФИО: " + patient.Name);
 
 			Dictionary<string, object> parameters = new Dictionary<string, object> { { "@pCode", patient.PCode } };
@@ -108,7 +137,7 @@ namespace InfomatSelfChecking {
 			try {
 				using (DataTable dataTable = fbClient.GetDataTable(sqlGetAppointments, parameters)) 
 					foreach (DataRow row in dataTable.Rows) 
-						ParseRow(row, ref patient);
+						ParsePatientAppointmentRow(row, ref patient);
 			} catch (Exception e) {
 				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
 				MainWindow.Instance.ShowErrorScreen(e, true);
@@ -121,11 +150,11 @@ namespace InfomatSelfChecking {
 			patient.AppointmentsAvailable.AddRange(appointmentSorted);
 
 			if (patient.StopCodesCurrent.Count == 0 &&
-				patient.AppointmentsAvailable.Count > 0)
+				patient.AppointmentsAvailable.Count + patient.AppointmentsVisited.Count > 0)
 				patient.CheckPrinterAndCreateWorksheet();
 		}
 
-		private static void ParseRow(DataRow row, ref ItemPatient patient) {
+		private void ParsePatientAppointmentRow(DataRow row, ref ItemPatient patient) {
 			try {
 				string group = row["GROUPS"].ToString().TrimStart(' ').TrimEnd(' ');
 				string info = row["INFO"].ToString().TrimStart(' ').TrimEnd(' ');
@@ -142,29 +171,29 @@ namespace InfomatSelfChecking {
 						foreach (string code in infoData) {
 							switch (code) {
 								case "cash":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Cash);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.Cash);
 									break;
 								case "firsttime":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.FirstTime);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.FirstTime);
 									break;
 								case "lock":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Lock);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.Lock);
 									break;
 								case "late":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Late);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.Late);
 									break;
 								//case "not_available_now":
 								//	patient.StopCodesCurrent.Add(ItemPatient.StopCodes.NotAvailableNow);
 								//	break;
 								case "depout":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.DepOut);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.DepOut);
 									break;
 								case "debt":
-									patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Debt);
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.Debt);
 									break;
 								case "sogl":
 									if (isThisASpbFilial)
-										patient.StopCodesCurrent.Add(ItemPatient.StopCodes.Agreement);
+										patient.StopCodesCurrent.Add(ItemPatient.StopCode.Agreement);
 									break;
 								case "":
 									break;
@@ -178,7 +207,7 @@ namespace InfomatSelfChecking {
 						foreach (string code in infoData) {
 							switch (code) {
 								case "inform_about_lk":
-									patient.InfoCodesCurrent.Add(ItemPatient.InfoCodes.InformAboutLK);
+									patient.InfoCodesCurrent.Add(ItemPatient.InfoCode.InformAboutLK);
 									break;
 								case "":
 									break;
@@ -207,6 +236,7 @@ namespace InfomatSelfChecking {
 						switch (group) {
 							case "visited":
 								patient.AppointmentsVisited.Add(itemAppointment);
+								itemAppointment.AlreadyChecked = true;
 								break;
 							case "available":
 								patient.AppointmentsAvailable.Add(itemAppointment);
@@ -226,36 +256,41 @@ namespace InfomatSelfChecking {
 			}
 		}
 
-		private static bool IsCentralDbAvailable() {
+		private bool IsCentralDbAvailable() {
 			Logging.ToLog("DataHandle - проверка доступности ЦБД");
-			using (DataTable dataTable = fbClientCentralDb.GetDataTable(sqlGetDbState, new Dictionary<string, object>())) {
+			using (DataTable dataTable = fbClientCentralDb.GetDataTable(sqlGetDbState)) {
 				bool result = dataTable.Rows.Count > 0;
 				Logging.ToLog("DataHandle - возвращаемое значение: " + result);
 				return result;
 			}
 		}
 
-		public static void CheckDbAvailable() {
+		public void CheckDbAvailable() {
 			Logging.ToLog("DataHandle - проверка доступности БД");
-			using (DataTable dataTable = fbClient.GetDataTable(sqlGetDbState, new Dictionary<string, object>())) 
+			using (DataTable dataTable = fbClient.GetDataTable(sqlGetDbState)) 
 				if (dataTable.Rows.Count == 0)
 					throw new Exception("DataHandle - CheckDbAvailable - result is empty");
 		}
 
-		public static bool IsCurrentFilialInList(string[] filialsID) {
+		public bool IsCurrentFilialInList(string[] filialsID) {
 			Logging.ToLog("DataHandle - определение принадлежности филиала к списку: " + string.Join(",", filialsID));
 
-			using (DataTable dataTable = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlGetFilialID, new Dictionary<string, object>())) {
-				string filID = dataTable.Rows[0][0].ToString();
-				bool result = filialsID.Contains(filID);
-				Logging.ToLog("DataHandle - возвращаемое значение: " + result);
-				return result;
+			try {
+				using (DataTable dataTable = fbClient.GetDataTable(Properties.Settings.Default.MisDbSqlGetFilialID)) {
+					string filID = dataTable.Rows[0][0].ToString();
+					bool result = filialsID.Contains(filID);
+					Logging.ToLog("DataHandle - возвращаемое значение: " + result);
+					return result;
+				}
+			} catch (Exception e) {
+				Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
+				return false;
 			}
 		}
 
-		public static void CloseDbConnections() {
-			fbClient.Close();
-			fbClientCentralDb.Close();
+		public void CloseDbConnections() {
+			fbClient.Dispose();
+			fbClientCentralDb.Dispose();
 		}
     }
 }

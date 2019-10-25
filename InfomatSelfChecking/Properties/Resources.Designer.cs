@@ -105,6 +105,18 @@ namespace InfomatSelfChecking.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Дополнительную информацию
+        ///Вы можете получить в регистратуре
+        ///
+        ///Благодарим Вас за использование нашего сервиса!.
+        /// </summary>
+        public static string notification_already_checked {
+            get {
+                return ResourceManager.GetString("notification_already_checked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Имеются записи за наличный расчет
         ///
         ///Требуется предварительная оплата приёма

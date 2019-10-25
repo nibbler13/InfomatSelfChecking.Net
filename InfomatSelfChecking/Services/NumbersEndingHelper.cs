@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace InfomatSelfChecking {
-	public static class Helper {
+	public static class NumbersEndingHelper {
 		/// <summary>
 		/// Возвращает слова в падеже, зависимом от заданного числа 
 		/// </summary>
@@ -28,7 +28,6 @@ namespace InfomatSelfChecking {
 				default:
 					return "минут";
 			}
-
 		}
 	}
 }

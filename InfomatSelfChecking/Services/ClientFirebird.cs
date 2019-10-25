@@ -30,12 +30,6 @@ namespace InfomatSelfChecking {
 			CheckConnectionState();
 		}
 
-
-
-		public void Close() {
-			connection.Close();
-		}
-
 		private void CheckConnectionState() {
 			if (connection == null) {
 				try {
@@ -56,7 +50,7 @@ namespace InfomatSelfChecking {
 			}
 		}
 
-		public DataTable GetDataTable(string query, Dictionary<string, object> parameters) {
+		public DataTable GetDataTable(string query, Dictionary<string, object> parameters = null) {
 			Exception exc = new Exception();
 
 			for (int i = 0; i < 3; i++) {
@@ -66,7 +60,6 @@ namespace InfomatSelfChecking {
 
 					DataTable dataTable = new DataTable();
 					using (FbCommand command = new FbCommand(query, connection)) {
-
 						if (parameters != null && parameters.Count > 0)
 							foreach (KeyValuePair<string, object> parameter in parameters)
 								command.Parameters.AddWithValue(parameter.Key, parameter.Value);
@@ -78,7 +71,7 @@ namespace InfomatSelfChecking {
 					}
 				} catch (Exception e) {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
-					Close();
+					connection.Close();
 					exc = e;
 				}
 			}
@@ -104,7 +97,7 @@ namespace InfomatSelfChecking {
 
 				} catch (Exception e) {
 					Logging.ToLog(e.Message + Environment.NewLine + e.StackTrace);
-					Close();
+					connection.Close();
 					exc = e;
 				}
 			}
@@ -113,6 +106,7 @@ namespace InfomatSelfChecking {
 		}
 
 		public void Dispose() {
+			connection.Close();
 			connection.Dispose();
 		}
 	}

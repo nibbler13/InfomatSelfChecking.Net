@@ -1,4 +1,4 @@
-﻿<Page x:Class="InfomatSelfChecking.PageNotification"
+﻿<Page x:Class="InfomatSelfChecking.Pages.PageNotification"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -76,7 +76,7 @@
                 x:Name="ButtonInfo" 
                 Click="ButtonInfo_Click"
                 Visibility="Hidden">
-            <Image Source="Media/Question.png" 
+            <Image Source="/InfomatSelfChecking;component/Media/Question.png" 
                    Margin="20" 
                    RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>

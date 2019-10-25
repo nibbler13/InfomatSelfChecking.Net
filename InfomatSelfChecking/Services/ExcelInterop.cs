@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using InfomatSelfChecking.Items;
+using System.Diagnostics;
 
 namespace InfomatSelfChecking {
 	class ExcelInterop {
@@ -42,6 +44,9 @@ namespace InfomatSelfChecking {
 
 		public ExcelInterop() {
 			Logging.ToLog("ExcelInterop - Запуск Excel");
+			foreach (Process p in Process.GetProcessesByName("EXCEL"))
+				p.Kill();
+
 			xlApp = new Excel.Application();
 			if (xlApp == null) {
 				string msg = "ExcelInterop - Не удалось открыть приложение Excel";
@@ -100,8 +105,6 @@ namespace InfomatSelfChecking {
 			try {
 				Logging.ToLog("ExcelInterop - Открытие книги: " + templateFullPath);
 
-				//CheckIfTemplateIsOpened();
-
 				string currentTemplate = Path.Combine(saveFolder, "PrintResult_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + filePostfix + ".xlsx");
 				File.Copy(templateFullPath, currentTemplate);
 
@@ -132,14 +135,7 @@ namespace InfomatSelfChecking {
 			return null;
 		}
 
-		//private void CheckIfTemplateIsOpened() {
-		//	try {
-		//		Excel.Workbook wb = xlApp.Workbooks.get_Item(templateFileName);
-		//		wb.Close(false);
-		//	} catch (Exception) { }
-		//}
-
-		public Excel.Worksheet CreateWorksheetAppointmentsAvailable(ItemPatient patient, out Excel.Workbook wb) {
+		public Excel.Worksheet CreateWorksheetAppointments(ItemPatient patient, out Excel.Workbook wb) {
 			Logging.ToLog("ExcelInterop - Печать назначений для пациента: " + patient.Name + ", pcode: " + patient.PCode);
 			wb = null;
 
@@ -164,7 +160,9 @@ namespace InfomatSelfChecking {
 			SetValue(ws, ROW_DATE_TIME, DateTime.Now.ToShortDateString() + ", " + DateTime.Now.ToShortTimeString());
 
 			int currentRow = ROW_START;
-			foreach (ItemAppointment item in patient.AppointmentsAvailable) {
+
+
+			foreach (ItemAppointment item in patient.AppointmentsToShow) {
 				SetValue(ws, currentRow, item.DateTimeScheduleBegin + ", кабинет " + item.RNum);
 				currentRow++;
 				SetValue(ws, currentRow, item.DName);
@@ -176,17 +174,17 @@ namespace InfomatSelfChecking {
 			}
 
 			string timeMessage = Properties.Resources.print_message_final_ok;
-			int timeLeft = patient.AppointmentsAvailable.First().GetMinutesLeftToBegin();
+			int timeLeft = patient.AppointmentsToShow.First().GetMinutesLeftToBegin();
 			if (timeLeft >= 10)
 				timeMessage = Properties.Resources.print_message_time_left + timeLeft +
-					" " + Helper.GetDeclension(timeLeft);
+					" " + NumbersEndingHelper.GetDeclension(timeLeft);
 
 			SetValue(ws, currentRow, timeMessage);
 			PasteFormat(ws, ROW_STYLE, currentRow);
 			PasteDelimiter(ws, ref currentRow);
 
 			string notificationMessage = Properties.Resources.print_message_information_loyalty;
-			if (patient.InfoCodesCurrent.Contains(ItemPatient.InfoCodes.InformAboutLK)) {
+			if (patient.InfoCodesCurrent.Contains(ItemPatient.InfoCode.InformAboutLK)) {
 				Random rnd = new Random();
 				if (rnd.Next(0, 100) < 50)
 					notificationMessage = Properties.Resources.print_message_information_private_office;

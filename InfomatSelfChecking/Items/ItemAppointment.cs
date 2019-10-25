@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Items {
     public class ItemAppointment {
 		public string SchedID { get; set; } = string.Empty;
 		public string DateTimeScheduleBegin { get; set; } = string.Empty;
@@ -13,6 +13,7 @@ namespace InfomatSelfChecking {
 		public string DepName { get; set; } = string.Empty;
 		public string DepShortName { get; set; } = string.Empty;
 		public string RNum { get; set; } = string.Empty;
+		public bool AlreadyChecked { get; set; } = false;
 
         public int GetMinutesLeftToBegin() {
             DateTime dateTime = DateTime.Now.Date;
@@ -30,6 +31,7 @@ namespace InfomatSelfChecking {
 			result += "DoctorName: " + DName + Environment.NewLine;
 			result += "DepartmentName: " + DepName + Environment.NewLine;
 			result += "Room: " + RNum + Environment.NewLine;
+			result += "AlreadyChecked: " + AlreadyChecked + Environment.NewLine;
 			result += "=====End ItemAppointment=====";
 
 			return result;

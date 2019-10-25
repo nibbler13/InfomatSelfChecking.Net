@@ -13,7 +13,7 @@ namespace InfomatSelfChecking {
 			Logging.ToLog("Mail - Отправка сообщения, тема: " + subject + ", текст: " + body);
 			Logging.ToLog("Mail - Получатели: " + receiver);
 
-			if (string.IsNullOrEmpty(receiver) || 
+			if (string.IsNullOrEmpty(receiver) ||
 				Debugger.IsAttached)
 				return;
 

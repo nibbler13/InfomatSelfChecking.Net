@@ -12,8 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using InfomatSelfChecking.Items;
 
-namespace InfomatSelfChecking {
+namespace InfomatSelfChecking.Pages {
 	/// <summary>
 	/// Interaction logic for PageCheckInCompleted.xaml
 	/// </summary>
@@ -24,6 +25,7 @@ namespace InfomatSelfChecking {
 
 		public PageCheckInCompleted(ItemPatient patient, bool returnBack, bool isAlreadyChecked = false) {
 			InitializeComponent();
+			Console.WriteLine(@"http://CONSTRUCT_PageCheckInCompleted");
 
 			Logging.ToLog("PageCheckInCompleted - Отображение страницы с отметкой о посещении");
 
@@ -36,16 +38,18 @@ namespace InfomatSelfChecking {
 			BindingValues.Instance.SetUpMainWindow(title, true, false);
 		}
 
+		~PageCheckInCompleted() {
+			Console.WriteLine(@"http://DECONSTRUCT_PageCheckInCompleted");
+		}
+
 		private async void PageCheckInCompleted_Loaded(object sender, RoutedEventArgs e) {
+			Loaded -= PageCheckInCompleted_Loaded;
+
 			await Task.Run(() => {
-				if (!patient.IsWorksheetCreated && !isAlreadyChecked)
+				if (!patient.IsWorksheetCreated)
 					patient.BackgroundWorkCompletedEvent.WaitOne();
 
-				PrinterInfo.State printerState;
-				if (isAlreadyChecked)
-					printerState = PrinterInfo.State.NotSelect;
-				else
-					printerState = patient.PrintAppointmentsAvailable();
+				PrinterInfo.State printerState = patient.PrintAppointmentsAvailable();
 
 				Application.Current.Dispatcher.Invoke(() => {
 					MediaElementsDots.MediaEnded -= MediaElementDots_MediaEnded;
@@ -59,11 +63,16 @@ namespace InfomatSelfChecking {
 					MediaElementCheckedIn.Play();
 
 					TextBlockThanks.Visibility = Visibility.Visible;
+					if (isAlreadyChecked)
+						TextBlockThanks.Text = "Благодарим Вас за использование нашего сервиса!";
 
 					if (printerState == PrinterInfo.State.Printed ||
-						printerState == PrinterInfo.State.NotSelect) {
+						printerState == PrinterInfo.State.DoNotCheck) {
 						if (printerState == PrinterInfo.State.Printed)
-							TextBlockCheckedIn.Text += Environment.NewLine + "Список назначений напечатан";
+							if (isAlreadyChecked)
+								TextBlockCheckedIn.Text = "Список назначений напечатан";
+							else
+								TextBlockCheckedIn.Text += Environment.NewLine + "Список назначений напечатан";
 
 						MediaElementsDots.Visibility = Visibility.Hidden;
 						TextBlockPrinting.Visibility = Visibility.Hidden;
@@ -74,25 +83,28 @@ namespace InfomatSelfChecking {
 						Grid.SetColumnSpan(MediaElementCheckedIn, 2);
 					} else {
 						TextBlockPrinting.Text = "К сожалению, не удалось распечатать " +
-						"список назначений. Информация об ошибке передана " + 
+						"список назначений. Информация об ошибке передана " +
 						"в службу технической поддержки";
 						MediaElementsDots.Visibility = Visibility.Hidden;
 						ImagePrinterError.Visibility = Visibility.Visible;
 						TextBlockPrinting.FontSize = BindingValues.Instance.FontSizeSubNotification;
 
+						if (isAlreadyChecked) {
+							Grid.SetColumnSpan(TextBlockPrinting, 2);
+							Grid.SetColumnSpan(ImagePrinterError, 2);
+						}
 					}
 
 					TextBlockTapToContinue.Visibility = Visibility.Visible;
-					IsVisibleChanged += PageCheckInCompleted_IsVisibleChanged;
-					MainWindow.Instance.PreviewMouseDown += Instance_PreviewMouseDown;
 					MainWindow.Instance.ResetAutoCloseTimer();
+					MainWindow.Instance.PreviewMouseDown += Instance_PreviewMouseDown;
+
+					IsVisibleChanged += (s, ev) => {
+						if (!(bool)ev.NewValue)
+							MainWindow.Instance.PreviewMouseDown -= Instance_PreviewMouseDown;
+					};
 				});
 			}).ConfigureAwait(false);
-		}
-
-		private void PageCheckInCompleted_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			if (!(bool)e.NewValue)
-				MainWindow.Instance.PreviewMouseDown -= Instance_PreviewMouseDown;
 		}
 
 		private void Instance_PreviewMouseDown(object sender, MouseButtonEventArgs e) {

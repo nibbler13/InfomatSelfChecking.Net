@@ -1,4 +1,4 @@
-﻿<Page x:Class="InfomatSelfChecking.PageEnterNumber"
+﻿<Page x:Class="InfomatSelfChecking.Pages.PageEnterNumber"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -97,7 +97,7 @@
                     Style="{Binding StyleRoundCorner}"
                     IsEnabledChanged="Button_IsEnabledChanged"
                     IsEnabled="False">
-                <Image Source="Media/ButtonClear.png" 
+                <Image Source="/InfomatSelfChecking;component/Media/ButtonClear.png" 
                        Margin="20" 
                        RenderOptions.BitmapScalingMode="HighQuality"/>
             </Button>
@@ -194,7 +194,7 @@
                     Style="{Binding StyleRoundCorner}"
                     IsEnabledChanged="Button_IsEnabledChanged"
                     IsEnabled="False">
-                <Image Source="Media/ButtonBackspace2.png" 
+                <Image Source="/InfomatSelfChecking;component/Media/ButtonBackspace2.png" 
                        Margin="20"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
             </Button>
@@ -209,7 +209,7 @@
                 IsEnabledChanged="Button_IsEnabledChanged"
                 IsEnabled="False">
             <WrapPanel>
-                <Image Source="Media/ButtonOk.png" 
+                <Image Source="/InfomatSelfChecking;component/Media/ButtonOk.png" 
                            Margin="0,20,20,20" 
                            VerticalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"/>
