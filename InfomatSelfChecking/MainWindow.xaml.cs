@@ -127,14 +127,17 @@ namespace InfomatSelfChecking {
 		}
 
 		public void ShowErrorScreen(Exception e, bool isQueryException) {
-			if (FrameMain.NavigationService.Content is PageNotification) {
-				PageNotification currentPage = FrameMain.NavigationService.Content as PageNotification;
-				if (currentPage.CurrentNotificationType == PageNotification.NotificationType.DbError)
-					return;
-			}
+			Dispatcher.BeginInvoke((Action)(() => {
+				if (FrameMain.NavigationService.Content is PageNotification) {
+					PageNotification currentPage = FrameMain.NavigationService.Content as PageNotification;
+					if (currentPage.CurrentNotificationType == PageNotification.NotificationType.DbError) {
+						return;
+					}
+				}
 
-			FrameMain.NavigationService.Navigate(
-				new PageNotification(PageNotification.NotificationType.DbError, exception: e, isQueryException: isQueryException));
+				FrameMain.NavigationService.Navigate(
+					new PageNotification(PageNotification.NotificationType.DbError, exception: e, isQueryException: isQueryException));
+			}));
 		}
 
 		public void CloseAllWindows() {

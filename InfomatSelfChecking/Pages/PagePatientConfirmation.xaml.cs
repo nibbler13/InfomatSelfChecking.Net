@@ -32,11 +32,13 @@ namespace InfomatSelfChecking.Pages {
 
 			this.patients = patients ?? throw new ArgumentNullException(nameof(patients));
 
+			bool isLogoVisible = true;
 			if (patients.Count == 1) {
 				TextBlockName.Text = patients[0].Name;
 				TextBlockBirthday.Text = "Дата рождения: " + patients[0].Birthday.ToLongDateString();
 				title = Properties.Resources.title_name_confirm;
 			} else {
+				isLogoVisible = false;
 				GridSinglePatient.Visibility = Visibility.Hidden;
 				GridMultiplePatients.Visibility = Visibility.Visible;
 				title = Properties.Resources.title_name_confirm_multiple;
@@ -47,7 +49,7 @@ namespace InfomatSelfChecking.Pages {
 			DataContext = BindingValues.Instance;
 			IsVisibleChanged += (s, e) => {
 				if ((bool)e.NewValue)
-					BindingValues.Instance.SetUpMainWindow(title, true, false);
+					BindingValues.Instance.SetUpMainWindow(title, isLogoVisible, false);
 			};
 		}
 
@@ -60,7 +62,7 @@ namespace InfomatSelfChecking.Pages {
 
 			foreach (ItemPatient patient in patients) {
                 if (row > 1)
-                    GridMultiplePatients.RowDefinitions.Add(new RowDefinition());
+                    GridMultiplePatientsInner.RowDefinitions.Add(new RowDefinition());
 
                 Grid grid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
 
@@ -109,7 +111,7 @@ namespace InfomatSelfChecking.Pages {
                 button.Click += ButtonPatient_Click;
 
 				Grid.SetRow(button, row);
-				GridMultiplePatients.Children.Add(button);
+				GridMultiplePatientsInner.Children.Add(button);
 
                 button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 patient.CheckStateImage = image;
@@ -141,8 +143,11 @@ namespace InfomatSelfChecking.Pages {
 
 			if (patients.Count == 1)
 				pageShowAppointments = new PageShowAppointments(patients[0], false);
-			else
+			else {
+				GridVisitedAppointmentsQuestion.Visibility = Visibility.Hidden;
+				GridMultiplePatients.Visibility = Visibility.Visible;
 				pageShowAppointments = new PageShowAppointments(selectedPatient, true);
+			}
 
 			NavigationService.Navigate(pageShowAppointments);
 		}
@@ -150,6 +155,12 @@ namespace InfomatSelfChecking.Pages {
 		private void ButtonNo_Click(object sender, RoutedEventArgs e) {
 			PageNotification pageNotification = new PageNotification(
 				PageNotification.NotificationType.AlreadyChecked, returnBack: patients.Count > 1);
+
+			if (patients.Count > 1) {
+				GridVisitedAppointmentsQuestion.Visibility = Visibility.Hidden;
+				GridMultiplePatients.Visibility = Visibility.Visible;
+			}
+
 			NavigationService.Navigate(pageNotification);
 		}
 

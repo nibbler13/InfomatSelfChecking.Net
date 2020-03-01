@@ -10,7 +10,7 @@
       Title="PagePatientSelect">
     <Grid x:Name="PatientConfirmation">
         <Grid x:Name="GridSinglePatient"
-              Visibility="Visible">
+              Visibility="Hidden">
             <Grid.RowDefinitions>
                 <RowDefinition Height="15*"/>
                 <RowDefinition Height="35*"/>
@@ -90,7 +90,7 @@
         </Grid>
 
         <Grid x:Name="GridMultiplePatients" 
-              Visibility="Hidden">
+              Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="85*"/>
                 <RowDefinition Height="15*"/>
@@ -102,7 +102,8 @@
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="GridMultiplePatientsInner"
-                  Grid.ColumnSpan="3">
+                  Grid.ColumnSpan="3"
+                  VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -115,7 +116,6 @@
                 Click="ButtonClose_Click"
                 BorderThickness="0"
                 Margin="20"
-                Foreground="White"
                 Style="{Binding StyleRoundCorner}">
                 <Button.Effect>
                     <DropShadowEffect Opacity="0.2" BlurRadius="10"/>
