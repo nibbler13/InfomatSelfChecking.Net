@@ -195,6 +195,9 @@ namespace InfomatSelfChecking {
 									if (isThisASpbFilial)
 										patient.StopCodesCurrent.Add(ItemPatient.StopCode.Agreement);
 									break;
+								case "akt":
+									patient.StopCodesCurrent.Add(ItemPatient.StopCode.Akt);
+									break;
 								case "":
 									break;
 								default:

@@ -172,7 +172,7 @@ namespace InfomatSelfChecking.Pages {
                     textBlockTimeLeft.Foreground = brushTimeLeft;
                     textBlockTimeLeft.HorizontalAlignment = HorizontalAlignment.Right;
                     textBlockTimeLeft.VerticalAlignment = VerticalAlignment.Bottom;
-                    textBlockTimeLeft.Margin = new Thickness(0, 10, 10, 10);
+                    textBlockTimeLeft.Margin = new Thickness(20,10,10,10);
                     Grid.SetRow(textBlockTimeLeft, row);
                     Grid.SetColumn(textBlockTimeLeft, 3);
                     GridAppointments.Children.Add(textBlockTimeLeft);

@@ -10,7 +10,7 @@
       Title="PagePatientSelect">
     <Grid x:Name="PatientConfirmation">
         <Grid x:Name="GridSinglePatient"
-              Visibility="Hidden">
+              Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="15*"/>
                 <RowDefinition Height="35*"/>
@@ -90,7 +90,7 @@
         </Grid>
 
         <Grid x:Name="GridMultiplePatients" 
-              Visibility="Visible">
+              Visibility="Hidden">
             <Grid.RowDefinitions>
                 <RowDefinition Height="85*"/>
                 <RowDefinition Height="15*"/>

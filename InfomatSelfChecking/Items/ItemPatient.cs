@@ -18,7 +18,8 @@ namespace InfomatSelfChecking.Items {
 			NotAvailableNow,
 			DepOut,
             Debt,
-			Agreement
+			Agreement,
+			Akt
 		}
 
 		public enum InfoCode {
