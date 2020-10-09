@@ -81,6 +81,14 @@ namespace InfomatSelfChecking.Pages {
 						Grid.SetColumn(MediaElementCheckedIn, 0);
 						Grid.SetColumnSpan(TextBlockCheckedIn, 2);
 						Grid.SetColumnSpan(MediaElementCheckedIn, 2);
+					} else if (printerState == PrinterInfo.State.NotSelect) {
+						MediaElementsDots.Visibility = Visibility.Hidden;
+						TextBlockPrinting.Visibility = Visibility.Hidden;
+
+						Grid.SetColumn(TextBlockCheckedIn, 0);
+						Grid.SetColumn(MediaElementCheckedIn, 0);
+						Grid.SetColumnSpan(TextBlockCheckedIn, 2);
+						Grid.SetColumnSpan(MediaElementCheckedIn, 2);
 					} else {
 						TextBlockPrinting.Text = "К сожалению, не удалось распечатать " +
 						"список назначений. Информация об ошибке передана " +

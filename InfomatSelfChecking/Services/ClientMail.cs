@@ -81,15 +81,16 @@ namespace InfomatSelfChecking {
 				if (!string.IsNullOrEmpty(Properties.Settings.Default.MailCopy))
 					message.CC.Add(Properties.Settings.Default.MailCopy);
 
-                SmtpClient client = new SmtpClient(Properties.Settings.Default.MailSmtpServer, 25) {
-                    UseDefaultCredentials = false,
-                    Credentials = new System.Net.NetworkCredential(
-                    Properties.Settings.Default.MailUser,
-                    Properties.Settings.Default.MailPassword,
-                    Properties.Settings.Default.MailDomain)
-                };
+				SmtpClient client = new SmtpClient(Properties.Settings.Default.MailSmtpServer, 587) {
+					UseDefaultCredentials = false,
+					DeliveryMethod = SmtpDeliveryMethod.Network,
+					EnableSsl = false,
+					Credentials = new System.Net.NetworkCredential(
+					Properties.Settings.Default.MailUser,
+					Properties.Settings.Default.MailPassword)
+				};
 
-                await Task.Run(() => { client.Send(message); }).ConfigureAwait(false);
+				await Task.Run(() => { client.Send(message); }).ConfigureAwait(false);
 				client.Dispose();
 
 				foreach (Attachment item in message.Attachments)
